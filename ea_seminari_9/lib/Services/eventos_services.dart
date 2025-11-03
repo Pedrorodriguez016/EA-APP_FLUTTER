@@ -18,4 +18,15 @@ class EventosService extends GetxService {
       isLoading.value = false;
     }
   }
+  Future<Evento> getEventoById(String id) async {
+    try {
+      isLoading.value = true;
+      return await _eventController.fetchEventById(id);
+    } catch (e) {
+      print('Error cargando evento: $e');
+      rethrow;
+    } finally {
+      isLoading.value = false;
+    }
+  }
 }

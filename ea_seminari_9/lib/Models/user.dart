@@ -4,12 +4,16 @@ class User {
   final String username;
   final String gmail;
   final String birthday;
+  final String rol;
+
 
   User({
     required this.id,
     required this.username,
     required this.gmail,
     required this.birthday,
+    required this.rol,
+
 
   });
 
@@ -19,6 +23,7 @@ class User {
       username: json['username'],
       gmail: json['gmail'],
       birthday: json['birthday'],
+      rol: json['rol'],
      
     );
   }

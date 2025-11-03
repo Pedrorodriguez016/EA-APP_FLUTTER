@@ -13,7 +13,7 @@ class EventosListScreen extends StatelessWidget {
     service.loadEvents();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Usuarios')),
+      appBar: AppBar(title: const Text('Eventos')),
       body: Obx(() {
         if (service.isLoading.value) {
           return const Center(child: CircularProgressIndicator());

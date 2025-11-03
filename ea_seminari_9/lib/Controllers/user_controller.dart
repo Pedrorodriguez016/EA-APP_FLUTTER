@@ -14,5 +14,14 @@ class UserController {
       throw Exception('Error al cargar usuarios');
     }
   }
+  Future<User> fetchUserById(String id) async {
+    final response = await http.get(Uri.parse('$apiUrl/$id'));
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      return User.fromJson(data);
+    } else {
+      throw Exception('Error al cargar el usuario');
+    }
+  }
 
 }
