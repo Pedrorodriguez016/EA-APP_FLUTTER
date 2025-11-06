@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Services/user_services.dart';
 import '../Widgets/user_card.dart';
+import '../Widgets/navigation_bar.dart';
 
 class UserListScreen extends StatelessWidget {
   final UserServices userService = Get.put(UserServices());
@@ -69,6 +70,8 @@ class UserListScreen extends StatelessWidget {
         backgroundColor: Colors.deepPurple,
         child: const Icon(Icons.refresh, color: Colors.white),
       ),
+      bottomNavigationBar: const CustomNavBar(currentIndex: 2),
+
     );
   }
 }

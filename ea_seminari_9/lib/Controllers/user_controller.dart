@@ -1,17 +1,20 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:get/get.dart';
 import '../Models/user.dart';
+import '../Interceptor/auth_interceptor.dart';
 
 class UserController extends GetxController {
   final String apiUrl = 'http://localhost:3000/api/user';
   var isLoading = true.obs;
   var users = <User>[].obs;
+  final client = AuthInterceptor();
+
 
   Future<List<User>> fetchUsers() async {
     try {
       isLoading(true);
-      final response = await http.get(Uri.parse(apiUrl));
+      final response = await client.get(Uri.parse(apiUrl),
+      );
       
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -31,7 +34,9 @@ class UserController extends GetxController {
 
   Future<User> fetchUserById(String id) async {
     try {
-      final response = await http.get(Uri.parse('$apiUrl/$id'));
+      isLoading(true);
+      final response = await client.get(Uri.parse('$apiUrl/$id')
+      );
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
         return User.fromJson(data);

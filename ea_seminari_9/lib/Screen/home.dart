@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Controllers/auth_controller.dart';
-import 'eventos_list.dart';
-import 'user_list.dart';
-import 'settings_screen.dart';
+import '../Widgets/navigation_bar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -251,83 +249,7 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      // Navigation Bar en la parte inferior con navegación real
-      bottomNavigationBar: _buildBottomNavigationBar(),
-    );
-  }
-
-  Widget _buildBottomNavigationBar() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.deepPurple.shade800,
-            Colors.purple.shade600,
-          ],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: BottomNavigationBar(
-        backgroundColor: Colors.transparent,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white70,
-        selectedLabelStyle: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 12,
-        ),
-        unselectedLabelStyle: const TextStyle(
-          fontWeight: FontWeight.normal,
-          fontSize: 11,
-        ),
-        currentIndex: 0, // Home seleccionado por defecto
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_filled),
-            label: 'Inicio',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.event_available),
-            label: 'Eventos',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people_alt),
-            label: 'Usuarios',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Ajustes',
-          ),
-        ],
-        onTap: (index) {
-          // Navegación real a las pantallas
-          switch (index) {
-            case 0:
-              // Ya estamos en Home
-              break;
-            case 1:
-              // Navegar a EventosListScreen
-              Get.to(() => EventosListScreen());
-              break;
-            case 2:
-              // Navegar a UserListScreen
-              Get.to(() => UserListScreen());
-              break;
-            case 3:
-              // Navegar a SettingsScreen
-              Get.to(() => SettingsScreen());
-              break;
-          }
-        },
-      ),
+      bottomNavigationBar: const CustomNavBar(currentIndex: 0),
     );
   }
 }

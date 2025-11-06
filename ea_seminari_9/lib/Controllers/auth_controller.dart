@@ -9,6 +9,7 @@ class AuthController extends GetxController {
   var isLoggedIn = false.obs;
   var currentUser = Rxn<User>();
   String? token;
+  String? refreshToken;
 
   Future<Map<String, dynamic>> login(String username, String password) async {
     try {
@@ -38,7 +39,9 @@ class AuthController extends GetxController {
         });
         
         token = data['token'];
+        refreshToken = data['refreshToken'];
         isLoggedIn.value = true;
+        print('token $token refrehtoken, $refreshToken');
         
         return {'success': true, 'message': 'Login exitoso'};
       } else {

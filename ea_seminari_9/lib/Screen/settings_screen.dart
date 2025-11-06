@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Controllers/auth_controller.dart';
+import '../Widgets/navigation_bar.dart';
 
 class SettingsScreen extends StatelessWidget {
   final AuthController authController = Get.find<AuthController>();
@@ -119,6 +120,8 @@ class SettingsScreen extends StatelessWidget {
           ],
         ),
       ),
+      bottomNavigationBar: const CustomNavBar(currentIndex: 3),
+
     );
   }
 }

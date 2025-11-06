@@ -1,55 +1,69 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../Screen/home.dart';
-import '../Screen/user_list.dart';
 import '../Screen/eventos_list.dart';
+import '../Screen/user_list.dart';
+import '../Screen/settings_screen.dart';
 
-class CustomNavigationBar extends StatefulWidget {
-  const CustomNavigationBar({super.key});
-
-  @override
-  State<CustomNavigationBar> createState() => _CustomNavigationBarState();
-}
-
-class _CustomNavigationBarState extends State<CustomNavigationBar> {
-  int _selectedIndex = 0;
-
-  final List<Widget> _screens = [
-    HomeScreen(),
-    UserListScreen(),
-    EventosListScreen(),
-  ];
-
-  void _onDestinationSelected(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+class CustomNavBar extends StatelessWidget {
+  final int currentIndex;
+  const CustomNavBar({super.key, required this.currentIndex});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _screens[_selectedIndex],
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: _onDestinationSelected,
-        backgroundColor: Colors.white,
-        indicatorColor: Colors.deepPurple.shade100,
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home, color: Colors.deepPurple),
-            label: 'Inicio',
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.deepPurple.shade800,
+            Colors.purple.shade600,
+          ],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
           ),
-          NavigationDestination(
-            icon: Icon(Icons.people_outline),
-            selectedIcon: Icon(Icons.people, color: Colors.deepPurple),
-            label: 'Usuarios',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.event_outlined),
-            selectedIcon: Icon(Icons.event, color: Colors.deepPurple),
-            label: 'Eventos',
-          ),
+        ],
+      ),
+      child: BottomNavigationBar(
+        backgroundColor: Colors.transparent,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white70,
+        selectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontWeight: FontWeight.normal,
+          fontSize: 11,
+        ),
+        currentIndex: currentIndex,
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              Get.offAll(() => const HomeScreen());
+              break;
+            case 1:
+              Get.offAll(() =>  EventosListScreen());
+              break;
+            case 2:
+              Get.offAll(() => UserListScreen());
+              break;
+            case 3:
+              Get.offAll(() =>  SettingsScreen());
+              break;
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Inicio'),
+          BottomNavigationBarItem(icon: Icon(Icons.event_available), label: 'Eventos'),
+          BottomNavigationBarItem(icon: Icon(Icons.people_alt), label: 'Usuarios'),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Ajustes'),
         ],
       ),
     );

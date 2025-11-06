@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Services/eventos_services.dart';
 import '../Widgets/eventos_card.dart';
+import '../Widgets/navigation_bar.dart';
 
 class EventosListScreen extends StatelessWidget {
   final EventosService service = Get.put(EventosService());
@@ -25,6 +26,7 @@ class EventosListScreen extends StatelessWidget {
           },
         );
       }),
+      bottomNavigationBar: const CustomNavBar(currentIndex: 1),
     );
   }
 }

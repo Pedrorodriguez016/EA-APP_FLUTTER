@@ -31,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (value == null || value.isEmpty) {
       return 'Por favor ingresa tu contraseña';
     }
-    if (value.length < 6) {
+    if (value.length < 7) {
       return 'La contraseña debe tener al menos 6 caracteres';
     }
     return null;
