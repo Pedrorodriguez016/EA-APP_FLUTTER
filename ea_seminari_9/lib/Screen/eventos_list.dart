@@ -14,18 +14,48 @@ class EventosListScreen extends StatelessWidget {
     service.loadEvents();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Eventos')),
-      body: Obx(() {
-        if (service.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        return ListView.builder(
-          itemCount: service.events.length,
-          itemBuilder: (context, index) {
-            return EventosCard(evento: service.events[index]);
-          },
-        );
-      }),
+      backgroundColor: Colors.grey.shade50,
+      appBar: AppBar(
+        title: const Text('Eventos'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.search, color: Colors.grey),
+            ),
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Obx(() {
+          if (service.isLoading.value) {
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Cargando eventos...'),
+                ],
+              ),
+            );
+          }
+          return ListView.builder(
+            itemCount: service.events.length,
+            itemBuilder: (context, index) {
+              return EventosCard(evento: service.events[index]);
+            },
+          );
+        }),
+      ),
       bottomNavigationBar: const CustomNavBar(currentIndex: 1),
     );
   }

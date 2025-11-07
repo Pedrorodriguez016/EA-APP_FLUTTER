@@ -15,21 +15,36 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.put(AuthController());
-    
+
     return GetMaterialApp(
       title: 'Seminario Flutter',
       theme: ThemeData(
-        useMaterial3: true, 
-        colorSchemeSeed: Colors.deepPurple,
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF667EEA),
+          brightness: Brightness.light,
+        ),
+        fontFamily: 'Inter',
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.black87,
+          elevation: 0,
+          centerTitle: true,
+          titleTextStyle: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Colors.black87,
+          ),
+        ),
       ),
       initialRoute: '/login',
       routes: {
-        '/login': (context) => LoginScreen(),
-        '/register': (context) => RegisterScreen(),
-        '/home': (context) => HomeScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
+        '/home': (context) => const HomeScreen(),
       },
-      // Esto permite navegación más fluida
       defaultTransition: Transition.cupertino,
+      debugShowCheckedModeBanner: false,
     );
   }
 }

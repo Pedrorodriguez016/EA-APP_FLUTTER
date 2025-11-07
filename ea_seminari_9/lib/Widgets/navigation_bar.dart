@@ -13,59 +13,75 @@ class CustomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.deepPurple.shade800,
-            Colors.purple.shade600,
-          ],
-        ),
+        color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.grey.withOpacity(0.1),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
         ],
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
       ),
       child: BottomNavigationBar(
-        backgroundColor: Colors.transparent,
+        currentIndex: currentIndex,
+        onTap: (index) => _onItemTapped(index),
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white70,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        selectedItemColor: const Color(0xFF667EEA),
+        unselectedItemColor: Colors.grey.shade400,
         selectedLabelStyle: const TextStyle(
-          fontWeight: FontWeight.bold,
+          fontWeight: FontWeight.w600,
           fontSize: 12,
         ),
         unselectedLabelStyle: const TextStyle(
-          fontWeight: FontWeight.normal,
+          fontWeight: FontWeight.w400,
           fontSize: 11,
         ),
-        currentIndex: currentIndex,
-        onTap: (index) {
-          switch (index) {
-            case 0:
-              Get.offAll(() => const HomeScreen());
-              break;
-            case 1:
-              Get.offAll(() =>  EventosListScreen());
-              break;
-            case 2:
-              Get.offAll(() => UserListScreen());
-              break;
-            case 3:
-              Get.offAll(() =>  SettingsScreen());
-              break;
-          }
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Inicio'),
-          BottomNavigationBarItem(icon: Icon(Icons.event_available), label: 'Eventos'),
-          BottomNavigationBarItem(icon: Icon(Icons.people_alt), label: 'Usuarios'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Ajustes'),
+        items: [
+          _buildNavItem(Icons.home_rounded, 'Inicio', 0),
+          _buildNavItem(Icons.event_available_rounded, 'Eventos', 1),
+          _buildNavItem(Icons.people_rounded, 'Usuarios', 2),
+          _buildNavItem(Icons.settings_rounded, 'Ajustes', 3),
         ],
       ),
     );
+  }
+
+  BottomNavigationBarItem _buildNavItem(IconData icon, String label, int index) {
+    return BottomNavigationBarItem(
+      icon: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: currentIndex == index 
+              ? const Color(0xFF667EEA).withOpacity(0.1)
+              : Colors.transparent,
+          shape: BoxShape.circle,
+        ),
+        child: Icon(icon, size: 24),
+      ),
+      label: label,
+    );
+  }
+
+  void _onItemTapped(int index) {
+    switch (index) {
+      case 0:
+        Get.offAll(() => const HomeScreen());
+        break;
+      case 1:
+        Get.offAll(() => EventosListScreen());
+        break;
+      case 2:
+        Get.offAll(() => UserListScreen());
+        break;
+      case 3:
+        Get.offAll(() => SettingsScreen());
+        break;
+    }
   }
 }

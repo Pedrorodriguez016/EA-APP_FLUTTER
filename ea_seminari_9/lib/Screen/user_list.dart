@@ -12,50 +12,56 @@ class UserListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: const Text('Lista de Usuarios'),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
+        title: const Text('Usuarios'),
+        backgroundColor: Colors.white,
+        elevation: 0,
       ),
-      body: Obx(() {
-        if (userService.isLoading.value) {
-          return const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('Cargando usuarios...'),
-              ],
-            ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Obx(() {
+          if (userService.isLoading.value) {
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Cargando usuarios...'),
+                ],
+              ),
+            );
+          }
+
+          if (userService.users.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.people_outline, size: 80, color: Colors.grey.shade400),
+                  const SizedBox(height: 16),
+                  Text(
+                    'No hay usuarios disponibles',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return ListView.builder(
+            itemCount: userService.users.length,
+            itemBuilder: (context, index) {
+              final user = userService.users[index];
+              return UserCard(user: user);
+            },
           );
-        }
-        
-        if (userService.users.isEmpty) {
-          return const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.people_outline, size: 64, color: Colors.grey),
-                SizedBox(height: 16),
-                Text(
-                  'No hay usuarios disponibles',
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
-                ),
-              ],
-            ),
-          );
-        }
-        
-        return ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: userService.users.length,
-          itemBuilder: (context, index) {
-            final user = userService.users[index];
-            return UserCard(user: user);
-          },
-        );
-      }),
+        }),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           userService.loadUsers();
@@ -65,13 +71,13 @@ class UserListScreen extends StatelessWidget {
             snackPosition: SnackPosition.BOTTOM,
             backgroundColor: Colors.green,
             colorText: Colors.white,
+            borderRadius: 12,
           );
         },
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: const Color(0xFF667EEA),
         child: const Icon(Icons.refresh, color: Colors.white),
       ),
       bottomNavigationBar: const CustomNavBar(currentIndex: 2),
-
     );
   }
 }

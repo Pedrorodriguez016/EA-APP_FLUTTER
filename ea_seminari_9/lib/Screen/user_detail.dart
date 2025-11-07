@@ -12,10 +12,12 @@ class UserDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Detalles del Usuario'),
-        backgroundColor: Colors.deepPurple,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        elevation: 0,
       ),
       body: FutureBuilder<User>(
         future: userController.fetchUserById(userId),
@@ -36,7 +38,7 @@ class UserDetailScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.error, size: 64, color: Colors.red),
+                  Icon(Icons.error_outline, size: 64, color: Colors.red),
                   const SizedBox(height: 16),
                   Text(
                     'Error: ${snapshot.error}',
@@ -45,9 +47,11 @@ class UserDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () {
-                      Get.back();
-                    },
+                    onPressed: () => Get.back(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF667EEA),
+                      foregroundColor: Colors.white,
+                    ),
                     child: const Text('Volver'),
                   ),
                 ],
@@ -70,48 +74,108 @@ class UserDetailScreen extends StatelessWidget {
           }
 
           final user = snapshot.data!;
-
-          return Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: CircleAvatar(
-                    radius: 60,
-                    backgroundColor: Colors.deepPurple,
-                    child: Text(
-                      user.username[0].toUpperCase(),
-                      style: const TextStyle(
-                        fontSize: 40,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                Card(
-                  elevation: 4,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildInfoRow(Icons.person, 'Usuario:', user.username),
-                        const SizedBox(height: 12),
-                        _buildInfoRow(Icons.email, 'Email:', user.gmail),
-                        const SizedBox(height: 12),
-                        _buildInfoRow(Icons.cake, 'Cumpleaños:', user.birthday),
-                        const SizedBox(height: 12),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
+          return _buildUserDetail(user);
         },
+      ),
+    );
+  }
+
+  Widget _buildUserDetail(User user) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          // Avatar y nombre
+          _buildUserHeader(user),
+          const SizedBox(height: 32),
+
+          // Información del usuario
+          _buildUserInfoCard(user),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUserHeader(User user) {
+    return Column(
+      children: [
+        Container(
+          width: 120,
+          height: 120,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+            ),
+            shape: BoxShape.circle,
+          ),
+          child: Center(
+            child: Text(
+              user.username[0].toUpperCase(),
+              style: const TextStyle(
+                fontSize: 48,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+        Text(
+          user.username,
+          style: const TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w800,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          user.gmail,
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey.shade600,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUserInfoCard(User user) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(color: Colors.grey.shade100),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Información Personal',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 20),
+          _buildInfoRow(Icons.person, 'Username:', user.username),
+          const SizedBox(height: 16),
+          _buildInfoRow(Icons.email, 'Email:', user.gmail),
+          const SizedBox(height: 16),
+          _buildInfoRow(Icons.cake, 'Fecha de Nacimiento:', user.birthday),
+          const SizedBox(height: 16),
+          _buildInfoRow(Icons.calendar_today, 'Miembro desde:', 'Fecha de registro'),
+        ],
       ),
     );
   }
@@ -120,7 +184,14 @@ class UserDetailScreen extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: Colors.deepPurple, size: 20),
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: const Color(0xFF667EEA).withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, color: const Color(0xFF667EEA), size: 20),
+        ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
@@ -128,16 +199,20 @@ class UserDetailScreen extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey,
-                  fontWeight: FontWeight.bold,
+                  color: Colors.grey.shade600,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 value,
-                style: const TextStyle(fontSize: 16),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
               ),
             ],
           ),
