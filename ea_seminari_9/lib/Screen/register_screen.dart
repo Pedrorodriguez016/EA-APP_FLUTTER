@@ -295,12 +295,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             validator: _validateGmail,
           ),
           const SizedBox(height: 16),
-          // Requisitos arriba del campo de contraseña, se reconstruyen en cada cambio
           Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: _buildPasswordRequirements(passwordController.text),
           ),
-          // Campo de contraseña igual que los otros, pero con onChanged para actualizar barra y requisitos
           TextFormField(
             controller: passwordController,
             obscureText: _obscurePassword,
@@ -345,7 +343,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          // Barra de fuerza alineada a la izquierda con palabra
           ValueListenableBuilder<PasswordStrength?>(
             valueListenable: passwordStrengthNotifier,
             builder: (context, strength, _) {
@@ -423,7 +420,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             validator: _validateBirthday,
           ),
           const SizedBox(height: 32),
-          // Botón grande para generar contraseña
           SizedBox(
             width: double.infinity,
             height: 48,
@@ -452,7 +448,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // Devuelve el ancho de la barra según la fuerza
   double _getStrengthWidth(PasswordStrength? strength) {
     switch (strength) {
       case PasswordStrength.strong:
@@ -468,10 +463,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  // Generador simple de contraseña fuerte
-  String _generateStrongPassword() {
-    // Puedes mejorar el generador si lo necesitas
-    return 'PDFL_#%n!KU)H-o2';
+  // Generador aleatorio de contraseña fuerte
+  String _generateStrongPassword({int length = 14}) {
+    const String lower = 'abcdefghijklmnopqrstuvwxyz';
+    const String upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const String digits = '0123456789';
+    const String special = '!@#\$%^&*(),.?":{}|<>';
+    final String all = lower + upper + digits + special;
+    final rand = DateTime.now().microsecondsSinceEpoch;
+    final List<String> password = [];
+    password.add(lower[rand % lower.length]);
+    password.add(upper[(rand ~/ 2) % upper.length]);
+    password.add(digits[(rand ~/ 3) % digits.length]);
+    password.add(special[(rand ~/ 4) % special.length]);
+    for (int i = password.length; i < length; i++) {
+      password.add(all[(rand + i * 17) % all.length]);
+    }
+    password.shuffle();
+    return password.join();
   }
 
   Widget _buildTextField({
