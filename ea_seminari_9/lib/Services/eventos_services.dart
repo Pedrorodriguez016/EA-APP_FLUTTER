@@ -12,10 +12,10 @@ class EventosServices {
     final response = await _client.get(Uri.parse(baseUrl));
 
     if (response.statusCode == 200) {
-      List<dynamic> body = jsonDecode(response.body);
-      List<Evento> eventos =
-          body.map((dynamic item) => Evento.fromJson(item)).toList();
-      return eventos;
+      print('JSON RECIBIDO PARA EL EVENTO: ${response.body}');
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      final List<dynamic> eventList = responseData['data'];
+      return eventList.map((json) => Evento.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load events');
     }
@@ -25,6 +25,7 @@ class EventosServices {
       
       final response = await _client.get(Uri.parse('$baseUrl/$id'));
       if (response.statusCode == 200) {
+        print('JSON RECIBIDO PARA EL EVENTO: ${response.body}');
         final Map<String, dynamic> data = jsonDecode(response.body);
         return Evento.fromJson(data);
       } else {

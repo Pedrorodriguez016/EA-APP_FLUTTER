@@ -4,7 +4,7 @@ class Evento {
   final String schedule;
   final String address;
   final int? capacidadMaxima;
-  final List<String> apuntados;
+  final List<String> participantes;
 
   Evento({
     required this.id,
@@ -12,7 +12,7 @@ class Evento {
     required this.schedule,
     required this.address,
     this.capacidadMaxima,
-    required this.apuntados,
+    required this.participantes,
   });
 
   factory Evento.fromJson(Map<String, dynamic> json) {
@@ -22,7 +22,8 @@ class Evento {
       schedule: json['schedule'],
       address: json['address'] ?? '',
       capacidadMaxima: json['capacidadMaxima'],
-      apuntados: List<String>.from(json['apuntados'] ?? []),
-    );
+      participantes: List<dynamic>.from(json['participantes'] ?? [])
+      .map((p) => (p as Map<String, dynamic>)['username'] as String)
+      .toList(),);
   }
 }

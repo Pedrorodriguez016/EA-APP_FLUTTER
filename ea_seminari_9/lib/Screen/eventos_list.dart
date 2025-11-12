@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../Controllers/eventos_controller.dart';
 import '../Widgets/eventos_card.dart';
 import '../Widgets/navigation_bar.dart';
+import'../Widgets/refresh_button.dart';
 
 class EventosListScreen extends GetView<EventoController> {
 
@@ -53,6 +54,10 @@ class EventosListScreen extends GetView<EventoController> {
           );
         }),
       ),
+      floatingActionButton: RefreshButton(
+        onRefresh: () => controller.fetchEventos(),
+        message: 'Lista de usuarios actualizada',
+),
       bottomNavigationBar: const CustomNavBar(currentIndex: 1),
     );
   }

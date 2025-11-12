@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Controllers/auth_controller.dart';
 import '../Widgets/navigation_bar.dart';
+import '../Screen/perfil_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   final AuthController authController = Get.find<AuthController>();
@@ -127,7 +128,7 @@ class SettingsScreen extends StatelessWidget {
             icon: Icons.person_outline,
             title: 'Perfil',
             subtitle: 'Gestiona tu información personal',
-            onTap: () => _showComingSoon('Perfil'),
+            onTap: () => Get.toNamed('/profile'),
           ),
           const Divider(height: 1),
           _buildSettingItem(

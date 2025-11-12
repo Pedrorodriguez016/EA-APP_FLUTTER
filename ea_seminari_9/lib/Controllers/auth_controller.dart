@@ -14,7 +14,7 @@ class AuthController extends GetxController {
   Future<Map<String, dynamic>> login(String username, String password) async {
     try {
       final response = await http.post(
-        Uri.parse('$apiUrl/user/login'),
+        Uri.parse('$apiUrl/user/auth/login'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -30,7 +30,7 @@ class AuthController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        final userData = data['User'];
+        final userData = data['user'];
         
         currentUser.value = User.fromJson({
           ...userData,
@@ -96,6 +96,8 @@ class AuthController extends GetxController {
     isLoggedIn.value = false;
     currentUser.value = null;
     token = null;
+    Get.offAllNamed('/login');
+    
   }
 
   Future<Map<String, dynamic>> deleteCurrentUser() async {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Widgets/user_card.dart';
 import '../Widgets/navigation_bar.dart';
+import '../Widgets/refresh_button.dart';
 
 class UserListScreen extends GetView<UserController> {
 
@@ -61,20 +62,11 @@ class UserListScreen extends GetView<UserController> {
           );
         }),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          controller.fetchUsers();
-          Get.snackbar(
-            'Actualizado',
-            'Lista de usuarios actualizada',
-            snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-            borderRadius: 12,
-          );},
-        backgroundColor: const Color(0xFF667EEA),
-        child: const Icon(Icons.refresh, color: Colors.white),
-      ),
+      floatingActionButton: RefreshButton(
+        onRefresh: () => controller.fetchUsers(),
+        message: 'Lista de usuarios actualizada',
+),
+
       bottomNavigationBar: const CustomNavBar(currentIndex: 2),
     );
   }

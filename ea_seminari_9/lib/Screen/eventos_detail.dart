@@ -97,8 +97,7 @@ class EventosDetailScreen extends GetView<EventoController> {
           _buildInfoCard(evento),
           const SizedBox(height: 20),
 
-          // Participantes
-          _buildParticipantsCard(evento),
+
         ],
       ),
     );
@@ -139,92 +138,14 @@ class EventosDetailScreen extends GetView<EventoController> {
           _buildDetailRow(
             Icons.people,
             'Participantes:',
-            '${evento.apuntados.length} personas',
-          ),
+            '${evento.participantes.length} personas',
+          ), 
         ],
       ),
     );
   }
 
-  Widget _buildParticipantsCard(Evento evento) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(color: Colors.grey.shade100),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Participantes',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 12),
-          if (evento.apuntados.isEmpty)
-            Text(
-              'Aún no hay participantes',
-              style: TextStyle(
-                color: Colors.grey.shade600,
-                fontStyle: FontStyle.italic,
-              ),
-            )
-          else
-            Column(
-              children: evento.apuntados.map((participante) {
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 16,
-                        backgroundColor: const Color(0xFF667EEA),
-                        child: Text(
-                          participante[0].toUpperCase(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          participante,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-        ],
-      ),
-    );
-  }
+  
 
   Widget _buildDetailRow(IconData icon, String label, String value) {
     return Row(
