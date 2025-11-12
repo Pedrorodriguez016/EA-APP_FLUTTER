@@ -73,7 +73,7 @@ class EventosCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    '${evento.apuntados.length}',
+                    '${evento.participantes.length}',
                     style: const TextStyle(
                       color: Colors.deepPurple,
                       fontWeight: FontWeight.w600,
