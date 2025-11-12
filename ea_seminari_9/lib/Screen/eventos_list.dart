@@ -4,6 +4,7 @@ import '../Controllers/eventos_controller.dart';
 import '../Widgets/eventos_card.dart';
 import '../Widgets/navigation_bar.dart';
 import'../Widgets/refresh_button.dart';
+import '../Widgets/app_bar.dart';
 
 class EventosListScreen extends GetView<EventoController> {
 
@@ -13,23 +14,8 @@ class EventosListScreen extends GetView<EventoController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        title: const Text('Eventos'),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.search, color: Colors.grey),
-            ),
-            onPressed: () {},
-          ),
-        ],
+      appBar: StandardAppBar(
+        title: "Eventos",
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),

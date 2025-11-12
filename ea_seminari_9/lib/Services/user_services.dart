@@ -56,7 +56,7 @@ class UserServices {
       }),
       );
       if (response.statusCode == 200){
-        print("Usuario actualizado ${updatedUser}");
+        print("Usuario actualizado $updatedUser");
       _authController.currentUser.value = updatedUser;
       return updatedUser;
       }
@@ -88,6 +88,18 @@ class UserServices {
     } catch (e) {
            print('Error in disableUserByid: $e');
       throw Exception('Error al eliminar el usuario: $e');
+    }
+  }
+  Future<List<User>> fetchFriends(String id) async {
+    final response = await _client.get(Uri.parse('$baseUrl/$id/friends'));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      final List<dynamic> userList = responseData['data'];
+      return userList.map((json) => User.fromJson(json)).toList();
+    }
+     else {
+      throw Exception('Failed to load users');
     }
   }
 

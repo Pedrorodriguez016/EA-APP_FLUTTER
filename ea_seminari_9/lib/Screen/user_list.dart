@@ -1,4 +1,5 @@
 import 'package:ea_seminari_9/Controllers/user_controller.dart';
+import 'package:ea_seminari_9/Widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Widgets/user_card.dart';
@@ -13,11 +14,7 @@ class UserListScreen extends GetView<UserController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        title: const Text('Usuarios'),
-        backgroundColor: Colors.white,
-        elevation: 0,
-      ),
+      appBar:StandardAppBar(title: "Usuarios"),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Obx(() {

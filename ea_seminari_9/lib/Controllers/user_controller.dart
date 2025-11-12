@@ -4,9 +4,11 @@ import 'package:get/get.dart';
 import '../Controllers/auth_controller.dart';
 
 class UserController extends GetxController {
+  final AuthController authController = Get.find<AuthController>();
   var isLoading = true.obs;
   var userList = <User>[].obs;
   var selectedUser = Rxn<User>();
+  var friendsList = <User>[].obs;
   final UserServices _userServices;
 
   UserController(this._userServices);
@@ -84,4 +86,17 @@ disableUserByid(String id,password) async {
     isLoading(false);
   }
 }
+
+void fetchFriends() async {
+    try {
+      var id = authController.currentUser.value!.id;
+      isLoading(true);
+      var friends = await _userServices.fetchFriends(id); 
+      if (friends.isNotEmpty) {
+        friendsList.assignAll(friends);
+      }
+    } finally {
+      isLoading(false);
+    }
+  }
 }

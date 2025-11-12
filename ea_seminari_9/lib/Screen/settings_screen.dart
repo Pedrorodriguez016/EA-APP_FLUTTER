@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Controllers/auth_controller.dart';
 import '../Widgets/navigation_bar.dart';
-import '../Screen/perfil_screen.dart';
+import '../Widgets/user_info.dart';
 
 class SettingsScreen extends StatelessWidget {
   final AuthController authController = Get.find<AuthController>();
@@ -28,6 +28,9 @@ class SettingsScreen extends StatelessWidget {
             _buildSettingsSection(),
             const SizedBox(height: 20),
             _buildAboutSection(),
+            UserInfoBasic(
+              name: authController.currentUser.value!.username, 
+              email: authController.currentUser.value!.gmail,)
           ],
         ),
       ),
