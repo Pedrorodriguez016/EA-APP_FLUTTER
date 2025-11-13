@@ -10,6 +10,7 @@ class UserController extends GetxController {
   var userList = <User>[].obs;
   var selectedUser = Rxn<User>();
   var friendsList = <User>[].obs;
+  var friendsRequests = <User>[].obs;
   var currentPage = 1.obs;
   var totalPages = 1.obs;
   var totalUsers = 0.obs;
@@ -141,6 +142,44 @@ void fetchFriends() async {
       }
     } finally {
       isLoading(false);
+    }
+  }
+  void fetchRequest() async {
+    try {
+      var id = authController.currentUser.value!.id;
+      isLoading(true);
+      print("Creando lista de solicitudes");
+      var friends = await _userServices.fetchRequest(id); 
+      if (friends.isNotEmpty) {
+        friendsRequests.assignAll(friends);
+      }
+    } finally {
+      isLoading(false);
+    }
+  }
+  void acceptFriendRequest(User requester) async {
+   try {
+      final userId = authController.currentUser.value!.id;
+      await _userServices.acceptFriendRequest(userId, requester.id,);
+
+      friendsRequests.removeWhere((u) => u.id == requester.id);
+      fetchFriends(); // opcional: refrescar lista de amigos
+      Get.snackbar('Solicitud', 'Amistad aceptada');
+    } catch (e) {
+      Get.snackbar('Error', 'No se pudo aceptar la solicitud: $e');
+    }
+  }
+  // --- Rechazar solicitud ---
+  void rejectFriendRequest(User requester) async {
+    try {
+      final userId = authController.currentUser.value!.id;
+      await _userServices.rejectFriendRequest(userId, requester.id);
+
+      // actualizar lista local
+      friendsRequests.removeWhere((u) => u.id == requester.id);
+      Get.snackbar('Solicitud', 'Solicitud rechazada');
+    } catch (e) {
+      Get.snackbar('Error', 'No se pudo rechazar la solicitud: $e');
     }
   }
 }

@@ -1,10 +1,12 @@
 import 'package:ea_seminari_9/Controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../Models/user.dart';
 import '../Controllers/auth_controller.dart';
 import '../Widgets/navigation_bar.dart';
 import '../Widgets/logout_button.dart';
 import '../Widgets/user_card.dart';
+import '../Widgets/solicitudes.dart';
 
 class HomeScreen extends GetView<UserController>{
   HomeScreen({Key? key}) : super(key: key);
@@ -27,7 +29,7 @@ class HomeScreen extends GetView<UserController>{
                 _buildEventsCard()
                 ),
                 Expanded(child: 
-                _buildFriendsCard())
+                _buildFriendsCard(context))
               ],
             )
           ],
@@ -176,9 +178,10 @@ class HomeScreen extends GetView<UserController>{
     );
   }
 
-  Widget _buildFriendsCard() {
+  Widget _buildFriendsCard(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.fetchFriends();
+      controller.fetchRequest();
     });
     return Card(
     elevation: 2,
@@ -215,7 +218,12 @@ class HomeScreen extends GetView<UserController>{
               ),
               const Spacer(),
               TextButton.icon(
-                onPressed: () { },
+                onPressed: () {
+                 final List<User> users = controller.friendsRequests;
+                 FriendRequestsDialog.show(context, requests: users, 
+                 onAccept: (user) => controller.acceptFriendRequest(user),
+                 onReject: (user) => controller.rejectFriendRequest(user),
+                 );},
                 icon: const Icon(Icons.group_add, size: 20),
                 label: const Text('Solicitudes'),
                 style: TextButton.styleFrom(
@@ -243,9 +251,7 @@ class HomeScreen extends GetView<UserController>{
           ),
           const SizedBox(height: 20),
 
-          // --- Cuerpo de la Tarjeta (Cargando / Vacío / Con Datos) ---
           Obx(() {
-            // --- Estado 1: Cargando ---
             if (controller.isLoading.value) { 
               return const Center(
                 child: Padding(
@@ -255,7 +261,6 @@ class HomeScreen extends GetView<UserController>{
               );
             }
 
-            // --- Estado 2: Vacío ---
             if (controller.friendsList.isEmpty) { 
               return Center(
                 child: Column(
@@ -278,7 +283,7 @@ class HomeScreen extends GetView<UserController>{
               primary: false,
               itemCount: controller.friendsList.length,
               itemBuilder: (context, index) {
-              final user = controller.userList[index];
+              final user = controller.friendsList[index];
               return UserCard(user: user);
               } ,
             );

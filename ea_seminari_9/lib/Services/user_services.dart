@@ -117,5 +117,49 @@ Future<Map<String, dynamic>> fetchUsers({
       throw Exception('Failed to load users');
     }
   }
+Future<List<User>> fetchRequest(String id) async {
+  final response = await _client.get(Uri.parse('$baseUrl/friend-requests/$id'));
 
+  if (response.statusCode == 200) {
+    final decoded = json.decode(response.body);
+
+    if (decoded is List) {
+      return decoded.map((json) => User.fromJson(json)).toList();
+    } else {
+      throw Exception('Formato inesperado: se esperaba una lista');
+    }
+  } else {
+    throw Exception('Error ${response.statusCode} al obtener solicitudes');
+  }
+}
+Future<void> acceptFriendRequest(String userId, String requesterId) async {
+  final response = await _client.post(
+    Uri.parse('$baseUrl/friend-accept/'),
+    body: 
+    jsonEncode({
+      'id': userId,
+      'requesterId': requesterId
+    }
+    )
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception('Error al aceptar solicitud: ${response.body}');
+  }
+}
+
+Future<void> rejectFriendRequest(String userId, String requesterId) async {
+  final response = await _client.post(
+    Uri.parse('$baseUrl/friend-reject/'),
+    body: 
+    jsonEncode({
+      'id': userId,
+      'requesterId': requesterId
+    })
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception('Error al rechazar solicitud: ${response.body}');
+  }
+}
 }
