@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:ea_seminari_9/Models/user.dart';
 import 'dart:convert';
 import 'package:get/get.dart';
@@ -12,18 +10,35 @@ class UserServices {
   final AuthInterceptor _client = Get.put(AuthInterceptor());
   UserServices();
 
-  Future<List<User>> fetchUsers() async {
-    final response = await _client.get(Uri.parse(baseUrl));
+Future<Map<String, dynamic>> fetchUsers({
+  int page = 1,
+  int limit = 20,
+  String q = '',
+}) async {
+  final uri = Uri.parse('$baseUrl').replace(queryParameters: {
+    'page': page.toString(),
+    'limit': limit.toString(),
+    if (q.isNotEmpty) 'q': q,
+  });
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> responseData = json.decode(response.body);
-      final List<dynamic> userList = responseData['data'];
-      return userList.map((json) => User.fromJson(json)).toList();
-    }
-     else {
-      throw Exception('Failed to load users');
-    }
+  final response = await _client.get(uri);
+
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    final List<dynamic> userList = responseData['data'];
+
+    return {
+      'users': userList.map((json) => User.fromJson(json)).toList(),
+      'totalPages': responseData['totalPages'] ?? 1,
+      'currentPage': responseData['page'] ?? 1,       
+      'total': responseData['totalItems'] ?? 0, 
+    };
+
+
+  } else {
+    throw Exception('Error al cargar usuarios paginados');
   }
+}
   Future<User> fetchUserById(String id) async {
     try {
       
@@ -56,7 +71,7 @@ class UserServices {
       }),
       );
       if (response.statusCode == 200){
-        print("Usuario actualizado ${updatedUser}");
+        print("Usuario actualizado $updatedUser");
       _authController.currentUser.value = updatedUser;
       return updatedUser;
       }
@@ -88,6 +103,18 @@ class UserServices {
     } catch (e) {
            print('Error in disableUserByid: $e');
       throw Exception('Error al eliminar el usuario: $e');
+    }
+  }
+  Future<List<User>> fetchFriends(String id) async {
+    final response = await _client.get(Uri.parse('$baseUrl/$id/friends'));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      final List<dynamic> userList = responseData['data'];
+      return userList.map((json) => User.fromJson(json)).toList();
+    }
+     else {
+      throw Exception('Failed to load users');
     }
   }
 

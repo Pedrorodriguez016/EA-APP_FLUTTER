@@ -1,32 +1,78 @@
 import 'package:ea_seminari_9/Models/user.dart';
 import 'package:ea_seminari_9/Services/user_services.dart';
 import 'package:get/get.dart';
+import 'package:flutter/widgets.dart';
 import '../Controllers/auth_controller.dart';
 
 class UserController extends GetxController {
+  final AuthController authController = Get.find<AuthController>();
   var isLoading = true.obs;
   var userList = <User>[].obs;
   var selectedUser = Rxn<User>();
+  var friendsList = <User>[].obs;
+  var currentPage = 1.obs;
+  var totalPages = 1.obs;
+  var totalUsers = 0.obs;
+  final int limit = 10;
+  var searchQuery = ''.obs;
+  final TextEditingController searchEditingController = TextEditingController();
   final UserServices _userServices;
 
   UserController(this._userServices);
   @override
   void onInit() {
-    fetchUsers();
+    fetchUsers(1);
     super.onInit();
   }
 
-  void fetchUsers() async {
+Future<void> fetchUsers(int page) async {
+    isLoading.value = true;
     try {
-      isLoading(true);
-      var users = await _userServices.fetchUsers(); 
-      if (users.isNotEmpty) {
-        userList.assignAll(users);
-      }
+      final data = await _userServices.fetchUsers(
+        page: page,
+        limit: limit,
+        q: searchQuery.value,
+      );
+
+      userList.assignAll(data['users']);
+      currentPage.value = data['currentPage'];
+      totalPages.value = data['totalPages'];
+      totalUsers.value = data['total'];
+    } catch (e) {
+      print("Error al cargar usuarios: $e");
     } finally {
-      isLoading(false);
+      isLoading.value = false;
     }
   }
+
+  void nextPage() {
+    if (currentPage.value < totalPages.value) {
+      fetchUsers(currentPage.value + 1);
+    }
+  }
+
+  void previousPage() {
+    if (currentPage.value > 1) {
+      fetchUsers(currentPage.value - 1);
+    }
+  }
+
+  void searchUsers(String query) {
+    searchQuery.value = query;
+    fetchUsers(1);
+  }
+  void refreshUsers() {
+    searchQuery.value = '';
+    searchEditingController.clear(); 
+    fetchUsers(1);
+    Get.snackbar(
+      'Actualizado',
+      'Lista de usuarios actualizada',
+      snackPosition: SnackPosition.BOTTOM,
+      duration: const Duration(seconds: 2),
+    );
+  }
+
   fetchUserById(String id) async{
     try {
       isLoading(true);
@@ -84,4 +130,17 @@ disableUserByid(String id,password) async {
     isLoading(false);
   }
 }
+
+void fetchFriends() async {
+    try {
+      var id = authController.currentUser.value!.id;
+      isLoading(true);
+      var friends = await _userServices.fetchFriends(id); 
+      if (friends.isNotEmpty) {
+        friendsList.assignAll(friends);
+      }
+    } finally {
+      isLoading(false);
+    }
+  }
 }

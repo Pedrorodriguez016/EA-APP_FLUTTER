@@ -57,7 +57,8 @@ class MyApp extends StatelessWidget {
         ),
         GetPage(
           name: '/home',
-          page: () => const HomeScreen(),
+          page: () =>  HomeScreen(),
+          binding: UserBinding(),
         ),
         GetPage(
           name: '/eventos',

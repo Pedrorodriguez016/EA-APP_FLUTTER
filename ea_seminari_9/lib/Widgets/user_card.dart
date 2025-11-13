@@ -21,6 +21,7 @@ class UserCard extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
+                // --- Avatar con inicial ---
                 CircleAvatar(
                   radius: 24,
                   backgroundColor: const Color(0xFF667EEA),
@@ -33,7 +34,10 @@ class UserCard extends StatelessWidget {
                     ),
                   ),
                 ),
+
                 const SizedBox(width: 16),
+
+                // --- Info principal del usuario ---
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,16 +58,37 @@ class UserCard extends StatelessWidget {
                           color: Colors.grey.shade600,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 6),
+
+                      // --- Estado de conexión ---
                       Row(
                         children: [
-                          Icon(Icons.cake, size: 14, color: Colors.grey.shade500),
-                          const SizedBox(width: 4),
+                          Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: (user.online ?? false) ? Colors.green : Colors.grey,
+
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: (user.online ?? false)
+                                  ? Colors.green.withOpacity(0.4)
+                                  : Colors.grey.withOpacity(0.4),
+                                  blurRadius: 4,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 6),
                           Text(
-                            user.birthday,
+                            (user.online ?? false) ? "Conectado" : "Desconectado",
                             style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey.shade500,
+                              fontSize: 13,
+                              color: (user.online ?? false)
+                              ? Colors.green.shade700
+                              : Colors.grey.shade700,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
@@ -71,13 +96,19 @@ class UserCard extends StatelessWidget {
                     ],
                   ),
                 ),
+
+                // --- Flecha lateral ---
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: Colors.grey.shade100,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                  child: const Icon(
+                    Icons.arrow_forward_ios,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
                 ),
               ],
             ),
