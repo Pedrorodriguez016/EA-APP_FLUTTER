@@ -6,12 +6,14 @@ class User {
   final String? password;
   final String? token;
   final String? refreshToken;
+  final bool? online;
 
   User({
     required this.id,
     required this.username,
     required this.gmail,
     required this.birthday,
+    this.online,
     this.password,
     this.token,
     this.refreshToken,
@@ -25,6 +27,7 @@ class User {
       birthday: json['birthday'] ?? '',
       token: json['token'],
       refreshToken: json['refreshToken'],
+      online: json['online'],
     );
   }
 
@@ -34,6 +37,7 @@ class User {
       'gmail': gmail,
       'password': password,
       'birthday': birthday,
+      'online': online,
     };
   }
 }

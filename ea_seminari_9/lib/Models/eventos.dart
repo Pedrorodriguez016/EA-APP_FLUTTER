@@ -23,7 +23,16 @@ class Evento {
       address: json['address'] ?? '',
       capacidadMaxima: json['capacidadMaxima'],
       participantes: List<dynamic>.from(json['participantes'] ?? [])
-      .map((p) => (p as Map<String, dynamic>)['username'] as String)
-      .toList(),);
+          .map((p) => p.toString())
+          .toList(),
+    );
+  }
+   Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'schedule': schedule,
+      'address': address,
+      'participantes': participantes,
+    };
   }
 }
