@@ -18,7 +18,7 @@ class EventoController extends GetxController {
 
   // --- ARREGLO: Inicializa los controllers aquí ---
   final TextEditingController tituloController = TextEditingController();
-  final TextEditingController descripcionController = TextEditingController();
+  final TextEditingController direccionController = TextEditingController();
   var selectedSchedule = Rxn<DateTime>();
   // --- FIN ARREGLO ---
 
@@ -34,7 +34,7 @@ class EventoController extends GetxController {
   // --- Limpia los campos del formulario ---
   void limpiarFormularioCrear() {
     tituloController.clear();
-    descripcionController.clear();
+    direccionController.clear();
     selectedSchedule.value = null;
   }
 
@@ -136,7 +136,7 @@ class EventoController extends GetxController {
   // --- Función 'crearEvento' ---
   Future<void> crearEvento() async {
     final String titulo = tituloController.text;
-    final String descripcion = descripcionController.text;
+    final String direccion = direccionController.text;
 
     // --- Validación ---
     if (titulo.isEmpty) {
@@ -159,7 +159,7 @@ class EventoController extends GetxController {
     try {
       final Map<String, dynamic> nuevoEventoData = {
         'name': titulo,
-        'descripcion': descripcion,
+        'address': direccion,
         'schedule': selectedSchedule.value!.toIso8601String(),
       };
 
@@ -199,7 +199,7 @@ class EventoController extends GetxController {
   @override
   void onClose() {
     tituloController.dispose();
-    descripcionController.dispose();
+    direccionController.dispose();
     super.onClose();
   }
 }

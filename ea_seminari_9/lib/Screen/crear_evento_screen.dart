@@ -12,7 +12,6 @@ class CrearEventoScreen extends GetView<EventoController> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Crear Evento'),
-        // AÑADIDO: Limpia el formulario si el usuario le da "atrás"
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -32,11 +31,11 @@ class CrearEventoScreen extends GetView<EventoController> {
             // MODIFICADO: Usa el controller de GetX
             TextField(controller: controller.tituloController),
             const SizedBox(height: 16),
-            const Text('Descripción',
+            const Text('Direccion',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             // MODIFICADO: Usa el controller de GetX
             TextField(
-                controller: controller.descripcionController, maxLines: 3),
+                controller: controller.direccionController, maxLines: 3),
             const SizedBox(height: 16),
 
             // --- NUEVO WIDGET: Selector de Fecha ---
