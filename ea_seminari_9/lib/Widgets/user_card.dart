@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Models/user.dart';
+import '../Controllers/user_controller.dart';
 
-class UserCard extends StatelessWidget {
+class UserCard extends GetView<UserController> {
   final User user;
   const UserCard({super.key, required this.user});
 
@@ -99,15 +100,12 @@ class UserCard extends StatelessWidget {
 
                 // --- Flecha lateral ---
                 Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.arrow_forward_ios,
-                    size: 16,
-                    color: Colors.grey,
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {
+                      controller.sendFriendRequest(user.id);
+                    },
+                    child: const Icon(Icons.person_add, color: Colors.blue),
                   ),
                 ),
               ],
