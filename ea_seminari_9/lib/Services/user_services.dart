@@ -161,5 +161,19 @@ Future<void> rejectFriendRequest(String userId, String requesterId) async {
   if (response.statusCode != 200) {
     throw Exception('Error al rechazar solicitud: ${response.body}');
   }
+} 
+Future<void> sendFriendRequest(String userId, String targetUserId) async {
+  final response = await _client.post(
+    Uri.parse('$baseUrl/friend-request/'),
+    body: 
+    jsonEncode({
+      'id': userId,
+      'targetId': targetUserId
+    })
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception('Error al enviar solicitud: ${response.body}');
+  }
 }
 }

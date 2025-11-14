@@ -1,5 +1,6 @@
 import 'package:ea_seminari_9/Models/user.dart';
 import 'package:ea_seminari_9/Services/user_services.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter/widgets.dart';
 import '../Controllers/auth_controller.dart';
@@ -71,6 +72,8 @@ Future<void> fetchUsers(int page) async {
       'Lista de usuarios actualizada',
       snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 2),
+      colorText: Colors.white,
+      backgroundColor: Colors.green
     );
   }
 
@@ -85,6 +88,8 @@ Future<void> fetchUsers(int page) async {
         "Error al cargar",
         "No se pudo encontrar el usuario: ${e.toString()}",
         snackPosition: SnackPosition.BOTTOM,
+        colorText: Colors.white,
+        backgroundColor: Colors.red,
       );
     } finally {
       isLoading(false);
@@ -106,6 +111,8 @@ Future<void> fetchUsers(int page) async {
         "Error al cargar",
         "No se pudo encontrar el usuario: ${e.toString()}",
         snackPosition: SnackPosition.BOTTOM,
+        colorText: Colors.white,
+        backgroundColor: Colors.red,
     );
   } finally {
     isLoading(false);
@@ -126,6 +133,8 @@ disableUserByid(String id,password) async {
         "Error al cargar",
         "No se pudo encontrar el usuario: ${e.toString()}",
         snackPosition: SnackPosition.BOTTOM,
+        colorText: Colors.white,
+        backgroundColor: Colors.red,
     );
   } finally {
     isLoading(false);
@@ -164,9 +173,17 @@ void fetchFriends() async {
 
       friendsRequests.removeWhere((u) => u.id == requester.id);
       fetchFriends(); // opcional: refrescar lista de amigos
-      Get.snackbar('Solicitud', 'Amistad aceptada');
+      Get.snackbar('Solicitud', 
+      'Amistad aceptada',
+       snackPosition: SnackPosition.BOTTOM,
+       backgroundColor: Colors.green,
+       colorText: Colors.white);
     } catch (e) {
-      Get.snackbar('Error', 'No se pudo aceptar la solicitud: $e');
+      Get.snackbar('Error', 
+      'No se pudo aceptar la solicitud: $e',
+       snackPosition: SnackPosition.BOTTOM,
+       backgroundColor: Colors.red,
+       colorText: Colors.white);
     }
   }
   // --- Rechazar solicitud ---
@@ -177,9 +194,34 @@ void fetchFriends() async {
 
       // actualizar lista local
       friendsRequests.removeWhere((u) => u.id == requester.id);
-      Get.snackbar('Solicitud', 'Solicitud rechazada');
+      Get.snackbar('Solicitud', 
+      'Solicitud rechazada',
+       snackPosition: SnackPosition.BOTTOM,
+       backgroundColor: Colors.red,
+       colorText: Colors.white);
     } catch (e) {
-      Get.snackbar('Error', 'No se pudo rechazar la solicitud: $e');
+      Get.snackbar('Error', 
+      'No se pudo rechazar la solicitud: $e',
+       snackPosition: SnackPosition.BOTTOM,
+       backgroundColor: Colors.red,
+       colorText: Colors.white);
+    }
+  }
+  sendFriendRequest(String targetUserId) async {
+    try {
+      final userId = authController.currentUser.value!.id;
+      await _userServices.sendFriendRequest(userId, targetUserId);
+      Get.snackbar('Solicitud',
+       'Solicitud de amistad enviada',
+       backgroundColor: Colors.green,
+       colorText: Colors.white,
+       snackPosition: SnackPosition.BOTTOM);
+    } catch (e) {
+      Get.snackbar('Error', 
+      'No se pudo enviar la solicitud: $e',
+       backgroundColor: Colors.red,
+       colorText: Colors.white,
+       snackPosition: SnackPosition.BOTTOM);
     }
   }
 }
