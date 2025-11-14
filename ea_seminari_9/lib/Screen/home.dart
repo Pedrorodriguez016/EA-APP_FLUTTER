@@ -135,7 +135,7 @@ class HomeScreen extends GetView<UserController>{
               runSpacing: 12,
               children: [
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () => Get.toNamed('/crear_evento'),
                   icon: const Icon(Icons.add_circle),
                   label: const Text('Crear evento'),
                   style: ElevatedButton.styleFrom(
@@ -159,7 +159,7 @@ class HomeScreen extends GetView<UserController>{
                   ),
                 ),
                 TextButton.icon(
-                  onPressed: () {},
+                  onPressed: () => Get.toNamed('/eventos?mine=true'),
                   icon: const Icon(Icons.calendar_today),
                   label: const Text('Mis eventos'),
                   style: TextButton.styleFrom(

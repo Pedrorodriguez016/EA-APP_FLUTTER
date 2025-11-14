@@ -12,6 +12,8 @@ import 'Screen/eventos_list.dart';
 import 'Screen/settings_screen.dart';
 import 'Bindings/user_bindings.dart';
 import '../Screen/perfil_screen.dart';
+import 'Screen/crear_evento_screen.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -89,6 +91,11 @@ class MyApp extends StatelessWidget {
           page: () => ProfileScreen(),
           binding: UserBinding(),
         ),
+          GetPage(
+            name: '/crear_evento',
+            page: () => const CrearEventoScreen(),
+            binding: EventosBinding(),
+          ), 
       ],
       defaultTransition: Transition.cupertino,
       debugShowCheckedModeBanner: false,
