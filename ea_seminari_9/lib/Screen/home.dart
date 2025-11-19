@@ -23,24 +23,18 @@ class HomeScreen extends GetView<UserController>{
           children: [
             _buildWelcomeCard(authController),
             const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(child:
-                _buildEventsCard()
-                ),
-                Expanded(child: 
-                _buildFriendsCard(context))
+            _buildEventsCard(),
+            const SizedBox(height: 24), 
+            _buildFriendsCard(context),
+            const SizedBox(height: 24),
               ],
-            )
-          ],
-        ),
-      ),
-      bottomNavigationBar: const CustomNavBar(currentIndex: 0),
-      
-    );
-  }
+            ),
+          ),
+        bottomNavigationBar: const CustomNavBar(currentIndex: 0), 
+      );
+    }
 
-  AppBar _buildAppBar() {
+    AppBar _buildAppBar() {
     return AppBar(
       title: const Text('Inicio'),
       backgroundColor: Colors.white,
@@ -103,7 +97,7 @@ class HomeScreen extends GetView<UserController>{
           ),
           const SizedBox(height: 16),
           Text(
-            'Bienvenido a tu aplicación de eventos',
+            'Bienvenido a EVENTER',
             style: TextStyle(
               color: Colors.white.withOpacity(0.9),
               fontSize: 16,
@@ -178,119 +172,135 @@ class HomeScreen extends GetView<UserController>{
     );
   }
 
-  Widget _buildFriendsCard(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.fetchFriends();
-      controller.fetchRequest();
-    });
-    return Card(
-    elevation: 2,
-    shadowColor: Colors.black.withOpacity(0.1),
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min, // Para que la tarjeta se ajuste
-        children: [
-          // --- Fila Superior: Título, Contador, Solicitudes ---
-          Row(
-            children: [
-              const Text('Amigos',
-                  style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87)),
-              const SizedBox(width: 8),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Obx(() => Text(
-                      controller.friendsList.length.toString(), 
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black54),
-                    )),
-              ),
-              const Spacer(),
-              TextButton.icon(
-                onPressed: () {
-                 final List<User> users = controller.friendsRequests;
-                 FriendRequestsDialog.show(context, requests: users, 
-                 onAccept: (user) => controller.acceptFriendRequest(user),
-                 onReject: (user) => controller.rejectFriendRequest(user),
-                 );},
-                icon: const Icon(Icons.group_add, size: 20),
-                label: const Text('Solicitudes'),
-                style: TextButton.styleFrom(
-                  backgroundColor: Colors.indigo.shade50,
-                  foregroundColor: Colors.indigo.shade800,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-              ElevatedButton.icon(
-                      onPressed: () => Get.toNamed('/users'),
-                      icon: const Icon(Icons.search, size: 20),
-                      label: const Text('Buscar amigos'), 
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey.shade200,
-                        foregroundColor: Colors.black87,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
+ Widget _buildFriendsCard(BuildContext context) {
+   WidgetsBinding.instance.addPostFrameCallback((_) {
+     controller.fetchFriends();
+     controller.fetchRequest();
+   });
+   return Card(
+     elevation: 2,
+     shadowColor: Colors.black.withOpacity(0.1),
+     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+     child: Padding(
+       padding: const EdgeInsets.all(16),
+       child: Column(
+         crossAxisAlignment: CrossAxisAlignment.start,
+         mainAxisSize: MainAxisSize.min, // Para que la tarjeta se ajuste
+         children: [ // <-- Lista de children de Column comienza aquí
+           
+           // 1. ROW (Título y Contador)
+           Row(
+             children: [
+               const Text('Amigos',
+                   style: TextStyle(
+                       fontSize: 20,
+                       fontWeight: FontWeight.bold,
+                       color: Colors.black87)),
+               const SizedBox(width: 8),
+               Container(
+                 padding:
+                     const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                 decoration: BoxDecoration(
+                   color: Colors.grey.shade200,
+                   borderRadius: BorderRadius.circular(12),
+                 ),
+                 child: Obx(() => Text(
+                       controller.friendsList.length.toString(), 
+                       style: const TextStyle(
+                           fontWeight: FontWeight.bold,
+                           color: Colors.black54),
+                     )),
+               ),
+               const Spacer(),
+               // *** REMOVIDO: const SizedBox(height: 16) de aquí ***
+             ],
+           ), // <-- Fin de Row
+
+           const SizedBox(height: 16), // <-- Espacio vertical correcto entre Row y Wrap
+
+           // 2. WRAP (Botones de Acción)
+           Wrap(
+             spacing: 12, // Horizontal space between items
+             runSpacing: 12, // Vertical space between lines
+             children: [
+               TextButton.icon(
+                 onPressed: () {
+                   final List<User> users = controller.friendsRequests;
+                   FriendRequestsDialog.show(context, requests: users, 
+                   onAccept: (user) => controller.acceptFriendRequest(user),
+                   onReject: (user) => controller.rejectFriendRequest(user),
+                   );
+                 },
+                 icon: const Icon(Icons.group_add, size: 20),
+                 label: const Text('Solicitudes'),
+                 style: TextButton.styleFrom(
+                   backgroundColor: Colors.indigo.shade50,
+                   foregroundColor: Colors.indigo.shade800,
+                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                   shape: RoundedRectangleBorder(
+                       borderRadius: BorderRadius.circular(12)),
+                 ),
+               ),
+               ElevatedButton.icon(
+                 onPressed: () => Get.toNamed('/users'),
+                 icon: const Icon(Icons.search, size: 20),
+                 label: const Text('Buscar amigos'), 
+                 style: ElevatedButton.styleFrom(
+                   backgroundColor: Colors.grey.shade200,
+                   foregroundColor: Colors.black87,
+                   elevation: 0,
+                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                   shape: RoundedRectangleBorder(
+                       borderRadius: BorderRadius.circular(12)),
+                 ),
+               )
+             ],
+           ), // <-- Fin de Wrap
+           
+           // *** REMOVIDO: El SizedBox(height: 16) duplicado ***
+
+           const SizedBox(height: 20), // Espacio antes de la lista
+
+           // 3. OBX (Lista de Amigos)
+           Obx(() {
+             if (controller.isLoading.value) { 
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+             }
+             if (controller.friendsList.isEmpty) { 
+                return Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Aún no tienes amigos para mostrar.',
+                        style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontStyle: FontStyle.italic),
+                        textAlign: TextAlign.center,
                       ),
-                    )
-            ],
-          ),
-          const SizedBox(height: 20),
-
-          Obx(() {
-            if (controller.isLoading.value) { 
-              return const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
-
-            if (controller.friendsList.isEmpty) { 
-              return Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Aún no tienes amigos para mostrar.',
-                      style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontStyle: FontStyle.italic),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 12),
-                  ],
-                ),
-              );
-            }
-            return ListView.builder(
-              shrinkWrap: true,
-              primary: false,
-              itemCount: controller.friendsList.length,
-              itemBuilder: (context, index) {
-              final user = controller.friendsList[index];
-              return UserCard(user: user);
-              } ,
-            );
-          }), // Fin de Obx
-        ],
-      ),
-    ),
-  );
-  }
+                      const SizedBox(height: 12),
+                    ],
+                  ),
+                );
+             }
+             return ListView.builder(
+                shrinkWrap: true,
+                primary: false,
+                itemCount: controller.friendsList.length,
+                itemBuilder: (context, index) {
+                  final user = controller.friendsList[index];
+                  return UserCard(user: user);
+                } ,
+             );
+           }), // Fin de Obx
+         ], // <-- Lista de children de Column termina aquí
+       ),
+     ),
+   );
+ }
 }
