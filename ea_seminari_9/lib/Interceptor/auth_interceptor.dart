@@ -1,133 +1,75 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import 'package:get/get.dart';
-import 'dart:async';
 import '../Controllers/auth_controller.dart';
 
-class AuthInterceptor extends http.BaseClient {
-  final http.Client _inner = http.Client();
+class AuthInterceptor extends Interceptor {
   final AuthController _auth = Get.find<AuthController>();
 
-  static const String baseUri = 'http://localhost:3000/api';
-
-  Future<bool>? _refreshing;
+  final Dio _tokenDio = Dio(BaseOptions(baseUrl: 'http://localhost:3000/api',
+    connectTimeout:const Duration(seconds: 5,),
+    receiveTimeout: const Duration(seconds: 5,))
+    );
 
   @override
-  Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    // Añade token si hay
-    request.headers['Content-Type'] = 'application/json';
-    request.headers['Accept'] = 'application/json';
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    options.headers['Accept'] = 'application/json';
     final token = _auth.token;
-    print('el token es $token');
     if (token != null && token.isNotEmpty) {
+      options.headers['Authorization'] = 'Bearer $token';
+    }
+    
+    print('Enviando request a: ${options.path}');
+    super.onRequest(options, handler);
+  }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
+    if (err.response?.statusCode == 401) {
+      print('Token expirado (401). Intentando refrescar...');
       
-      request.headers['Authorization'] = 'Bearer $token';
-    }
-
-    var response = await _inner.send(request);
-
-    // Si expira, refresca y reintenta 1 vez
-    if (response.statusCode == 401) {
-      final ok = await _refreshToken();
-      if (ok) {
-        final retried = await _retry(request);
-        return retried;
-      }
-    }
-
-    return response;
-  }
-
-  Future<http.StreamedResponse> _retry(http.BaseRequest original) async {
-    // Reconstruye la Request con el nuevo token
-    final newReq = _cloneRequestWithNewToken(original, _auth.token);
-    return _inner.send(newReq);
-  }
-
-  http.BaseRequest _cloneRequestWithNewToken(http.BaseRequest original, String? newToken) {
-    // Copia método y url
-    if (original is http.Request) {
-      final r = http.Request(original.method, original.url);
-      r.headers.addAll(original.headers);
-      if (newToken != null && newToken.isNotEmpty) {
-        r.headers['Authorization'] = 'Bearer $newToken';
-      }
-      r.bodyBytes = original.bodyBytes;
-      return r;
-    } else if (original is http.MultipartRequest) {
-      final r = http.MultipartRequest(original.method, original.url);
-      r.headers.addAll(original.headers);
-      if (newToken != null && newToken.isNotEmpty) {
-        r.headers['Authorization'] = 'Bearer $newToken';
-      }
-      r.fields.addAll(original.fields);
-      r.files.addAll(original.files);
-      return r;
-    } else {
-      // Caso genérico
-      final r = http.Request(original.method, original.url);
-      r.headers.addAll(original.headers);
-      if (newToken != null && newToken.isNotEmpty) {
-        r.headers['Authorization'] = 'Bearer $newToken';
-      }
-      return r;
-    }
-  }
-
-  Future<bool> _refreshToken() async {
-    if (_refreshing != null) return await _refreshing!;
-    final completer = Completer<bool>();
-    _refreshing = completer.future;
-
-    try {
       final refreshToken = _auth.refreshToken;
-      final userId = _auth.currentUser.value?.id; // asegúrate de tener id en tu modelo
+      final userId = _auth.currentUser.value?.id;
 
-      if (refreshToken == null || refreshToken.isEmpty || userId == null) {
-        completer.complete(false);
-        _refreshing = null;
-        return false;
-      }
+      if (refreshToken != null && userId != null) {
+        try {
+          final response = await _tokenDio.post('/user/refresh', data: {
+            'refreshToken': refreshToken,
+            'userId': userId,
+          });
 
-      final res = await http.post(
-        Uri.parse('$baseUri/user/refresh'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'refreshToken': refreshToken, 
-          'userId': userId,             
-        }),
-      );
+          if (response.statusCode == 200) {
+            final newAccessToken = response.data['token'] as String?;
+            final newRefreshToken = response.data['refreshToken'] as String?;
+            
+            _auth.token = newAccessToken;
+            if (newRefreshToken != null) {
+              _auth.refreshToken = newRefreshToken;
+            }
 
-      if (res.statusCode == 200) {
-        final data = jsonDecode(res.body);
-        final newAccess = data['token'] as String?;
-        final newRefresh = data['refreshToken'] as String?;
+            // REINTENTAR la petición original con el nuevo token
+            final opts = err.requestOptions;
+            opts.headers['Authorization'] = 'Bearer $newAccessToken';
 
-        if (newAccess == null || newAccess.isEmpty) {
-          completer.complete(false);
-          _refreshing = null;
-          return false;
+            // Clonamos la petición original y la reenviamos usando la instancia de Dio original (err.requestOptions.extra)
+            final clonedRequest = await Dio().fetch(opts); 
+            
+            // Resolvemos la promesa original con el resultado del reintento
+            return handler.resolve(clonedRequest);
+          }
+        } catch (e) {
+          // Si falla el refresh, logout
+          print('Fallo al refrescar token: $e');
+          _auth.logout();
+          Get.offAllNamed('/login');
         }
-
-        _auth.token = newAccess;
-        if (newRefresh != null && newRefresh.isNotEmpty) {
-          _auth.refreshToken = newRefresh;
-        }
-        completer.complete(true);
-        _refreshing = null;
-        return true;
       } else {
+        // No hay refresh token
         _auth.logout();
         Get.offAllNamed('/login');
-        completer.complete(false);
-        _refreshing = null;
-        return false;
       }
-    } catch (e) {
-      // Error de red
-      completer.complete(false);
-      _refreshing = null;
-      return false;
     }
+    
+    // Si no fue 401 o falló el refresh, devolvemos el error original
+    super.onError(err, handler);
   }
 }
