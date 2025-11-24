@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 class EventoController extends GetxController {
   // --- Variables de la lista (existentes) ---
   var isLoading = true.obs;
+  var isMoreLoading = false.obs;
   var eventosList = <Evento>[].obs;
   var currentPage = 1.obs;
   var totalPages = 1.obs;
@@ -23,12 +24,21 @@ class EventoController extends GetxController {
   // --- FIN ARREGLO ---
 
   EventoController(this._eventosServices);
+  final ScrollController scrollController = ScrollController();
 
   @override
   void onInit() {
     fetchEventos(1); // Carga inicial de eventos
     selectedSchedule.value = null; // Limpia la fecha
     super.onInit();
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 200) {
+        if (!isLoading.value && !isMoreLoading.value && currentPage.value < totalPages.value) {
+          loadMoreUsers();
+        }
+      }
+    });
+    debounce(searchQuery, (_) => fetchEventos(1), time: const Duration(milliseconds: 500));
   }
 
   // --- Limpia los campos del formulario ---
@@ -70,14 +80,25 @@ class EventoController extends GetxController {
   // --- (Funciones de la lista: fetchEventos, nextPage, etc.) ---
   
   void fetchEventos(int page) async {
-    isLoading.value = true;
+    if (page == 1) {
+      isLoading.value = true;
+    } else {
+      isMoreLoading.value = true;
+    }
     try {
       final data = await _eventosServices.fetchEvents(
         page: page,
         limit: limit,
         q: searchQuery.value,
       );
-      eventosList.assignAll(data['eventos']);
+     final List<Evento> newEventos = data['eventos'];
+
+      if (page == 1) {
+        eventosList.assignAll(newEventos);
+      } else {
+        eventosList.addAll(newEventos);
+      }
+
       currentPage.value = data['currentPage'];
       totalPages.value = data['totalPages'];
       totalEventos.value = data['total'];
@@ -85,24 +106,18 @@ class EventoController extends GetxController {
       print("Error al cargar eventos: $e");
     } finally {
       isLoading.value = false;
+      isMoreLoading.value = false;
     }
   }
 
-  void nextPage() {
+  void loadMoreUsers() {
     if (currentPage.value < totalPages.value) {
       fetchEventos(currentPage.value + 1);
     }
   }
 
-  void previousPage() {
-    if (currentPage.value > 1) {
-      fetchEventos(currentPage.value - 1);
-    }
-  }
-
   void searchEventos(String query) {
     searchQuery.value = query;
-    fetchEventos(1);
   }
 
   void refreshEventos() {

@@ -1,5 +1,4 @@
 import 'package:ea_seminari_9/Models/user.dart';
-import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import '../Interceptor/auth_interceptor.dart';

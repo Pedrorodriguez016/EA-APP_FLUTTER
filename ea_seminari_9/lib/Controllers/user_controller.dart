@@ -2,12 +2,12 @@ import 'package:ea_seminari_9/Models/user.dart';
 import 'package:ea_seminari_9/Services/user_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter/widgets.dart';
 import '../Controllers/auth_controller.dart';
 
 class UserController extends GetxController {
   final AuthController authController = Get.find<AuthController>();
   var isLoading = true.obs;
+  var isMoreLoading = false.obs;
   var userList = <User>[].obs;
   var selectedUser = Rxn<User>();
   var friendsList = <User>[].obs;
@@ -20,15 +20,29 @@ class UserController extends GetxController {
   final TextEditingController searchEditingController = TextEditingController();
   final UserServices _userServices;
 
+  final ScrollController scrollController = ScrollController();
+
   UserController(this._userServices);
   @override
   void onInit() {
     fetchUsers(1);
     super.onInit();
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 200) {
+        if (!isLoading.value && !isMoreLoading.value && currentPage.value < totalPages.value) {
+          loadMoreUsers();
+        }
+      }
+    });
+    debounce(searchQuery, (_) => fetchUsers(1), time: const Duration(milliseconds: 500));
   }
+  Future<void> fetchUsers(int page) async {
+    if (page == 1) {
+      isLoading.value = true;
+    } else {
+      isMoreLoading.value = true;
+    }
 
-Future<void> fetchUsers(int page) async {
-    isLoading.value = true;
     try {
       final data = await _userServices.fetchUsers(
         page: page,
@@ -36,32 +50,34 @@ Future<void> fetchUsers(int page) async {
         q: searchQuery.value,
       );
 
-      userList.assignAll(data['users']);
+      final List<User> newUsers = data['users'];
+
+      if (page == 1) {
+        userList.assignAll(newUsers);
+      } else {
+        userList.addAll(newUsers);
+      }
+
       currentPage.value = data['currentPage'];
       totalPages.value = data['totalPages'];
       totalUsers.value = data['total'];
+      
     } catch (e) {
       print("Error al cargar usuarios: $e");
     } finally {
       isLoading.value = false;
+      isMoreLoading.value = false; 
     }
   }
 
-  void nextPage() {
+  void loadMoreUsers() {
     if (currentPage.value < totalPages.value) {
       fetchUsers(currentPage.value + 1);
     }
   }
 
-  void previousPage() {
-    if (currentPage.value > 1) {
-      fetchUsers(currentPage.value - 1);
-    }
-  }
-
   void searchUsers(String query) {
     searchQuery.value = query;
-    fetchUsers(1);
   }
   void refreshUsers() {
     searchQuery.value = '';
