@@ -7,6 +7,8 @@ import '../Widgets/navigation_bar.dart';
 import '../Widgets/logout_button.dart';
 import '../Widgets/user_card.dart';
 import '../Widgets/solicitudes.dart';
+import '../Widgets/mapa.dart';
+import 'package:latlong2/latlong.dart';
 
 class HomeScreen extends GetView<UserController>{
   HomeScreen({Key? key}) : super(key: key);
@@ -23,15 +25,10 @@ class HomeScreen extends GetView<UserController>{
           children: [
             _buildWelcomeCard(authController),
             const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(child:
-                _buildEventsCard()
-                ),
-                Expanded(child: 
-                _buildFriendsCard(context))
-              ],
-            )
+            _buildEventsCard(),
+            const SizedBox(height: 24),
+            _buildFriendsCard(context),
+            const SizedBox(height: 24),
           ],
         ),
       ),
@@ -172,6 +169,12 @@ class HomeScreen extends GetView<UserController>{
                 ),
               ],
             ),
+            const CustomMap(
+              height: 200,
+              center: LatLng(41.3851, 2.1734), 
+              zoom: 12,
+            ),
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -216,7 +219,14 @@ class HomeScreen extends GetView<UserController>{
                           color: Colors.black54),
                     )),
               ),
-              const Spacer(),
+            ]
+          ),
+              const SizedBox(width: 16),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child:Row(
+            children: [
+
               TextButton.icon(
                 onPressed: () {
                  final List<User> users = controller.friendsRequests;
@@ -234,6 +244,7 @@ class HomeScreen extends GetView<UserController>{
                       borderRadius: BorderRadius.circular(12)),
                 ),
               ),
+              const SizedBox(width: 12),
               ElevatedButton.icon(
                       onPressed: () => Get.toNamed('/users'),
                       icon: const Icon(Icons.search, size: 20),
@@ -246,8 +257,9 @@ class HomeScreen extends GetView<UserController>{
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
                       ),
-                    )
+                ),
             ],
+          ),
           ),
           const SizedBox(height: 20),
 

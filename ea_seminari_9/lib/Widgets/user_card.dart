@@ -99,6 +99,7 @@ class UserCard extends GetView<UserController> {
                 ),
 
                 // --- Flecha lateral ---
+                
                 Container(
                   alignment: Alignment.centerRight,
                   child: TextButton(
