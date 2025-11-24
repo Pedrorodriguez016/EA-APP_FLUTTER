@@ -1,179 +1,165 @@
 import 'package:ea_seminari_9/Models/user.dart';
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import '../Interceptor/auth_interceptor.dart';
 import '../Controllers/auth_controller.dart';
 
 class UserServices {
   final String baseUrl = 'http://localhost:3000/api/user';
-  final AuthController _authController= Get.put(AuthController());
-  final AuthInterceptor _client = Get.put(AuthInterceptor());
-  UserServices();
+  final AuthController _authController = Get.find<AuthController>();
+  
+  late final Dio _client;
+  
+  UserServices(){
+    _client = Dio(BaseOptions(baseUrl: baseUrl));
+    _client.interceptors.add(AuthInterceptor());
+  }
 
 Future<Map<String, dynamic>> fetchUsers({
   int page = 1,
   int limit = 20,
   String q = '',
 }) async {
-  final uri = Uri.parse('$baseUrl').replace(queryParameters: {
-    'page': page.toString(),
-    'limit': limit.toString(),
-    if (q.isNotEmpty) 'q': q,
-  });
+    try {
+      final response = await _client.get('/', queryParameters: {
+        'page': page,
+        'limit': limit,
+        if (q.isNotEmpty) 'q': q,
+      });
 
-  final response = await _client.get(uri);
+      final responseData = response.data; 
+      final List<dynamic> userList = responseData['data'];
 
-  if (response.statusCode == 200) {
-    final Map<String, dynamic> responseData = json.decode(response.body);
-    final List<dynamic> userList = responseData['data'];
+      return {
+        'users': userList.map((json) => User.fromJson(json)).toList(),
+        'totalPages': responseData['totalPages'] ?? 1,
+        'currentPage': responseData['page'] ?? 1,
+        'total': responseData['totalItems'] ?? 0,
+      };
+    } catch (e) {
 
-    return {
-      'users': userList.map((json) => User.fromJson(json)).toList(),
-      'totalPages': responseData['totalPages'] ?? 1,
-      'currentPage': responseData['page'] ?? 1,       
-      'total': responseData['totalItems'] ?? 0, 
-    };
-
-
-  } else {
-    throw Exception('Error al cargar usuarios paginados');
+      throw Exception('Error al cargar usuarios: $e');
+    }
   }
-}
   Future<User> fetchUserById(String id) async {
     try {
-      
-      final response = await _client.get(Uri.parse('$baseUrl/$id'));
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = jsonDecode(response.body);
-        return User.fromJson(data);
-      } else {
-        throw Exception('Error al cargar el usuario: ${response.statusCode}');
-      }
+      final response = await _client.get('/$id');
+      return User.fromJson(response.data);
     } catch (e) {
-      print('Error in fetchUserById: $e');
       throw Exception('Error al cargar el usuario: $e');
     }
   }
 
   Future<User> updateUserById(String id, Map<String, dynamic> newData) async {
     try {
-      final updatedUser = User(
-        id: id,
-        username: newData['username'] ?? _authController.currentUser.value?.username ?? '',
-        gmail: newData['email'] ?? _authController.currentUser.value?.gmail ?? '',
-        birthday: newData['birthday'] ?? _authController.currentUser.value?.birthday ?? '',
-      );
-      final response = await _client.put(Uri.parse('$baseUrl/$id/self'),
-      body: jsonEncode({
-        'username': updatedUser.username,
-        'gmail': updatedUser.gmail,
-        'birthday': updatedUser.birthday,
-      }),
-      );
-      if (response.statusCode == 200){
-        print("Usuario actualizado $updatedUser");
-      _authController.currentUser.value = updatedUser;
-      return updatedUser;
-      }
-      else{
-        throw Exception('Error al actualizar el usuario: ${response.statusCode}');
-      }
-    } catch (e) {
-           print('Error in updateUserByid: $e');
-      throw Exception('Error al actualizar el usuario: $e');
+      final updatedData = {
+        'username': newData['username'] ?? _authController.currentUser.value?.username,
+        'gmail': newData['email'] ?? _authController.currentUser.value?.gmail,
+        'birthday': newData['birthday'] ?? _authController.currentUser.value?.birthday,
+      };
 
+      // Dio hace el jsonEncode automáticamente
+      final response = await _client.put('/$id/self', data: updatedData);
+
+      final user = User(
+        id: id,
+        username: updatedData['username'],
+        gmail: updatedData['gmail'],
+        birthday: updatedData['birthday'],
+      );
+      _authController.currentUser.value = user;
+      return user;
+    } catch (e) {
+      throw Exception('Error al actualizar el usuario: $e');
     }
   }
 
   Future<bool> disableUserById(String id, password) async {
     try {
 
-      final response = await _client.patch(Uri.parse('$baseUrl/$id/delete-with-password'),
-      body: 
-      jsonEncode({
-      'password' : password}),
+      final response = await _client.patch('/$id/delete-with-password',
+        data:{
+          'password' : password
+        }
       );
-      if (response.statusCode == 204){
+
         print("Usuario eliminado");
         return true;
-      }
-      else{
-        throw Exception('Error al actualizar el usuario: ${response.statusCode}');
-      }
-    } catch (e) {
+      } 
+    catch (e) {
            print('Error in disableUserByid: $e');
       throw Exception('Error al eliminar el usuario: $e');
     }
   }
   Future<List<User>> fetchFriends(String id) async {
-    final response = await _client.get(Uri.parse('$baseUrl/$id/friends'));
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> responseData = json.decode(response.body);
+    try {
+    final response = await _client.get('/$id/friends');
+      final Map<String, dynamic> responseData = response.data;
       final List<dynamic> userList = responseData['data'];
       return userList.map((json) => User.fromJson(json)).toList();
     }
-     else {
-      throw Exception('Failed to load users');
+    catch (e) {
+      print('Error in fetchFriends: $e');
+      throw Exception('Error al cargar amigos: $e');
     }
   }
 Future<List<User>> fetchRequest(String id) async {
-  final response = await _client.get(Uri.parse('$baseUrl/friend-requests/$id'));
+  try {
+  final response = await _client.get('/friend-requests/$id');
 
-  if (response.statusCode == 200) {
-    final decoded = json.decode(response.body);
+    final decoded = response.data;
 
     if (decoded is List) {
       return decoded.map((json) => User.fromJson(json)).toList();
-    } else {
+    } 
       throw Exception('Formato inesperado: se esperaba una lista');
-    }
-  } else {
-    throw Exception('Error ${response.statusCode} al obtener solicitudes');
+  }
+  catch (e) {
+    print('Error in fetchRequest: $e');
+    throw Exception('Error al cargar solicitudes: $e');
   }
 }
 Future<void> acceptFriendRequest(String userId, String requesterId) async {
-  final response = await _client.post(
-    Uri.parse('$baseUrl/friend-accept/'),
-    body: 
-    jsonEncode({
+  try{
+  final response = await _client.post('/friend-accept/',
+    data: 
+    {
       'id': userId,
       'requesterId': requesterId
-    }
-    )
-  );
-
-  if (response.statusCode != 200) {
-    throw Exception('Error al aceptar solicitud: ${response.body}');
+    });
+  }
+  catch (e) {
+    print('Error in acceptFriendRequest: $e');
+    throw Exception('Error al aceptar solicitud: $e');
   }
 }
 
 Future<void> rejectFriendRequest(String userId, String requesterId) async {
-  final response = await _client.post(
-    Uri.parse('$baseUrl/friend-reject/'),
-    body: 
-    jsonEncode({
+  try{
+  final response = await _client.post('/friend-reject/',
+    data: {
       'id': userId,
       'requesterId': requesterId
-    })
-  );
-
-  if (response.statusCode != 200) {
-    throw Exception('Error al rechazar solicitud: ${response.body}');
+    }
+  );}
+  catch (e) {
+    print('Error in rejectFriendRequest: $e');
+    throw Exception('Error al rechazar solicitud: $e');
   }
 } 
 Future<void> sendFriendRequest(String userId, String targetUserId) async {
-  final response = await _client.post(
-    Uri.parse('$baseUrl/friend-request/'),
-    body: 
-    jsonEncode({
+  try{
+  final response = await _client.post('/friend-request/',
+    data: {
       'id': userId,
       'targetId': targetUserId
-    })
+    }
   );
-
-  if (response.statusCode != 200) {
-    throw Exception('Error al enviar solicitud: ${response.body}');
+  }
+  catch (e) {
+    print('Error in sendFriendRequest: $e');
+    throw Exception('Error al enviar solicitud: $e');
   }
 }
 }
