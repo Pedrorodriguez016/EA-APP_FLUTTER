@@ -8,11 +8,16 @@ import '../Widgets/logout_button.dart';
 import '../Widgets/user_card.dart';
 import '../Widgets/solicitudes.dart';
 import '../Widgets/mapa.dart';
+import '../Controllers/eventos_controller.dart ';
+import '../Services/eventos_services.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:flutter_map/flutter_map.dart';
 
 class HomeScreen extends GetView<UserController>{
   HomeScreen({Key? key}) : super(key: key);
   final AuthController authController = Get.find<AuthController>();
+  final EventoController eventoController = Get.put(EventoController(EventosServices()));
+
   @override
   Widget build(BuildContext context) {
     
@@ -169,10 +174,34 @@ class HomeScreen extends GetView<UserController>{
                 ),
               ],
             ),
-            const CustomMap(
-              height: 200,
-              center: LatLng(41.3851, 2.1734), 
-              zoom: 12,
+            SizedBox(
+              height: 200, 
+              child: Obx(() {
+                // Usamos Obx para escuchar cambios en los marcadores del controller
+                return CustomMap(
+                  height: 200,
+                  center: LatLng(41.3851, 2.1734),
+                  zoom: 12,
+                  enableExpansion: true,
+                  markers: eventoController.getMarkers(), 
+
+                   onPositionChanged: (MapPosition position, bool hasGesture) {
+                    final lat = position.center?.latitude;
+                    final lng = position.center?.longitude;
+                    final zoom = position.zoom;
+                    final bounds = position.bounds;
+                    // Llamamos al método del controller para cargar eventos en el área visible
+                    if (bounds != null) {
+                      eventoController.fetchMapEvents(
+                        bounds.north,
+                        bounds.south,
+                        bounds.east,
+                        bounds.west
+                      );
+                    }
+                  },
+                );
+              }),
             ),
             const SizedBox(height: 16),
           ],

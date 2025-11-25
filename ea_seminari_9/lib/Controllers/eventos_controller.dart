@@ -2,11 +2,15 @@ import 'package:ea_seminari_9/Models/eventos.dart';
 import 'package:ea_seminari_9/Services/eventos_services.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 class EventoController extends GetxController {
   // --- Variables de la lista (existentes) ---
   var isLoading = true.obs;
   var eventosList = <Evento>[].obs;
+  var mapEventosList = <Evento>[].obs;
   var currentPage = 1.obs;
   var totalPages = 1.obs;
   var totalEventos = 0.obs;
@@ -15,6 +19,7 @@ class EventoController extends GetxController {
   var selectedEvento = Rxn<Evento>();
   final TextEditingController searchEditingController = TextEditingController();
   final EventosServices _eventosServices;
+  Timer? _debounce;
 
   // --- ARREGLO: Inicializa los controllers aquí ---
   final TextEditingController tituloController = TextEditingController();
@@ -67,7 +72,49 @@ class EventoController extends GetxController {
     selectedSchedule.value = combinedDateTime;
   }
 
-  // --- (Funciones de la lista: fetchEventos, nextPage, etc.) ---
+ void fetchMapEvents(double north, double south, double east, double west) async {
+    try {
+      // Llamada al servicio
+      var nuevosEventos = await _eventosServices.fetchEventsByBounds(
+        north: north, 
+        south: south, 
+        east: east, 
+        west: west
+      );
+      
+      mapEventosList.assignAll(nuevosEventos);
+      
+    } catch (e) {
+      print("Error cargando mapa: $e");
+    }
+  }
+
+
+  List<Marker> getMarkers() {
+    return mapEventosList
+        .where((e) => e.lat != null && e.lng != null)
+        .map((evento) {
+          return Marker(
+            point: LatLng(evento.lat!.toDouble(), evento.lng!.toDouble()),
+            width: 40,
+            height: 40,
+            child: GestureDetector(
+              onTap: () {
+                 Get.snackbar('Evento', evento.name, 
+                   snackPosition: SnackPosition.BOTTOM,
+                   backgroundColor: Colors.white,
+                 );
+              },
+              child: const Icon(
+                Icons.location_on,
+                color: Color(0xFF667EEA), 
+                size: 40,
+              ),
+            ),
+          );
+        }).toList();
+  }
+
   
   void fetchEventos(int page) async {
     isLoading.value = true;
@@ -195,11 +242,28 @@ class EventoController extends GetxController {
     }
   }
   
+ void onMapPositionChanged(MapCamera camera, bool hasGesture) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      
+      final bounds = camera.visibleBounds;
+      
+      fetchMapEvents(
+        bounds.north, 
+        bounds.south, 
+        bounds.east, 
+        bounds.west
+      );
+    });
+  }
+  
   // Limpia los controllers de texto
   @override
   void onClose() {
     tituloController.dispose();
     direccionController.dispose();
+    _debounce?.cancel();
     super.onClose();
   }
 }
