@@ -1,5 +1,4 @@
 import 'package:ea_seminari_9/Models/user.dart';
-import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import '../Interceptor/auth_interceptor.dart';
@@ -162,4 +161,20 @@ Future<void> sendFriendRequest(String userId, String targetUserId) async {
     throw Exception('Error al enviar solicitud: $e');
   }
 }
+  Future<User?> getUserByUsername(String username) async {
+    try {
+      final response = await _client.get('/by-username/$username');
+      return User.fromJson(response.data);
+      
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        print('Usuario no encontrado: $username');
+        return null; 
+      }
+      
+      throw Exception('Error al buscar usuario por username: ${e.message}');
+    } catch (e) {
+      throw Exception('Error desconocido al buscar usuario: $e');
+    }
+  }
 }
