@@ -90,30 +90,7 @@ class EventoController extends GetxController {
   }
 
 
-  List<Marker> getMarkers() {
-    return mapEventosList
-        .where((e) => e.lat != null && e.lng != null)
-        .map((evento) {
-          return Marker(
-            point: LatLng(evento.lat!.toDouble(), evento.lng!.toDouble()),
-            width: 40,
-            height: 40,
-            child: GestureDetector(
-              onTap: () {
-                 Get.snackbar('Evento', evento.name, 
-                   snackPosition: SnackPosition.BOTTOM,
-                   backgroundColor: Colors.white,
-                 );
-              },
-              child: const Icon(
-                Icons.location_on,
-                color: Color(0xFF667EEA), 
-                size: 40,
-              ),
-            ),
-          );
-        }).toList();
-  }
+
 
   
   void fetchEventos(int page) async {

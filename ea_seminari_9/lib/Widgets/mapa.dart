@@ -8,9 +8,8 @@ class CustomMap extends StatelessWidget {
   final double zoom;
   final double? height; 
   final bool enableExpansion; 
-  final List<Marker> markers; // <--- Ya lo tenías
+  final List<Marker> markers; 
   
-  // 1. AGREGAMOS EL CALLBACK AQUÍ
   final void Function(MapPosition position, bool hasGesture)? onPositionChanged; 
 
   const CustomMap({
@@ -20,7 +19,7 @@ class CustomMap extends StatelessWidget {
     this.height, 
     this.enableExpansion = false, 
     this.markers = const [],
-    this.onPositionChanged, // 2. LO AGREGAMOS AL CONSTRUCTOR
+    this.onPositionChanged, 
   }) : super(key: key);
 
   @override

@@ -175,22 +175,41 @@ class HomeScreen extends GetView<UserController>{
               ],
             ),
             SizedBox(
-              height: 200, 
+              height: 200,
               child: Obx(() {
-                // Usamos Obx para escuchar cambios en los marcadores del controller
+                final eventos = eventoController.mapEventosList;
+                final myMarkers = eventos
+                    .where((e) => e.lat != null && e.lng != null)
+                    .map((evento) {
+                  return Marker(
+                    point: LatLng(evento.lat!.toDouble(), evento.lng!.toDouble()),
+                    width: 45,
+                    height: 45,
+                    child: GestureDetector(
+                      onTap: () {
+                         Get.toNamed('/evento/${evento.id}');
+                      },
+                      child: const Icon(
+                        Icons.location_on,
+                        color: Color(0xFF667EEA),
+                        size: 45,
+                        shadows: [
+                          Shadow(blurRadius: 10, color: Colors.black26, offset: Offset(2, 2))
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList();
                 return CustomMap(
                   height: 200,
-                  center: LatLng(41.3851, 2.1734),
+                  center: const LatLng(41.3851, 2.1734),
                   zoom: 12,
                   enableExpansion: true,
-                  markers: eventoController.getMarkers(), 
-
-                   onPositionChanged: (MapPosition position, bool hasGesture) {
-                    final lat = position.center?.latitude;
-                    final lng = position.center?.longitude;
-                    final zoom = position.zoom;
+                  markers: myMarkers, // Pasamos la lista limpia
+                  
+                  // Lógica de recarga al mover el mapa
+                  onPositionChanged: (MapPosition position, bool hasGesture) {
                     final bounds = position.bounds;
-                    // Llamamos al método del controller para cargar eventos en el área visible
                     if (bounds != null) {
                       eventoController.fetchMapEvents(
                         bounds.north,
