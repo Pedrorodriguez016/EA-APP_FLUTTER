@@ -63,4 +63,21 @@ class EventosServices {
       throw Exception('Error al crear el evento: $e');
     }
   }
+
+  Future<Evento?> getEventoByName(String name) async {
+    try {
+      final response = await _client.get('/by-name/$name');
+      return Evento.fromJson(response.data);
+      
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        print('Usuario no encontrado: $name');
+        return null; 
+      }
+      
+      throw Exception('Error al buscar usuario por username: ${e.message}');
+    } catch (e) {
+      throw Exception('Error desconocido al buscar usuario: $e');
+    }
+  }
 }

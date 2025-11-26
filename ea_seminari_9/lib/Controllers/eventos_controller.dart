@@ -12,7 +12,6 @@ class EventoController extends GetxController {
   var totalPages = 1.obs;
   var totalEventos = 0.obs;
   final int limit = 10;
-  var searchQuery = ''.obs;
   var selectedEvento = Rxn<Evento>();
   final TextEditingController searchEditingController = TextEditingController();
   final EventosServices _eventosServices;
@@ -38,7 +37,6 @@ class EventoController extends GetxController {
         }
       }
     });
-    debounce(searchQuery, (_) => fetchEventos(1), time: const Duration(milliseconds: 500));
   }
 
   // --- Limpia los campos del formulario ---
@@ -89,7 +87,6 @@ class EventoController extends GetxController {
       final data = await _eventosServices.fetchEvents(
         page: page,
         limit: limit,
-        q: searchQuery.value,
       );
      final List<Evento> newEventos = data['eventos'];
 
@@ -116,12 +113,43 @@ class EventoController extends GetxController {
     }
   }
 
-  void searchEventos(String query) {
-    searchQuery.value = query;
+  Future<void> searchEventos(String query) async {
+    if (searchEditingController.text.isEmpty) {
+      refreshEventos();
+      return;
+    }
+
+    try {
+      isLoading(true);
+    
+      final Evento? evento = await _eventosServices.getEventoByName(searchEditingController.text);
+      if (evento != null) {
+        eventosList.assignAll([evento]);
+      } else {
+        eventosList.clear();
+        Get.snackbar(
+          'Búsqueda', 
+          'No se encontró ningún evento con ese nombre',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2)
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error', 
+        'Ocurrió un error al buscar: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white
+      );
+    } finally {
+      isLoading(false);
+    }
   }
 
   void refreshEventos() {
-    searchQuery.value = '';
     searchEditingController.clear();
     fetchEventos(1);
     Get.snackbar(
@@ -217,4 +245,5 @@ class EventoController extends GetxController {
     direccionController.dispose();
     super.onClose();
   }
+  
 }

@@ -82,16 +82,11 @@ class UserController extends GetxController {
     try {
       isLoading(true);
       
-      // 2. Llamamos a la función que creamos en el Service
-      // Asegúrate de haber agregado 'getUserByUsername' en tu UserServices como vimos antes
       final User? user = await _userServices.getUserByUsername(searchEditingController);
 
-      // 3. Manejamos el resultado
       if (user != null) {
-        // Si encontramos al usuario, la lista ahora es de un solo elemento
         userList.assignAll([user]);
       } else {
-        // Si es null (404), vaciamos la lista y avisamos
         userList.clear();
         Get.snackbar(
           'Búsqueda', 
@@ -114,7 +109,7 @@ class UserController extends GetxController {
       isLoading(false);
     }
   }
-  
+
   void refreshUsers() {
     searchEditingController.clear(); 
     fetchUsers(1);
