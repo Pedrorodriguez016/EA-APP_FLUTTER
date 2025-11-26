@@ -7,10 +7,17 @@ import '../Widgets/navigation_bar.dart';
 import '../Widgets/logout_button.dart';
 import '../Widgets/user_card.dart';
 import '../Widgets/solicitudes.dart';
+import '../Widgets/mapa.dart';
+import '../Controllers/eventos_controller.dart ';
+import '../Services/eventos_services.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:flutter_map/flutter_map.dart';
 
 class HomeScreen extends GetView<UserController>{
   HomeScreen({Key? key}) : super(key: key);
   final AuthController authController = Get.find<AuthController>();
+  final EventoController eventoController = Get.put(EventoController(EventosServices()));
+
   @override
   Widget build(BuildContext context) {
     
@@ -23,15 +30,10 @@ class HomeScreen extends GetView<UserController>{
           children: [
             _buildWelcomeCard(authController),
             const SizedBox(height: 24),
-            Row(
-              children: [
-                Expanded(child:
-                _buildEventsCard()
-                ),
-                Expanded(child: 
-                _buildFriendsCard(context))
-              ],
-            )
+            _buildEventsCard(),
+            const SizedBox(height: 24),
+            _buildFriendsCard(context),
+            const SizedBox(height: 24),
           ],
         ),
       ),
@@ -172,6 +174,55 @@ class HomeScreen extends GetView<UserController>{
                 ),
               ],
             ),
+            SizedBox(
+              height: 200,
+              child: Obx(() {
+                final eventos = eventoController.mapEventosList;
+                final myMarkers = eventos
+                    .where((e) => e.lat != null && e.lng != null)
+                    .map((evento) {
+                  return Marker(
+                    point: LatLng(evento.lat!.toDouble(), evento.lng!.toDouble()),
+                    width: 45,
+                    height: 45,
+                    child: GestureDetector(
+                      onTap: () {
+                         Get.toNamed('/evento/${evento.id}');
+                      },
+                      child: const Icon(
+                        Icons.location_on,
+                        color: Color(0xFF667EEA),
+                        size: 45,
+                        shadows: [
+                          Shadow(blurRadius: 10, color: Colors.black26, offset: Offset(2, 2))
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList();
+                return CustomMap(
+                  height: 200,
+                  center: const LatLng(41.3851, 2.1734),
+                  zoom: 12,
+                  enableExpansion: true,
+                  markers: myMarkers, // Pasamos la lista limpia
+                  
+                  // Lógica de recarga al mover el mapa
+                  onPositionChanged: (MapPosition position, bool hasGesture) {
+                    final bounds = position.bounds;
+                    if (bounds != null) {
+                      eventoController.fetchMapEvents(
+                        bounds.north,
+                        bounds.south,
+                        bounds.east,
+                        bounds.west
+                      );
+                    }
+                  },
+                );
+              }),
+            ),
+            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -216,7 +267,14 @@ class HomeScreen extends GetView<UserController>{
                           color: Colors.black54),
                     )),
               ),
-              const Spacer(),
+            ]
+          ),
+              const SizedBox(width: 16),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child:Row(
+            children: [
+
               TextButton.icon(
                 onPressed: () {
                  final List<User> users = controller.friendsRequests;
@@ -234,6 +292,7 @@ class HomeScreen extends GetView<UserController>{
                       borderRadius: BorderRadius.circular(12)),
                 ),
               ),
+              const SizedBox(width: 12),
               ElevatedButton.icon(
                       onPressed: () => Get.toNamed('/users'),
                       icon: const Icon(Icons.search, size: 20),
@@ -246,8 +305,9 @@ class HomeScreen extends GetView<UserController>{
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
                       ),
-                    )
+                ),
             ],
+          ),
           ),
           const SizedBox(height: 20),
 

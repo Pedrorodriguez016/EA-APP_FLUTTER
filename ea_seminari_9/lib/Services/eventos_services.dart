@@ -14,6 +14,38 @@ class EventosServices {
     _client.interceptors.add(AuthInterceptor());
   }
   
+  Future<List<Evento>> fetchEventsByBounds({
+    required double north,
+    required double south,
+    required double east,
+    required double west,
+  }) async {
+    try {
+      final response = await _client.get('/by-bounds', queryParameters: {
+        'north': north,
+        'south': south,
+        'east': east,
+        'west': west,
+        'limit': 10, 
+      });
+
+      var data = response.data;
+      List<dynamic> eventosList;
+
+      if (data is List) {
+        eventosList = data;
+      } else if (data is Map<String, dynamic> && data.containsKey('data')) {
+        eventosList = data['data']; 
+      } else {
+        eventosList = [];
+      }
+      print('Eventos fetched by bounds: $eventosList');
+      return eventosList.map((json) => Evento.fromJson(json)).toList();
+    } catch (e) {
+      print('Error in fetchEventsByBounds: $e');
+      return []; 
+    }
+  }
 
   Future<Map<String, dynamic>> fetchEvents({
     int page = 1,
