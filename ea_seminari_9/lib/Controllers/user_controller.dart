@@ -16,7 +16,6 @@ class UserController extends GetxController {
   var totalPages = 1.obs;
   var totalUsers = 0.obs;
   final int limit = 10;
-  var searchQuery = ''.obs;
   final TextEditingController searchEditingController = TextEditingController();
   final UserServices _userServices;
 
@@ -34,7 +33,6 @@ class UserController extends GetxController {
         }
       }
     });
-    debounce(searchQuery, (_) => fetchUsers(1), time: const Duration(milliseconds: 500));
   }
   Future<void> fetchUsers(int page) async {
     if (page == 1) {
@@ -47,7 +45,6 @@ class UserController extends GetxController {
       final data = await _userServices.fetchUsers(
         page: page,
         limit: limit,
-        q: searchQuery.value,
       );
 
       final List<User> newUsers = data['users'];
@@ -76,11 +73,49 @@ class UserController extends GetxController {
     }
   }
 
-  void searchUsers(String query) {
-    searchQuery.value = query;
+  void searchUsers(String searchEditingController) async {
+   if (searchEditingController.isEmpty) {
+      refreshUsers();
+      return;
+    }
+
+    try {
+      isLoading(true);
+      
+      // 2. Llamamos a la función que creamos en el Service
+      // Asegúrate de haber agregado 'getUserByUsername' en tu UserServices como vimos antes
+      final User? user = await _userServices.getUserByUsername(searchEditingController);
+
+      // 3. Manejamos el resultado
+      if (user != null) {
+        // Si encontramos al usuario, la lista ahora es de un solo elemento
+        userList.assignAll([user]);
+      } else {
+        // Si es null (404), vaciamos la lista y avisamos
+        userList.clear();
+        Get.snackbar(
+          'Búsqueda', 
+          'No se encontró ningún usuario con ese nombre',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2)
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error', 
+        'Ocurrió un error al buscar: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white
+      );
+    } finally {
+      isLoading(false);
+    }
   }
+  
   void refreshUsers() {
-    searchQuery.value = '';
     searchEditingController.clear(); 
     fetchUsers(1);
     Get.snackbar(
