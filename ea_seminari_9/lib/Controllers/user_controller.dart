@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter/widgets.dart';
 import '../Controllers/auth_controller.dart';
+import '../Services/socket_services.dart';
 
 class UserController extends GetxController {
   final AuthController authController = Get.find<AuthController>();
+  final SocketService _socketService;
   var isLoading = true.obs;
   var userList = <User>[].obs;
   var selectedUser = Rxn<User>();
@@ -20,9 +22,10 @@ class UserController extends GetxController {
   final TextEditingController searchEditingController = TextEditingController();
   final UserServices _userServices;
 
-  UserController(this._userServices);
+  UserController(this._userServices, this._socketService);
   @override
   void onInit() {
+    _initSocketConnection();
     fetchUsers(1);
     super.onInit();
   }
@@ -223,5 +226,19 @@ void fetchFriends() async {
        colorText: Colors.white,
        snackPosition: SnackPosition.BOTTOM);
     }
+  }
+  void _initSocketConnection() {
+    // Obtenemos el ID del usuario actual desde el AuthController
+    final userId = authController.currentUser.value?.id;
+    
+    if (userId != null) {
+      print("UserController: Inicializando conexión Socket para $userId");
+      _socketService.connectWithUserId(userId);
+    }
+  }
+  @override
+  void onClose() {
+    _socketService.disconnect();
+    super.onClose();
   }
 }

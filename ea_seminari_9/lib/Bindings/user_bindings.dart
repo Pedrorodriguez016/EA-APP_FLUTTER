@@ -1,11 +1,13 @@
-import 'package:ea_seminari_9/Controllers/user_controller.dart';
-import 'package:ea_seminari_9/Services/user_services.dart';
+import '../Controllers/user_controller.dart';
+import '../Services/user_services.dart';
 import 'package:get/get.dart';
+import '../Services/socket_services.dart';
 
 class UserBinding extends Bindings {
   @override
   void dependencies() {
      Get.lazyPut<UserServices>(() => UserServices());
-     Get.lazyPut<UserController>(() => UserController(Get.find<UserServices>()));
+     Get.lazyPut<SocketService>(() => SocketService());
+     Get.lazyPut<UserController>(() => UserController(Get.find<UserServices>(), Get.find<SocketService>()));
   }
 }
