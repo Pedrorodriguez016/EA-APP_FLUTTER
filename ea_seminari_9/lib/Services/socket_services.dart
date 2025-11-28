@@ -2,40 +2,63 @@ import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class SocketService extends GetxService {
-  late IO.Socket socket;
+  late IO.Socket _socket;
   final String _url = 'http://localhost:3000'; 
 
   void connectWithUserId(String userId) {
     // Configuración del cliente
-    socket = IO.io(_url, IO.OptionBuilder()
+    _socket = IO.io(_url, IO.OptionBuilder()
         .setTransports(['websocket']) // forzar WebSockets
         .disableAutoConnect()         // conectamos manualmente
         .build()
     );
 
-    socket.connect();
+    _socket.connect();
 
-    socket.onConnect((_) {
+    _socket.onConnect((_) {
       print('✅ Conectado al Socket Server');
       
       // Emitimos el evento que tu backend espera en la línea 63
-      socket.emit('user:online', userId); 
+      _socket.emit('user:online', userId); 
     });
 
-    socket.on('user:online', (data) {
+    _socket.on('user:online', (data) {
       print('Servidor confirmó usuario online: $data');
     });
 
-    socket.onDisconnect((_) => print('❌ Desconectado del Socket'));
-    
-    // Aquí puedes añadir los listeners para el chat
-    socket.on('chat:message', (payload) {
-      print('Nuevo mensaje: $payload');
-      // Aquí podrías usar un ChatController para actualizar la UI
+    _socket.onDisconnect((_) => print('❌ Desconectado del Socket'));
+  }
+    void joinChatRoom(String myUserId, String friendId) {
+    _socket.emit('chat:join', {
+      'userId': myUserId,
+      'friendId': friendId
     });
   }
 
+  void sendChatMessage(String from, String to, String text) {
+    _socket.emit('chat:message', {
+      'from': from,
+      'to': to,
+      'text': text
+    });
+  }
+
+  // El controlador pasará una función aquí para saber qué hacer cuando llegue un mensaje
+  void listenToChatMessages(Function(dynamic) onMessageReceived) {
+    _socket.on('chat:message', onMessageReceived);
+  }
+
+  void stopListeningToChatMessages() {
+    _socket.off('chat:message');
+  }
   void disconnect() {
-    socket.disconnect();
+    try {
+      if (_socket.connected) {
+        _socket.disconnect();
+      }
+    } catch (e) {
+      print('Error al desconectar: $e');
+    }
   }
 }
+  

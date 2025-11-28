@@ -3,7 +3,6 @@ import 'package:ea_seminari_9/Widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Widgets/user_card.dart';
-import '../Widgets/navigation_bar.dart';
 import '../Widgets/refresh_button.dart';
 import '../Widgets/paginator.dart';
 
@@ -96,7 +95,6 @@ class UserListScreen extends GetView<UserController> {
         onRefresh: () => controller.refreshUsers(),
         message: 'Lista de usuarios actualizada',
       ),
-      bottomNavigationBar: const CustomNavBar(currentIndex: 2),
     );
   }
 
