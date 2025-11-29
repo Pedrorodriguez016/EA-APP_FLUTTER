@@ -1,0 +1,144 @@
+{
+  "app_title": "Eventer",
+  "common": {
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "accept": "Accepter",
+    "save": "Enregistrer",
+    "close": "Fermer",
+    "search": "Rechercher...",
+    "loading": "Chargement...",
+    "update": "Mettre à jour",
+    "delete": "Supprimer",
+    "confirm": "Confirmer",
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "auth": {
+    "login": {
+      "title": "Bienvenue",
+      "subtitle": "Connectez-vous à votre compte",
+      "password": "Mot de passe",
+      "action_btn": "Se connecter",
+      "no_account": "Pas de compte ?",
+      "register_link": "Inscrivez-vous ici",
+      "success_msg": "Connexion réussie"
+    },
+    "register": {
+      "title": "Créer un compte",
+      "subtitle": "Remplissez vos coordonnées pour vous inscrire",
+      "action_btn": "Créer un compte",
+      "has_account": "Vous avez déjà un compte ?",
+      "login_link": "Se connecter",
+      "success_title": "Inscription réussie !",
+      "success_msg": "Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.",
+      "continue": "Continuer"
+    },
+    "fields": {
+      "username": "Nom d'utilisateur",
+      "email": "Gmail",
+      "password": "Mot de passe",
+      "confirm_password": "Confirmer le mot de passe",
+      "birthday": "Date de naissance (AAAA-MM-JJ)",
+      "birthday_hint": "2000-01-01"
+    },
+    "errors": {
+      "username_empty": "Veuillez entrer un nom d'utilisateur",
+      "username_short": "Le nom d'utilisateur doit comporter au moins 3 caractères",
+      "username_chars": "Seuls les lettres, les chiffres et les traits de soulignement sont autorisés",
+      "email_empty": "Veuillez entrer votre gmail",
+      "email_invalid": "Veuillez entrer un gmail valide",
+      "password_empty": "Veuillez entrer un mot de passe",
+      "password_short": "Le mot de passe doit comporter au moins 6 caractères",
+      "password_mismatch": "Les mots de passe ne correspondent pas",
+      "birthday_empty": "Veuillez entrer votre date de naissance",
+      "birthday_invalid": "Date invalide"
+    }
+  },
+  "home": {
+    "title": "Accueil",
+    "welcome_card": {
+      "greeting": "Bonjour !",
+      "subtitle": "Bienvenue sur votre application d'événements"
+    },
+    "events_section": {
+      "title": "Événements",
+      "create_btn": "Créer un événement",
+      "explore_btn": "Explorer les événements",
+      "my_events_btn": "Mes événements"
+    },
+    "friends_section": {
+      "title": "Amis",
+      "requests_btn": "Demandes",
+      "search_btn": "Rechercher des amis",
+      "empty_msg": "Pas encore d'amis à afficher."
+    }
+  },
+  "events": {
+    "list_title": "Événements",
+    "search_hint": "Rechercher un événement...",
+    "empty_search": "Aucun événement trouvé",
+    "create_title": "Créer un événement",
+    "save_btn": "Enregistrer l'événement",
+    "field_title": "Titre de l'événement",
+    "field_address": "Adresse",
+    "field_date": "Date et heure de l'événement",
+    "select_date_btn": "Sélectionner la date et l'heure",
+    "detail_title": "Détails de l'événement",
+    "info_card_title": "Informations sur l'événement",
+    "schedule": "Horaire :",
+    "participants": "Participants :",
+    "not_found": "Événement non trouvé",
+    "created_success": "L'événement a été créé avec succès."
+  },
+  "users": {
+    "list_title": "Utilisateurs",
+    "search_hint": "Rechercher un utilisateur...",
+    "empty_search": "Aucun utilisateur trouvé",
+    "detail_title": "Détails de l'utilisateur",
+    "info_card_title": "Informations personnelles",
+    "status_online": "En ligne",
+    "status_offline": "Hors ligne",
+    "friend_requests_title": "Demandes d'amis",
+    "no_requests": "Vous n'avez aucune demande en attente.",
+    "accept_req": "Accepter la demande",
+    "reject_req": "Refuser la demande",
+    "req_sent": "Demande d'ami envoyée",
+    "friendship_accepted": "Amitié acceptée",
+    "req_rejected": "Demande refusée"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "config_section": "Configuration",
+    "profile": "Profil",
+    "profile_subtitle": "Gérer vos informations personnelles",
+    "notifications": "Notifications",
+    "privacy": "Confidentialité",
+    "language": "Langue",
+    "about_section": "À propos",
+    "version": "Version",
+    "help": "Aide et support",
+    "terms": "Termes et conditions",
+    "coming_soon": "Bientôt disponible"
+  },
+  "profile": {
+    "title": "Mon profil",
+    "save_changes": "Enregistrer les modifications",
+    "delete_account": "Supprimer le compte",
+    "update_success": "Profil mis à jour avec succès",
+    "delete_dialog": {
+      "title": "Êtes-vous sûr ?",
+      "content": "Cette action est permanente et ne peut pas être annulée. Votre compte sera supprimé définitivement.",
+      "password_confirm": "Confirmez votre mot de passe",
+      "confirm_btn": "Confirmer la suppression"
+    }
+  },
+  "dialogs": {
+    "logout": {
+      "title": "Se déconnecter",
+      "content": "Êtes-vous sûr de vouloir vous déconnecter ?",
+      "confirm": "Oui, sortir"
+    }
+  }
+}

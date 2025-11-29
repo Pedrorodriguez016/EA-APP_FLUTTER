@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:flutter_translate/flutter_translate.dart'; // Importar
 
 class EventoController extends GetxController {
-  // --- Variables de la lista (existentes) ---
   var isLoading = true.obs;
   var isMoreLoading = false.obs;
   var eventosList = <Evento>[].obs;
@@ -21,19 +21,17 @@ class EventoController extends GetxController {
   final EventosServices _eventosServices;
   Timer? _debounce;
 
-  // --- ARREGLO: Inicializa los controllers aquí ---
   final TextEditingController tituloController = TextEditingController();
   final TextEditingController direccionController = TextEditingController();
   var selectedSchedule = Rxn<DateTime>();
-  // --- FIN ARREGLO ---
 
   EventoController(this._eventosServices);
   final ScrollController scrollController = ScrollController();
 
   @override
   void onInit() {
-    fetchEventos(1); // Carga inicial de eventos
-    selectedSchedule.value = null; // Limpia la fecha
+    fetchEventos(1);
+    selectedSchedule.value = null;
     super.onInit();
     scrollController.addListener(() {
       if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 200) {
@@ -44,14 +42,12 @@ class EventoController extends GetxController {
     });
   }
 
-  // --- Limpia los campos del formulario ---
   void limpiarFormularioCrear() {
     tituloController.clear();
     direccionController.clear();
     selectedSchedule.value = null;
   }
 
-  // --- Muestra el selector de fecha y hora ---
   Future<void> pickSchedule(BuildContext context) async {
     final DateTime? date = await showDatePicker(
       context: context,
@@ -82,25 +78,18 @@ class EventoController extends GetxController {
 
  void fetchMapEvents(double north, double south, double east, double west) async {
     try {
-      // Llamada al servicio
       var nuevosEventos = await _eventosServices.fetchEventsByBounds(
         north: north, 
         south: south, 
         east: east, 
         west: west
       );
-      
       mapEventosList.assignAll(nuevosEventos);
-      
     } catch (e) {
       print("Error cargando mapa: $e");
     }
   }
 
-
-
-
-  
   void fetchEventos(int page) async {
     if (page == 1) {
       isLoading.value = true;
@@ -152,8 +141,8 @@ class EventoController extends GetxController {
       } else {
         eventosList.clear();
         Get.snackbar(
-          'Búsqueda', 
-          'No se encontró ningún evento con ese nombre',
+          translate('common.search'), // 'Búsqueda'
+          translate('events.empty_search'), // 'No se encontró ningún evento...'
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.orange,
           colorText: Colors.white,
@@ -162,8 +151,8 @@ class EventoController extends GetxController {
       }
     } catch (e) {
       Get.snackbar(
-        'Error', 
-        'Ocurrió un error al buscar: $e',
+        translate('common.error'), 
+        e.toString(),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white
@@ -177,8 +166,8 @@ class EventoController extends GetxController {
     searchEditingController.clear();
     fetchEventos(1);
     Get.snackbar(
-      'Actualizado',
-      'Lista de Eventos actualizada',
+      translate('common.update'), // 'Actualizado'
+      translate('events.list_updated') ?? 'Lista de Eventos actualizada', // Asegúrate de tener esta clave o pon el texto traducido aquí
       snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 2),
     );
@@ -191,8 +180,8 @@ class EventoController extends GetxController {
       selectedEvento.value = evento;
     } catch (e) {
       Get.snackbar(
-        "Error al cargar",
-        "No se pudo encontrar el evento: ${e.toString()}",
+        translate('common.error'),
+        translate('events.not_found'),
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {
@@ -200,14 +189,14 @@ class EventoController extends GetxController {
     }
   }
   
-  // --- Función 'crearEvento' ---
   Future<void> crearEvento() async {
     final String titulo = tituloController.text;
     final String direccion = direccionController.text;
 
-    // --- Validación ---
     if (titulo.isEmpty) {
-      Get.snackbar('Campo requerido', 'Por favor, introduce un título.',
+      Get.snackbar(
+          translate('common.error'), 
+          translate('events.errors.title_required') ?? 'Por favor, introduce un título.',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.orange,
           colorText: Colors.white);
@@ -215,13 +204,14 @@ class EventoController extends GetxController {
     }
     
     if (selectedSchedule.value == null) {
-      Get.snackbar('Campo requerido', 'Por favor, selecciona una fecha y hora.',
+      Get.snackbar(
+          translate('common.error'), 
+          translate('events.errors.date_required') ?? 'Por favor, selecciona una fecha.',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.orange,
           colorText: Colors.white);
       return;
     }
-    // --- Fin Validación ---
 
     try {
       final Map<String, dynamic> nuevoEventoData = {
@@ -232,29 +222,22 @@ class EventoController extends GetxController {
 
       await _eventosServices.createEvento(nuevoEventoData);
 
-      // 1. Volvemos al Home INMEDIATAMENTE
       Get.back();
-
-      // 2. Limpiamos el formulario (para la próxima vez)
       limpiarFormularioCrear();
 
-      // 3. Mostramos el mensaje de Éxito (se mostrará sobre el Home)
       Get.snackbar(
-        'Éxito',
-        'El evento "$titulo" se ha creado correctamente.',
+        translate('common.success'),
+        translate('events.created_success'),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
-    // 4. Refrescamos la lista de eventos en el Home
-      // (refreshEventos() ya muestra su propio snackbar,
-      // quizás quieras quitar el de 'Éxito' si te molesta)
       refreshEventos();
 
     } catch (e) {
       Get.snackbar(
-        'Error',
-        'No se pudo crear el evento: ${e.toString()}',
+        translate('common.error'),
+        e.toString(),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -266,9 +249,7 @@ class EventoController extends GetxController {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
 
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      
       final bounds = camera.visibleBounds;
-      
       fetchMapEvents(
         bounds.north, 
         bounds.south, 
@@ -278,7 +259,6 @@ class EventoController extends GetxController {
     });
   }
   
-  // Limpia los controllers de texto
   @override
   void onClose() {
     tituloController.dispose();
@@ -286,5 +266,4 @@ class EventoController extends GetxController {
     _debounce?.cancel();
     super.onClose();
   }
-  
 }

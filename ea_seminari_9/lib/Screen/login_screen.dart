@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart'; // Importar librería
 import '../Controllers/auth_controller.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -20,20 +21,20 @@ class LoginScreenState extends State<LoginScreen> {
 
   String? _validateUsername(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Por favor ingresa tu username';
+      return translate('auth.errors.username_empty');
     }
     if (value.length < 3) {
-      return 'El username debe tener al menos 3 caracteres';
+      return translate('auth.errors.username_short');
     }
     return null;
   }
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Por favor ingresa tu contraseña';
+      return translate('auth.errors.password_empty');
     }
     if (value.length < 6) {
-      return 'La contraseña debe tener al menos 6 caracteres';
+      return translate('auth.errors.password_short');
     }
     return null;
   }
@@ -77,9 +78,9 @@ class LoginScreenState extends State<LoginScreen> {
           child: const Icon(Icons.event, color: Colors.white, size: 32),
         ),
         const SizedBox(height: 24),
-        const Text(
-          'Bienvenido\nde vuelta',
-          style: TextStyle(
+        Text(
+          translate('auth.login.title'), // Traducido
+          style: const TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.w800,
             color: Colors.black87,
@@ -88,7 +89,7 @@ class LoginScreenState extends State<LoginScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Inicia sesión en tu cuenta',
+          translate('auth.login.subtitle'), // Traducido
           style: TextStyle(
             fontSize: 16,
             color: Colors.grey.shade600,
@@ -112,11 +113,11 @@ class LoginScreenState extends State<LoginScreen> {
             child: TextFormField(
               controller: usernameController,
               style: const TextStyle(fontSize: 16),
-              decoration: const InputDecoration(
-                labelText: 'Username',
+              decoration: InputDecoration(
+                labelText: translate('auth.fields.username'), // Traducido
                 border: InputBorder.none,
-                prefixIcon: Icon(Icons.person_outline, color: Colors.grey),
-                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               ),
               validator: _validateUsername,
             ),
@@ -133,7 +134,7 @@ class LoginScreenState extends State<LoginScreen> {
               obscureText: _obscurePassword,
               style: const TextStyle(fontSize: 16),
               decoration: InputDecoration(
-                labelText: 'Contraseña',
+                labelText: translate('auth.fields.password'), // Traducido
                 border: InputBorder.none,
                 prefixIcon: const Icon(Icons.lock_outline, color: Colors.grey),
                 suffixIcon: IconButton(
@@ -175,9 +176,9 @@ class LoginScreenState extends State<LoginScreen> {
                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                       ),
                     )
-                  : const Text(
-                      'Iniciar Sesión',
-                      style: TextStyle(
+                  : Text(
+                      translate('auth.login.action_btn'), // Traducido
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -194,14 +195,14 @@ class LoginScreenState extends State<LoginScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          '¿No tienes cuenta? ',
+          translate('auth.login.no_account') + ' ', // Traducido
           style: TextStyle(color: Colors.grey.shade600),
         ),
         GestureDetector(
           onTap: () => Get.toNamed('/register'),
-          child: const Text(
-            'Regístrate aquí',
-            style: TextStyle(
+          child: Text(
+            translate('auth.login.register_link'), // Traducido
+            style: const TextStyle(
               color: Color(0xFF667EEA),
               fontWeight: FontWeight.w600,
             ),
@@ -231,8 +232,8 @@ class LoginScreenState extends State<LoginScreen> {
 
   void _showSuccessSnackbar() {
     Get.snackbar(
-      '¡Éxito!',
-      'Sesión iniciada correctamente',
+      translate('common.success'), // Traducido
+      translate('auth.login.success_msg'), // Traducido
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.green,
       colorText: Colors.white,
@@ -243,8 +244,8 @@ class LoginScreenState extends State<LoginScreen> {
 
   void _showErrorSnackbar(String message) {
     Get.snackbar(
-      'Error',
-      message,
+      translate('common.error'), // Traducido
+      message, // Mensaje del backend (difícil de traducir sin códigos de error)
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.red,
       colorText: Colors.white,

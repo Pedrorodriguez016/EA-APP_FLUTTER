@@ -1,0 +1,144 @@
+{
+  "app_title": "Eventer",
+  "common": {
+    "error": "Error",
+    "success": "Èxit",
+    "cancel": "Cancel·la",
+    "accept": "Accepta",
+    "save": "Desa",
+    "close": "Tanca",
+    "search": "Cerca...",
+    "loading": "Carregant...",
+    "update": "Actualitza",
+    "delete": "Elimina",
+    "confirm": "Confirma",
+    "yes": "Sí",
+    "no": "No"
+  },
+  "auth": {
+    "login": {
+      "title": "Benvingut",
+      "subtitle": "Inicia sessió al teu compte",
+      "password": "contrasenya",
+      "action_btn": "Inicia Sessió",
+      "no_account": "No tens compte?",
+      "register_link": "Registra't aquí",
+      "success_msg": "Sessió iniciada correctament"
+    },
+    "register": {
+      "title": "Crear Compte",
+      "subtitle": "Completa les teves dades per registrar-te",
+      "action_btn": "Crear Compte",
+      "has_account": "Ja tens compte?",
+      "login_link": "Inicia Sessió",
+      "success_title": "Registre Completat!",
+      "success_msg": "El teu compte s'ha creat correctament. Ara pots iniciar sessió.",
+      "continue": "Continua"
+    },
+    "fields": {
+      "username": "Nom d'usuari",
+      "email": "Gmail",
+      "password": "Contrasenya",
+      "confirm_password": "Confirma la contrasenya",
+      "birthday": "Data de naixement (AAAA-MM-DD)",
+      "birthday_hint": "2000-01-01"
+    },
+    "errors": {
+      "username_empty": "Si us plau, introdueix un nom d'usuari",
+      "username_short": "El nom d'usuari ha de tenir almenys 3 caràcters",
+      "username_chars": "Només es permeten lletres, números i guions baixos",
+      "email_empty": "Si us plau, introdueix el teu gmail",
+      "email_invalid": "Si us plau, introdueix un gmail vàlid",
+      "password_empty": "Si us plau, introdueix una contrasenya",
+      "password_short": "La contrasenya ha de tenir almenys 6 caràcters",
+      "password_mismatch": "Les contrasenyes no coincideixen",
+      "birthday_empty": "Si us plau, introdueix la teva data de naixement",
+      "birthday_invalid": "Data invàlida"
+    }
+  },
+  "home": {
+    "title": "Inici",
+    "welcome_card": {
+      "greeting": "Hola!",
+      "subtitle": "Benvingut a la teva aplicació d'esdeveniments"
+    },
+    "events_section": {
+      "title": "Esdeveniments",
+      "create_btn": "Crear esdeveniment",
+      "explore_btn": "Explorar esdeveniments",
+      "my_events_btn": "Els meus esdeveniments"
+    },
+    "friends_section": {
+      "title": "Amics",
+      "requests_btn": "Sol·licituds",
+      "search_btn": "Cercar amics",
+      "empty_msg": "Encara no tens amics per mostrar."
+    }
+  },
+  "events": {
+    "list_title": "Esdeveniments",
+    "search_hint": "Cerca esdeveniment...",
+    "empty_search": "No s'han trobat esdeveniments",
+    "create_title": "Crear Esdeveniment",
+    "save_btn": "Desa l'esdeveniment",
+    "field_title": "Títol de l'esdeveniment",
+    "field_address": "Adreça",
+    "field_date": "Data i hora de l'esdeveniment",
+    "select_date_btn": "Selecciona data i hora",
+    "detail_title": "Detalls de l'Esdeveniment",
+    "info_card_title": "Informació de l'Esdeveniment",
+    "schedule": "Horari:",
+    "participants": "Participants:",
+    "not_found": "Esdeveniment no trobat",
+    "created_success": "L'esdeveniment s'ha creat correctament."
+  },
+  "users": {
+    "list_title": "Usuaris",
+    "search_hint": "Cerca usuari...",
+    "empty_search": "No s'han trobat usuaris",
+    "detail_title": "Detalls de l'Usuari",
+    "info_card_title": "Informació Personal",
+    "status_online": "Connectat",
+    "status_offline": "Desconnectat",
+    "friend_requests_title": "Sol·licituds d'amistat",
+    "no_requests": "No tens sol·licituds pendents.",
+    "accept_req": "Accepta sol·licitud",
+    "reject_req": "Rebutja sol·licitud",
+    "req_sent": "Sol·licitud d'amistat enviada",
+    "friendship_accepted": "Amistat acceptada",
+    "req_rejected": "Sol·licitud rebutjada"
+  },
+  "settings": {
+    "title": "Ajustos",
+    "config_section": "Configuració",
+    "profile": "Perfil",
+    "profile_subtitle": "Gestiona la teva informació personal",
+    "notifications": "Notificacions",
+    "privacy": "Privadesa",
+    "language": "Idioma",
+    "about_section": "Sobre l'app",
+    "version": "Versió",
+    "help": "Ajuda i Suport",
+    "terms": "Termes i Condicions",
+    "coming_soon": "Pròximament"
+  },
+  "profile": {
+    "title": "El meu perfil",
+    "save_changes": "Desa els canvis",
+    "delete_account": "Elimina el compte",
+    "update_success": "Perfil actualitzat correctament",
+    "delete_dialog": {
+      "title": "N'estàs segur?",
+      "content": "Aquesta acció és permanent i no es pot desfer. El teu compte s'eliminarà per sempre.",
+      "password_confirm": "Confirma la teva contrasenya",
+      "confirm_btn": "Confirma l'Eliminació"
+    }
+  },
+  "dialogs": {
+    "logout": {
+      "title": "Tancar sessió",
+      "content": "Segur que vols tancar la sessió?",
+      "confirm": "Sí, surt"
+    }
+  }
+}

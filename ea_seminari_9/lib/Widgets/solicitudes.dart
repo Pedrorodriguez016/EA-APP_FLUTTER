@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart'; // Importar
 import '../Models/user.dart';
 import 'request_card.dart';
 
 class FriendRequestsDialog {
-  /// Muestra un diálogo con la lista de solicitudes.
-  /// IMPORTANTE: usa parámetros con nombre: requests, onAccept, onReject
   static void show(
     BuildContext context, {
     required List<User> requests,
@@ -17,13 +16,13 @@ class FriendRequestsDialog {
       barrierDismissible: true,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Solicitudes de amistad'),
+          title: Text(translate('users.friend_requests_title')), // 'Solicitudes de amistad'
           content: SizedBox(
             width: double.maxFinite,
             child: requests.isEmpty
-                ? const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Center(child: Text('No tienes solicitudes pendientes.')),
+                ? Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Center(child: Text(translate('users.no_requests'))), // 'No tienes solicitudes...'
                   )
                 : ListView.builder(
                     shrinkWrap: true,
@@ -47,7 +46,7 @@ class FriendRequestsDialog {
           actions: [
             TextButton(
               onPressed: () => Get.back(),
-              child: const Text('Cerrar'),
+              child: Text(translate('common.close')), // 'Cerrar'
             ),
           ],
         );

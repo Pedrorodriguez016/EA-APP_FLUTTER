@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import '../Controllers/auth_controller.dart';
 
 class AuthInterceptor extends Interceptor {
-  final AuthController _auth = Get.find<AuthController>();
+  AuthController get _auth => Get.find<AuthController>();
 
   final Dio _tokenDio = Dio(BaseOptions(baseUrl: 'http://localhost:3000/api',
     connectTimeout:const Duration(seconds: 5,),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart'; // Importar
 import '../Controllers/auth_controller.dart';
 import '../Controllers/user_controller.dart';
 import '../Widgets/logout_button.dart';
@@ -18,7 +19,7 @@ class ProfileScreen extends GetView<UserController> {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: const Text('Mi perfil'),
+        title: Text(translate('profile.title')), // 'Mi perfil'
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
@@ -40,9 +41,9 @@ class ProfileScreen extends GetView<UserController> {
             ),
             const SizedBox(height: 20),
 
-            _buildTextField('Nombre', nameController, Icons.person),
-            _buildTextField('Correo electrónico', emailController, Icons.email),
-            _buildTextField('Cumpleaños', birthdayController, Icons.cake_outlined),
+            _buildTextField(translate('auth.fields.username'), nameController, Icons.person),
+            _buildTextField(translate('auth.fields.email'), emailController, Icons.email),
+            _buildTextField(translate('auth.fields.birthday'), birthdayController, Icons.cake_outlined),
 
             const SizedBox(height: 30),
 
@@ -54,10 +55,10 @@ class ProfileScreen extends GetView<UserController> {
                   'email': emailController.text,
                   'birthday': birthdayController.text,
                 };
-                await controller.updateUserByid(userId, updatedUser); // o llamar un método en AuthService
+                await controller.updateUserByid(userId, updatedUser); 
                 Get.snackbar(
-                  'Perfil actualizado',
-                  'Tus datos se han guardado correctamente',
+                  translate('profile.update_success'), // 'Perfil actualizado'
+                  translate('common.success'),
                   snackPosition: SnackPosition.BOTTOM,
                   backgroundColor: Colors.green,
                   colorText: Colors.white,
@@ -65,7 +66,7 @@ class ProfileScreen extends GetView<UserController> {
                 );
               },
               icon: const Icon(Icons.save),
-              label: const Text('Guardar cambios'),
+              label: Text(translate('profile.save_changes')), // 'Guardar cambios'
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF667EEA),
                 foregroundColor: Colors.white,
@@ -83,9 +84,9 @@ class ProfileScreen extends GetView<UserController> {
                       _showDeleteConfirmationDialog(context);
               },
               icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-              label: const Text(
-                'Eliminar cuenta',
-                style: TextStyle(color: Colors.redAccent),
+              label: Text(
+                translate('profile.delete_account'), // 'Eliminar cuenta'
+                style: const TextStyle(color: Colors.redAccent),
               ),
             ),
           ],
@@ -120,61 +121,53 @@ class ProfileScreen extends GetView<UserController> {
       barrierDismissible: false,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: const Text('¿Estás seguro?'),
+          title: Text(translate('profile.delete_dialog.title')), // '¿Estás seguro?'
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Esta acción es permanente y no se puede deshacer. Tu cuenta se eliminará para siempre.',
-              ),
+              Text(translate('profile.delete_dialog.content')), // 'Esta acción es permanente...'
               const SizedBox(height: 20),
-              // El campo de texto para la contraseña
               TextField(
                 controller: passwordController,
-                obscureText: true, // Oculta la contraseña
-                autofocus: true, // El cursor aparece aquí automáticamente
-                decoration: const InputDecoration(
-                  labelText: 'Confirma tu contraseña',
-                  border: OutlineInputBorder(),
+                obscureText: true,
+                autofocus: true, 
+                decoration: InputDecoration(
+                  labelText: translate('profile.delete_dialog.password_confirm'), // 'Confirma tu contraseña'
+                  border: const OutlineInputBorder(),
                 ),
               ),
             ],
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Cancelar'),
+              child: Text(translate('common.cancel')), // 'Cancelar'
               onPressed: () {
                 Get.back();
               },
             ),
-            // Botón para "Confirmar"
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red, // Mantener el estilo de peligro
+                backgroundColor: Colors.red, 
               ),
-              child: const Text(
-                'Confirmar Eliminación',
-                style: TextStyle(color: Colors.white),
+              child: Text(
+                translate('profile.delete_dialog.confirm_btn'), // 'Confirmar Eliminación'
+                style: const TextStyle(color: Colors.white),
               ),
               onPressed: () {
-
                 final String password = passwordController.text;
-
                 if (password.isNotEmpty) {
                   controller.disableUserByid(user!.id, password);
-
-                  
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Cuenta eliminada'),
+                     SnackBar(
+                      content: Text(translate('common.success')),
                       backgroundColor: Colors.green,
                     ),
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Por favor, introduce tu contraseña'),
+                      content: Text('Error'), // O usar una clave traducida para error de contraseña vacía
                       backgroundColor: Colors.orange,
                     ),
                   );

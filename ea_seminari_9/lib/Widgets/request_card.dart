@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart'; // Importar
 import '../Models/user.dart';
 
 class FriendRequestCard extends StatelessWidget {
@@ -68,12 +69,12 @@ class FriendRequestCard extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.check_circle, color: Colors.green),
                     onPressed: onAccept,
-                    tooltip: 'Aceptar solicitud',
+                    tooltip: translate('users.accept_req'), // 'Aceptar solicitud'
                   ),
                   IconButton(
                     icon: const Icon(Icons.cancel, color: Colors.red),
                     onPressed: onReject,
-                    tooltip: 'Rechazar solicitud',
+                    tooltip: translate('users.reject_req'), // 'Rechazar solicitud'
                   ),
                 ],
               ),

@@ -1,6 +1,7 @@
 import 'package:ea_seminari_9/Controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart'; // Importar
 import '../Models/user.dart';
 import '../Controllers/auth_controller.dart';
 import '../Widgets/navigation_bar.dart';
@@ -44,10 +45,10 @@ class HomeScreen extends GetView<UserController>{
 
   AppBar _buildAppBar() {
     return AppBar(
-      title: const Text('Inicio'),
+      title: Text(translate('home.title')), // 'Inicio'
       backgroundColor: Colors.white,
       elevation: 0,
-      leading: LogoutButton(),
+      leading: const LogoutButton(),
       actions: [
         IconButton(
           icon: Container(
@@ -86,9 +87,9 @@ class HomeScreen extends GetView<UserController>{
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            '¡Hola!',
-            style: TextStyle(
+          Text(
+            translate('home.welcome_card.greeting'), // '¡Hola!'
+            style: const TextStyle(
               color: Colors.white,
               fontSize: 24,
               fontWeight: FontWeight.w700,
@@ -105,7 +106,7 @@ class HomeScreen extends GetView<UserController>{
           ),
           const SizedBox(height: 16),
           Text(
-            'Bienvenido a tu aplicación de eventos',
+            translate('home.welcome_card.subtitle'), // 'Bienvenido a tu aplicación...'
             style: TextStyle(
               color: Colors.white.withOpacity(0.9),
               fontSize: 16,
@@ -126,8 +127,8 @@ class HomeScreen extends GetView<UserController>{
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Eventos',
-                style: TextStyle(
+            Text(translate('home.events_section.title'), // 'Eventos'
+                style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87)),
@@ -139,9 +140,9 @@ class HomeScreen extends GetView<UserController>{
                 ElevatedButton.icon(
                   onPressed: () => Get.toNamed('/crear_evento'),
                   icon: const Icon(Icons.add_circle),
-                  label: const Text('Crear evento'),
+                  label: Text(translate('home.events_section.create_btn')), // 'Crear evento'
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF667EEA), // Púrpura principal
+                    backgroundColor: const Color(0xFF667EEA), 
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     shape: RoundedRectangleBorder(
@@ -151,7 +152,7 @@ class HomeScreen extends GetView<UserController>{
                 TextButton.icon(
                   onPressed: () => Get.toNamed('/eventos'),
                   icon: const Icon(Icons.search),
-                  label: const Text('Explorar eventos'),
+                  label: Text(translate('home.events_section.explore_btn')), // 'Explorar eventos'
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.indigo.shade50,
                     foregroundColor: Colors.indigo.shade800,
@@ -163,7 +164,7 @@ class HomeScreen extends GetView<UserController>{
                 TextButton.icon(
                   onPressed: () => Get.toNamed('/eventos?mine=true'),
                   icon: const Icon(Icons.calendar_today),
-                  label: const Text('Mis eventos'),
+                  label: Text(translate('home.events_section.my_events_btn')), // 'Mis eventos'
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.indigo.shade50,
                     foregroundColor: Colors.indigo.shade800,
@@ -205,7 +206,7 @@ class HomeScreen extends GetView<UserController>{
                   center: const LatLng(41.3851, 2.1734),
                   zoom: 12,
                   enableExpansion: true,
-                  markers: myMarkers, // Pasamos la lista limpia
+                  markers: myMarkers, 
                   
                   // Lógica de recarga al mover el mapa
                   onPositionChanged: (MapPosition position, bool hasGesture) {
@@ -242,13 +243,12 @@ class HomeScreen extends GetView<UserController>{
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min, // Para que la tarjeta se ajuste
+        mainAxisSize: MainAxisSize.min, 
         children: [
-          // --- Fila Superior: Título, Contador, Solicitudes ---
           Row(
             children: [
-              const Text('Amigos',
-                  style: TextStyle(
+              Text(translate('home.friends_section.title'), // 'Amigos'
+                  style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87)),
@@ -283,7 +283,7 @@ class HomeScreen extends GetView<UserController>{
                  onReject: (user) => controller.rejectFriendRequest(user),
                  );},
                 icon: const Icon(Icons.group_add, size: 20),
-                label: const Text('Solicitudes'),
+                label: Text(translate('home.friends_section.requests_btn')), // 'Solicitudes'
                 style: TextButton.styleFrom(
                   backgroundColor: Colors.indigo.shade50,
                   foregroundColor: Colors.indigo.shade800,
@@ -296,7 +296,7 @@ class HomeScreen extends GetView<UserController>{
               ElevatedButton.icon(
                       onPressed: () => Get.toNamed('/users'),
                       icon: const Icon(Icons.search, size: 20),
-                      label: const Text('Buscar amigos'), 
+                      label: Text(translate('home.friends_section.search_btn')), // 'Buscar amigos'
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey.shade200,
                         foregroundColor: Colors.black87,
@@ -327,7 +327,7 @@ class HomeScreen extends GetView<UserController>{
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Aún no tienes amigos para mostrar.',
+                      translate('home.friends_section.empty_msg'), // 'Aún no tienes amigos...'
                       style: TextStyle(
                           color: Colors.grey.shade600,
                           fontStyle: FontStyle.italic),
@@ -347,7 +347,7 @@ class HomeScreen extends GetView<UserController>{
               return UserCard(user: user);
               } ,
             );
-          }), // Fin de Obx
+          }), 
         ],
       ),
     ),

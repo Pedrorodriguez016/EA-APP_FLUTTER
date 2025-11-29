@@ -1,66 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:password_strength_checker/password_strength_checker.dart';
+import 'package:flutter_translate/flutter_translate.dart'; // Importar
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+// ... (El widget HomePage que tenías aquí de prueba parece no usarse, lo omito o lo dejas igual si lo usas)
 
-  @override
-  Widget build(BuildContext context) {
-    final passNotifier = ValueNotifier<PasswordStrength?>(null);
+class PasswordValidator {
+  static String? validate(String? password) {
+    if (password == null || password.isEmpty) {
+      return translate('auth.errors.password_empty'); // 'Por favor ingresa...'
+    }
+    if (password.length < 6) {
+      return translate('auth.errors.password_short'); // '...al menos 6 caracteres'
+    }
+    final strength = PasswordStrength.calculate(text: password);
+    if (strength == PasswordStrength.weak) {
+      // Puedes añadir esta clave a tu JSON: "password_weak": "La contraseña es débil..."
+      return translate('auth.errors.password_weak'); 
+    }
+    return null;
+  }
 
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Password',
-              ),
-              onChanged: (value) {
-                passNotifier.value = PasswordStrength.calculate(text: value);
-              },
-            ),
-            const SizedBox(height: 20),
-            PasswordStrengthChecker(strength: passNotifier),
-          ],
-        ),
-      ),
-    );
+  static String getStrengthText(PasswordStrength? strength) {
+    switch (strength) {
+      case PasswordStrength.weak:
+        return translate('common.weak'); // 'Débil' (Añadir a JSON)
+      case PasswordStrength.medium:
+        return translate('common.medium'); // 'Media'
+      case PasswordStrength.strong:
+        return translate('common.strong'); // 'Fuerte'
+      default:
+        return translate('common.unknown'); // 'Sin evaluar'
+    }
   }
 }
-
-  // --- PasswordValidator utilitario para registro ---
-  class PasswordValidator {
-    /// Valida la contraseña según criterios básicos y fuerza
-    static String? validate(String? password) {
-      if (password == null || password.isEmpty) {
-        return 'Por favor ingresa una contraseña';
-      }
-      if (password.length < 6) {
-        return 'La contraseña debe tener al menos 6 caracteres';
-      }
-      final strength = PasswordStrength.calculate(text: password);
-      // Puedes ajustar el umbral según tu preferencia
-      if (strength == PasswordStrength.weak) {
-        return 'La contraseña es débil. Usa mayúsculas, números y símbolos.';
-      }
-      return null;
-    }
-
-    /// Devuelve el texto descriptivo de la fuerza
-    static String getStrengthText(PasswordStrength? strength) {
-      switch (strength) {
-        case PasswordStrength.weak:
-          return 'Débil';
-        case PasswordStrength.medium:
-          return 'Media';
-        case PasswordStrength.strong:
-          return 'Fuerte';
-        default:
-          return 'Sin evaluar';
-      }
-    }
-  }

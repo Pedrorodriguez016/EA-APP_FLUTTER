@@ -1,0 +1,144 @@
+{
+  "app_title": "Eventer",
+  "common": {
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "accept": "Accept",
+    "save": "Save",
+    "close": "Close",
+    "search": "Search...",
+    "loading": "Loading...",
+    "update": "Update",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome",
+      "subtitle": "Sign in to your account",
+      "password": "Password",
+      "action_btn": "Sign In",
+      "no_account": "Don't have an account?",
+      "register_link": "Sign up here",
+      "success_msg": "Logged in successfully"
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Fill in your details to register",
+      "action_btn": "Create Account",
+      "has_account": "Already have an account?",
+      "login_link": "Sign In",
+      "success_title": "Registration Successful!",
+      "success_msg": "Your account has been created successfully. You can now log in.",
+      "continue": "Continue"
+    },
+    "fields": {
+      "username": "Username",
+      "email": "Gmail",
+      "password": "Password",
+      "confirm_password": "Confirm Password",
+      "birthday": "Date of Birth (YYYY-MM-DD)",
+      "birthday_hint": "2000-01-01"
+    },
+    "errors": {
+      "username_empty": "Please enter a username",
+      "username_short": "Username must be at least 3 characters",
+      "username_chars": "Only letters, numbers, and underscores allowed",
+      "email_empty": "Please enter your gmail",
+      "email_invalid": "Please enter a valid gmail",
+      "password_empty": "Please enter a password",
+      "password_short": "Password must be at least 6 characters",
+      "password_mismatch": "Passwords do not match",
+      "birthday_empty": "Please enter your date of birth",
+      "birthday_invalid": "Invalid date"
+    }
+  },
+  "home": {
+    "title": "Home",
+    "welcome_card": {
+      "greeting": "Hello!",
+      "subtitle": "Welcome to your events app"
+    },
+    "events_section": {
+      "title": "Events",
+      "create_btn": "Create event",
+      "explore_btn": "Explore events",
+      "my_events_btn": "My events"
+    },
+    "friends_section": {
+      "title": "Friends",
+      "requests_btn": "Requests",
+      "search_btn": "Search friends",
+      "empty_msg": "No friends to show yet."
+    }
+  },
+  "events": {
+    "list_title": "Events",
+    "search_hint": "Search event...",
+    "empty_search": "No events found",
+    "create_title": "Create Event",
+    "save_btn": "Save event",
+    "field_title": "Event title",
+    "field_address": "Address",
+    "field_date": "Event date and time",
+    "select_date_btn": "Select date and time",
+    "detail_title": "Event Details",
+    "info_card_title": "Event Information",
+    "schedule": "Schedule:",
+    "participants": "Participants:",
+    "not_found": "Event not found",
+    "created_success": "The event has been created successfully."
+  },
+  "users": {
+    "list_title": "Users",
+    "search_hint": "Search user...",
+    "empty_search": "No users found",
+    "detail_title": "User Details",
+    "info_card_title": "Personal Information",
+    "status_online": "Online",
+    "status_offline": "Offline",
+    "friend_requests_title": "Friend Requests",
+    "no_requests": "You have no pending requests.",
+    "accept_req": "Accept request",
+    "reject_req": "Reject request",
+    "req_sent": "Friend request sent",
+    "friendship_accepted": "Friendship accepted",
+    "req_rejected": "Request rejected"
+  },
+  "settings": {
+    "title": "Settings",
+    "config_section": "Configuration",
+    "profile": "Profile",
+    "profile_subtitle": "Manage your personal information",
+    "notifications": "Notifications",
+    "privacy": "Privacy",
+    "language": "Language",
+    "about_section": "About",
+    "version": "Version",
+    "help": "Help & Support",
+    "terms": "Terms & Conditions",
+    "coming_soon": "Coming Soon"
+  },
+  "profile": {
+    "title": "My Profile",
+    "save_changes": "Save changes",
+    "delete_account": "Delete account",
+    "update_success": "Profile updated successfully",
+    "delete_dialog": {
+      "title": "Are you sure?",
+      "content": "This action is permanent and cannot be undone. Your account will be deleted forever.",
+      "password_confirm": "Confirm your password",
+      "confirm_btn": "Confirm Deletion"
+    }
+  },
+  "dialogs": {
+    "logout": {
+      "title": "Log Out",
+      "content": "Are you sure you want to log out?",
+      "confirm": "Yes, log out"
+    }
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "app_title": "Eventer",
+  "common": {
+    "error": "Error",
+    "success": "Éxito",
+    "cancel": "Cancelar",
+    "accept": "Aceptar",
+    "save": "Guardar",
+    "close": "Cerrar",
+    "search": "Buscar...",
+    "loading": "Cargando...",
+    "update": "Actualizar",
+    "delete": "Eliminar",
+    "confirm": "Confirmar",
+    "yes": "Sí",
+    "no": "No"
+  },
+  "auth": {
+    "login": {
+      "title": "Bienvenido",
+      "subtitle": "Inicia sesión en tu cuenta",
+      "action_btn": "Iniciar Sesión",
+      "no_account": "¿No tienes cuenta?",
+      "register_link": "Regístrate aquí",
+      "success_msg": "Sesión iniciada correctamente"
+    },
+    "register": {
+      "title": "Crear Cuenta",
+      "subtitle": "Completa tus datos para registrarte",
+      "action_btn": "Crear Cuenta",
+      "has_account": "¿Ya tienes cuenta?",
+      "login_link": "Inicia Sesión",
+      "success_title": "¡Registro Exitoso!",
+      "success_msg": "Tu cuenta ha sido creada correctamente. Ahora puedes iniciar sesión.",
+      "continue": "Continuar"
+    },
+    "fields": {
+      "username": "Username",
+      "email": "Gmail",
+      "password": "Contraseña",
+      "confirm_password": "Confirmar Contraseña",
+      "birthday": "Fecha de Nacimiento (YYYY-MM-DD)",
+      "birthday_hint": "2000-01-01"
+    },
+    "errors": {
+      "username_empty": "Por favor ingresa un username",
+      "username_short": "El username debe tener al menos 3 caracteres",
+      "username_chars": "Solo se permiten letras, números y guiones bajos",
+      "email_empty": "Por favor ingresa tu gmail",
+      "email_invalid": "Por favor ingresa un gmail válido",
+      "password_empty": "Por favor ingresa una contraseña",
+      "password_short": "La contraseña debe tener al menos 6 caracteres",
+      "password_mismatch": "Las contraseñas no coinciden",
+      "birthday_empty": "Por favor ingresa tu fecha de nacimiento",
+      "birthday_invalid": "Fecha inválida"
+    }
+  },
+  "home": {
+    "title": "Inicio",
+    "welcome_card": {
+      "greeting": "¡Hola!",
+      "subtitle": "Bienvenido a tu aplicación de eventos"
+    },
+    "events_section": {
+      "title": "Eventos",
+      "create_btn": "Crear evento",
+      "explore_btn": "Explorar eventos",
+      "my_events_btn": "Mis eventos"
+    },
+    "friends_section": {
+      "title": "Amigos",
+      "requests_btn": "Solicitudes",
+      "search_btn": "Buscar amigos",
+      "empty_msg": "Aún no tienes amigos para mostrar."
+    }
+  },
+  "events": {
+    "list_title": "Eventos",
+    "search_hint": "Buscar evento...",
+    "empty_search": "No se encontraron eventos",
+    "create_title": "Crear Evento",
+    "save_btn": "Guardar evento",
+    "field_title": "Título del evento",
+    "field_address": "Dirección",
+    "field_date": "Fecha y hora del evento",
+    "select_date_btn": "Seleccionar fecha y hora",
+    "detail_title": "Detalles del Evento",
+    "info_card_title": "Información del Evento",
+    "schedule": "Horario:",
+    "participants": "Participantes:",
+    "not_found": "Evento no encontrado",
+    "created_success": "El evento se ha creado correctamente."
+  },
+  "users": {
+    "list_title": "Usuarios",
+    "search_hint": "Buscar usuario...",
+    "empty_search": "No se encontraron usuarios",
+    "detail_title": "Detalles del Usuario",
+    "info_card_title": "Información Personal",
+    "status_online": "Conectado",
+    "status_offline": "Desconectado",
+    "friend_requests_title": "Solicitudes de amistad",
+    "no_requests": "No tienes solicitudes pendientes.",
+    "accept_req": "Aceptar solicitud",
+    "reject_req": "Rechazar solicitud",
+    "req_sent": "Solicitud de amistad enviada",
+    "friendship_accepted": "Amistad aceptada",
+    "req_rejected": "Solicitud rechazada"
+  },
+  "settings": {
+    "title": "Ajustes",
+    "config_section": "Configuración",
+    "profile": "Perfil",
+    "profile_subtitle": "Gestiona tu información personal",
+    "notifications": "Notificaciones",
+    "privacy": "Privacidad",
+    "language": "Idioma",
+    "about_section": "Acerca de",
+    "version": "Versión",
+    "help": "Ayuda y Soporte",
+    "terms": "Términos y Condiciones",
+    "coming_soon": "Próximamente"
+  },
+  "profile": {
+    "title": "Mi perfil",
+    "save_changes": "Guardar cambios",
+    "delete_account": "Eliminar cuenta",
+    "update_success": "Perfil actualizado correctamente",
+    "delete_dialog": {
+      "title": "¿Estás seguro?",
+      "content": "Esta acción es permanente y no se puede deshacer. Tu cuenta se eliminará para siempre.",
+      "password_confirm": "Confirma tu contraseña",
+      "confirm_btn": "Confirmar Eliminación"
+    }
+  },
+  "dialogs": {
+    "logout": {
+      "title": "Cerrar sesión",
+      "content": "¿Seguro que quieres cerrar sesión?",
+      "confirm": "Sí, salir"
+    }
+  }
+}

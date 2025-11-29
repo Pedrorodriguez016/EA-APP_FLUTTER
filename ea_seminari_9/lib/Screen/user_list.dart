@@ -2,6 +2,7 @@ import 'package:ea_seminari_9/Controllers/user_controller.dart';
 import 'package:ea_seminari_9/Widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart'; // Importar
 import '../Widgets/user_card.dart';
 import '../Widgets/navigation_bar.dart';
 import '../Widgets/refresh_button.dart';
@@ -13,7 +14,7 @@ class UserListScreen extends GetView<UserController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-      appBar: StandardAppBar(title: "Usuarios"),
+      appBar: StandardAppBar(title: translate('users.list_title')), // 'Usuarios'
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Obx(() {
@@ -26,7 +27,7 @@ class UserListScreen extends GetView<UserController> {
               TextField(
                 controller: controller.searchEditingController,
                 decoration: InputDecoration(
-                  hintText: "Buscar usuario...",
+                  hintText: translate('users.search_hint'), // 'Buscar usuario...'
                   prefixIcon: const Icon(Icons.search),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -45,17 +46,15 @@ class UserListScreen extends GetView<UserController> {
                 }
               
                 if (controller.userList.isEmpty) {
-                   return const Center(child: Text("No se encontraron usuarios"));
+                   return Center(child: Text(translate('users.empty_search'))); // 'No se encontraron usuarios'
                 }
 
                 return ListView.separated(
-                  // 1. ASIGNAMOS EL CONTROLLER AQUÍ
                   controller: controller.scrollController, 
                   itemCount: controller.userList.length + 1, 
                   separatorBuilder: (c, i) => const SizedBox(height: 10),
                   itemBuilder: (context, index) {
                     
-                    // 2. DETECTAMOS SI ES EL ÚLTIMO ITEM PARA MOSTRAR SPINNER
                     if (index == controller.userList.length) {
                       return Obx(() => controller.isMoreLoading.value
                           ? const Center(
@@ -63,7 +62,7 @@ class UserListScreen extends GetView<UserController> {
                               padding: EdgeInsets.all(16.0),
                               child: CircularProgressIndicator(),
                             ))
-                          : const SizedBox.shrink()); // Si no carga, espacio vacío
+                          : const SizedBox.shrink()); 
                     }
                     final user = controller.userList[index];
                     return UserCard(user: user);
@@ -78,7 +77,7 @@ class UserListScreen extends GetView<UserController> {
       ),
       floatingActionButton: RefreshButton(
         onRefresh: () => controller.refreshUsers(),
-        message: 'Lista de usuarios actualizada',
+        message: translate('common.success'),
       ),
       bottomNavigationBar: const CustomNavBar(currentIndex: 2),
     );
