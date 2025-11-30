@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'auth_controller.dart'; // ¡IMPORTANTE! Asumo que tienes este archivo
+import 'auth_controller.dart'; 
 
 // Definimos los tipos de filtro posibles
 enum EventFilter { all, myEvents }
 
 class EventoController extends GetxController {
-  // --- Variables de la lista (existentes) ---
+  // --- Variables de la lista ---
   var isLoading = true.obs;
   var isMoreLoading = false.obs;
   var eventosList = <Evento>[].obs;
@@ -25,49 +25,134 @@ class EventoController extends GetxController {
   final EventosServices _eventosServices;
   Timer? _debounce;
 
-  // --- NUEVOS ESTADOS PARA FILTRADO ---
-  var currentFilter = EventFilter.all.obs; // Estado del filtro actual
-  final AuthController _authController = Get.find<AuthController>(); // Inyectamos AuthController
+  // --- ESTADOS PARA FILTRADO ---
+  var currentFilter = EventFilter.all.obs; 
+  final AuthController _authController = Get.find<AuthController>(); 
 
-  // --- ARREGLO: Inicializa los controllers aquí ---
+  // --- Controllers para formulario ---
   final TextEditingController tituloController = TextEditingController();
   final TextEditingController direccionController = TextEditingController();
   var selectedSchedule = Rxn<DateTime>();
-  // --- FIN ARREGLO ---
 
   EventoController(this._eventosServices);
   final ScrollController scrollController = ScrollController();
 
   @override
   void onInit() {
-    fetchEventos(1); // Carga inicial de eventos
-    selectedSchedule.value = null; // Limpia la fecha
-    super.onInit();
-    scrollController.addListener(() {
-      if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 200) {
-        if (!isLoading.value && !isMoreLoading.value && currentPage.value < totalPages.value) {
-          loadMoreEvents();
-        }
+    // Escucha el estado del usuario para refrescar la lista si es necesario.
+    ever(_authController.currentUser, (_) {
+      if (currentFilter.value == EventFilter.myEvents || _authController.currentUser.value == null) {
+        refreshEventos();
       }
     });
+    
+    fetchEventos(1); 
+    selectedSchedule.value = null; 
+    super.onInit();
+    scrollController.addListener(_scrollListener);
+  }
+  
+  @override
+  void onClose() {
+    tituloController.dispose();
+    direccionController.dispose();
+    _debounce?.cancel();
+    scrollController.removeListener(_scrollListener); 
+    super.onClose();
   }
 
-  // Nuevo método para cambiar el filtro y reiniciar la lista (página 1)
-  void setFilter(EventFilter filter) {
-    if (currentFilter.value != filter) {
-      currentFilter.value = filter;
-      refreshEventos(); // Llama a refreshEventos, que a su vez llama a fetchEventos(1)
+  void _scrollListener() {
+    if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 200) {
+      if (!isLoading.value && !isMoreLoading.value && currentPage.value < totalPages.value) {
+        loadMoreEvents();
+      }
     }
   }
 
-  // --- Limpia los campos del formulario ---
+  void setFilter(EventFilter filter) {
+    if (currentFilter.value != filter) {
+      currentFilter.value = filter;
+      currentPage.value = 1; 
+      eventosList.clear(); 
+      searchEditingController.clear(); 
+      fetchEventos(1);
+    }
+  }
+
+
+  void fetchEventos(int page) async {
+    
+    String? creatorId;
+    if (currentFilter.value == EventFilter.myEvents) {
+      creatorId = _authController.currentUser.value?.id; 
+      
+      if (creatorId == null) {
+        isLoading.value = false;
+        isMoreLoading.value = false;
+        eventosList.clear(); 
+        
+        // Esto evita que intente cargar eventos si el usuario no está logueado
+        Get.snackbar('Acceso Restringido', 'Debes iniciar sesión para ver tus eventos.',
+            snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red);
+        return;
+      }
+    }
+
+    // --- LÍNEA DE DEPURACIÓN CLAVE ---
+    // Mira esta línea en la consola para saber si tienes el ID del usuario.
+    print("DEBUG FILTRO: Filtro actual: ${currentFilter.value.name}, creatorId enviado: $creatorId");
+    // ----------------------------------
+
+    if (page == 1) {  
+      isLoading.value = true;
+    } else {
+      isMoreLoading.value = true;
+    }
+    
+
+    try {
+      final data = await _eventosServices.fetchEvents(
+        page: page,
+        limit: limit,
+        creatorId: creatorId, 
+      );
+        
+      final List<Evento> newEventos = data['eventos'];
+      if (page == 1) {
+        eventosList.assignAll(newEventos);
+      } else {
+        eventosList.addAll(newEventos);
+      }
+      currentPage.value = data['currentPage'];
+      totalPages.value = data['totalPages'];
+      totalEventos.value = data['total'];
+    } catch (e) {
+      print("Error al cargar eventos: $e");
+      if (page == 1) eventosList.clear();
+      
+      Get.snackbar('Error de Carga', 'No se pudieron cargar los eventos. Revise su conexión o el servidor.',
+          snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red);
+
+    } finally {
+      isLoading.value = false;
+      isMoreLoading.value = false;
+    }
+  }
+  
+  // --- [Resto de las funciones sin cambios, solo para completar el archivo] ---
+
+  void loadMoreEvents() { 
+    if (currentPage.value < totalPages.value) {
+       fetchEventos(currentPage.value + 1); 
+    }
+  }
+  
   void limpiarFormularioCrear() {
     tituloController.clear();
     direccionController.clear();
     selectedSchedule.value = null;
   }
 
-  // --- Muestra el selector de fecha y hora ---
   Future<void> pickSchedule(BuildContext context) async {
     final DateTime? date = await showDatePicker(
       context: context,
@@ -96,9 +181,8 @@ class EventoController extends GetxController {
     selectedSchedule.value = combinedDateTime;
   }
 
- void fetchMapEvents(double north, double south, double east, double west) async {
+  void fetchMapEvents(double north, double south, double east, double west) async {
     try {
-      // Llamada al servicio
       var nuevosEventos = await _eventosServices.fetchEventsByBounds(
         north: north, 
         south: south, 
@@ -112,81 +196,18 @@ class EventoController extends GetxController {
       print("Error cargando mapa: $e");
     }
   }
-
-
-
-
   
-  void fetchEventos(int page) async {
-    // 1. Determinar el creatorId si el filtro es "Mis Eventos"
-    String? creatorId;
-    if (currentFilter.value == EventFilter.myEvents) {
-      // Usar el ID del usuario logueado.
-      // ¡ATENCIÓN! Asegúrate de que 'user.value?.id' sea la propiedad correcta
-      creatorId = _authController.currentUser.value?.id; 
-      
-      if (creatorId == null) {
-        // Si no hay ID de usuario logueado, no podemos cargar "Mis Eventos"
-        isLoading.value = false;
-        isMoreLoading.value = false;
-        eventosList.clear();
-        Get.snackbar('Error de Acceso', 'Debes iniciar sesión para ver tus eventos.',
-            snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red);
-        return;
-      }
-    }
-
-     // 2. Control de estado de carga
-    if (page == 1) {  
-      isLoading.value = true;
-    } else {
-      isMoreLoading.value = true;
-    }
-    
-
-    try {
-      // 3. Llamada al servicio con el creatorId (que será null para 'EventFilter.all')
-      final data = await _eventosServices.fetchEvents(
-        page: page,
-        limit: limit,
-        creatorId: creatorId, // <-- PASAMOS EL FILTRO AL SERVICIO
-      );
-        
-      final List<Evento> newEventos = data['eventos'];
-      if (page == 1) {
-        eventosList.assignAll(newEventos);
-      } else {
-        eventosList.addAll(newEventos);
-      }
-      currentPage.value = data['currentPage'];
-      totalPages.value = data['totalPages'];
-      totalEventos.value = data['total'];
-      } catch (e) {
-      print("Error al cargar eventos: $e");
-      // En caso de error, limpiamos la lista
-      if (page == 1) eventosList.clear();
-      } finally {
-      isLoading.value = false;
-      isMoreLoading.value = false;
-      }
- }
-
-  void loadMoreEvents() { // Renombré loadMoreUsers por loadMoreEvents
-  if (currentPage.value < totalPages.value) {
-       fetchEventos(currentPage.value + 1); 
-    }
-  }
-
   Future<void> searchEventos(String query) async {
     if (searchEditingController.text.isEmpty) {
       refreshEventos();
       return;
     }
-
+    
     try {
       isLoading(true);
     
-      final Evento? evento = await _eventosServices.getEventoByName(searchEditingController.text);
+      final Evento? evento = await _eventosServices.getEventoByName(searchEditingController.text); 
+      
       if (evento != null) {
         eventosList.assignAll([evento]);
       } else {
@@ -215,7 +236,7 @@ class EventoController extends GetxController {
 
   void refreshEventos() {
     searchEditingController.clear();
-    fetchEventos(1);
+    fetchEventos(1); 
     Get.snackbar(
       'Actualizado',
       'Lista de Eventos actualizada',
@@ -240,12 +261,10 @@ class EventoController extends GetxController {
     }
   }
   
-  // --- Función 'crearEvento' ---
   Future<void> crearEvento() async {
     final String titulo = tituloController.text;
     final String direccion = direccionController.text;
 
-    // --- Validación ---
     if (titulo.isEmpty) {
       Get.snackbar('Campo requerido', 'Por favor, introduce un título.',
           snackPosition: SnackPosition.BOTTOM,
@@ -261,7 +280,6 @@ class EventoController extends GetxController {
           colorText: Colors.white);
       return;
     }
-    // --- Fin Validación ---
 
     try {
       final Map<String, dynamic> nuevoEventoData = {
@@ -272,13 +290,9 @@ class EventoController extends GetxController {
 
       await _eventosServices.createEvento(nuevoEventoData);
 
-      // 1. Volvemos al Home INMEDIATAMENTE
       Get.back();
-
-      // 2. Limpiamos el formulario (para la próxima vez)
       limpiarFormularioCrear();
 
-      // 3. Mostramos el mensaje de Éxito (se mostrará sobre el Home)
       Get.snackbar(
         'Éxito',
         'El evento "$titulo" se ha creado correctamente.',
@@ -286,10 +300,9 @@ class EventoController extends GetxController {
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
-    // 4. Refrescamos la lista de eventos en el Home
-      // (refreshEventos() ya muestra su propio snackbar,
-      // quizás quieras quitar el de 'Éxito' si te molesta)
+    
       refreshEventos();
+      
 
     } catch (e) {
       Get.snackbar(
@@ -302,7 +315,7 @@ class EventoController extends GetxController {
     }
   }
   
- void onMapPositionChanged(MapCamera camera, bool hasGesture) {
+  void onMapPositionChanged(MapCamera camera, bool hasGesture) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
 
     _debounce = Timer(const Duration(milliseconds: 500), () {
@@ -316,15 +329,6 @@ class EventoController extends GetxController {
         bounds.west
       );
     });
-  }
-  
-  // Limpia los controllers de texto
-  @override
-  void onClose() {
-    tituloController.dispose();
-    direccionController.dispose();
-    _debounce?.cancel();
-    super.onClose();
   }
   
 }
