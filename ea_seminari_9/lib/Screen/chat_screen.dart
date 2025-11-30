@@ -26,9 +26,12 @@ class ChatScreen extends GetView<ChatController> {
               ),
             ),
             const SizedBox(width: 10),
-            Text(
-              controller.friendName,
-              style: const TextStyle(color: Colors.black87, fontSize: 16),
+            GestureDetector(
+              onTap: () => Get.toNamed('/user/${controller.friendId}'),
+              child: Text(
+                controller.friendName,
+                style: const TextStyle(color: Colors.black87, fontSize: 16),
+              ),
             ),
           ],
         ),
@@ -105,6 +108,7 @@ class _ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final time = "${message.createdAt.hour.toString().padLeft(2, '0')}:${message.createdAt.minute.toString().padLeft(2, '0')}";
     return Align(
       alignment: message.isMine ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -119,11 +123,30 @@ class _ChatBubble extends StatelessWidget {
             bottomRight: message.isMine ? Radius.zero : const Radius.circular(12),
           ),
         ),
-        child: Text(
-          message.text,
-          style: TextStyle(
-            color: message.isMine ? Colors.white : Colors.black87,
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min, // Ocupa el mínimo espacio posible
+          crossAxisAlignment: CrossAxisAlignment.end, // Alinea la hora a la derecha siempre
+          children: [
+            // El mensaje de texto
+            Flexible(
+              child: Text(
+                message.text,
+                style: TextStyle(
+                  color: message.isMine ? Colors.white : Colors.black87,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            const SizedBox(height: 4), // Espacio entre texto y hora
+            // La hora
+            Text(
+              time,
+              style: TextStyle(
+                color: message.isMine ? Colors.white70 : Colors.black54,
+                fontSize: 10, // Letra pequeña para la hora
+              ),
+            ),
+          ],
         ),
       ),
     );
