@@ -9,13 +9,13 @@ import 'package:latlong2/latlong.dart';
 class EventoController extends GetxController {
   // --- Variables de la lista (existentes) ---
   var isLoading = true.obs;
+  var isMoreLoading = false.obs;
   var eventosList = <Evento>[].obs;
   var mapEventosList = <Evento>[].obs;
   var currentPage = 1.obs;
   var totalPages = 1.obs;
   var totalEventos = 0.obs;
   final int limit = 10;
-  var searchQuery = ''.obs;
   var selectedEvento = Rxn<Evento>();
   final TextEditingController searchEditingController = TextEditingController();
   final EventosServices _eventosServices;
@@ -28,12 +28,20 @@ class EventoController extends GetxController {
   // --- FIN ARREGLO ---
 
   EventoController(this._eventosServices);
+  final ScrollController scrollController = ScrollController();
 
   @override
   void onInit() {
     fetchEventos(1); // Carga inicial de eventos
     selectedSchedule.value = null; // Limpia la fecha
     super.onInit();
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 200) {
+        if (!isLoading.value && !isMoreLoading.value && currentPage.value < totalPages.value) {
+          loadMoreUsers();
+        }
+      }
+    });
   }
 
   // --- Limpia los campos del formulario ---
@@ -94,14 +102,24 @@ class EventoController extends GetxController {
 
   
   void fetchEventos(int page) async {
-    isLoading.value = true;
+    if (page == 1) {
+      isLoading.value = true;
+    } else {
+      isMoreLoading.value = true;
+    }
     try {
       final data = await _eventosServices.fetchEvents(
         page: page,
         limit: limit,
-        q: searchQuery.value,
       );
-      eventosList.assignAll(data['eventos']);
+     final List<Evento> newEventos = data['eventos'];
+
+      if (page == 1) {
+        eventosList.assignAll(newEventos);
+      } else {
+        eventosList.addAll(newEventos);
+      }
+
       currentPage.value = data['currentPage'];
       totalPages.value = data['totalPages'];
       totalEventos.value = data['total'];
@@ -109,28 +127,53 @@ class EventoController extends GetxController {
       print("Error al cargar eventos: $e");
     } finally {
       isLoading.value = false;
+      isMoreLoading.value = false;
     }
   }
 
-  void nextPage() {
+  void loadMoreUsers() {
     if (currentPage.value < totalPages.value) {
       fetchEventos(currentPage.value + 1);
     }
   }
 
-  void previousPage() {
-    if (currentPage.value > 1) {
-      fetchEventos(currentPage.value - 1);
+  Future<void> searchEventos(String query) async {
+    if (searchEditingController.text.isEmpty) {
+      refreshEventos();
+      return;
+    }
+
+    try {
+      isLoading(true);
+    
+      final Evento? evento = await _eventosServices.getEventoByName(searchEditingController.text);
+      if (evento != null) {
+        eventosList.assignAll([evento]);
+      } else {
+        eventosList.clear();
+        Get.snackbar(
+          'Búsqueda', 
+          'No se encontró ningún evento con ese nombre',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 2)
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error', 
+        'Ocurrió un error al buscar: $e',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white
+      );
+    } finally {
+      isLoading(false);
     }
   }
 
-  void searchEventos(String query) {
-    searchQuery.value = query;
-    fetchEventos(1);
-  }
-
   void refreshEventos() {
-    searchQuery.value = '';
     searchEditingController.clear();
     fetchEventos(1);
     Get.snackbar(
@@ -243,4 +286,5 @@ class EventoController extends GetxController {
     _debounce?.cancel();
     super.onClose();
   }
+  
 }

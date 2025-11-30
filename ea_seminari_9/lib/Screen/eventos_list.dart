@@ -5,7 +5,6 @@ import '../Widgets/eventos_card.dart';
 import '../Widgets/navigation_bar.dart';
 import'../Widgets/refresh_button.dart';
 import '../Widgets/app_bar.dart';
-import '../Widgets/paginator.dart';
 
 class EventosListScreen extends GetView<EventoController> {
 
@@ -43,54 +42,35 @@ class EventosListScreen extends GetView<EventoController> {
               const SizedBox(height: 12),
               Expanded(
                 child: Obx(() {
-
-                  if (controller.isLoading.value &&
-                      controller.eventosList.isNotEmpty) {
-                    return Stack(
-                      children: [
-                        _buildEventosList(), 
-                        Positioned.fill(
-                          child: Container(
-                            color: Colors.white.withOpacity(0.5),
-                            child:
-                                const Center(child: CircularProgressIndicator()),
-                          ),
-                        ),
-                      ],
-                    );
+                  if (controller.isLoading.value && controller.eventosList.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
                   }
+                
                   if (controller.eventosList.isEmpty) {
-                    return const Center(child: Text("No se encontraron eventos"));
+                     return const Center(child: Text("No se encontraron eventos"));
                   }
-                  return _buildEventosList();
+
+                  return ListView.separated(
+                    controller: controller.scrollController, 
+                    itemCount: controller.eventosList.length + 1, 
+                    separatorBuilder: (c, i) => const SizedBox(height: 10),
+                    itemBuilder: (context, index) {
+                      if (index == controller.eventosList.length) {
+                        return Obx(() => controller.isMoreLoading.value
+                          ? const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              child: Center(child: CircularProgressIndicator()),
+                            )
+                          : const SizedBox.shrink()
+                        );
+                      }
+
+                      final evento = controller.eventosList[index];
+                      return EventosCard(evento: evento);
+                    },
+                  );
                 }),
               ),
-              Obx(() {
-                
-                final bool isLoading = controller.isLoading.value;
-                final int currentPage = controller.currentPage.value;
-                final int totalPages = controller.totalPages.value;
-
-                
-                return PaginationControls(
-                  totalPages: totalPages,
-                  currentPage: currentPage,
-                  totalItems: controller.totalEventos.value,
-                  itemTypePlural: "eventos", 
-                  isLoading: isLoading,
-                  
-                  
-                  onPreviousPage: (currentPage > 1 && !isLoading)
-                      ? controller.previousPage 
-                      : null, 
-                      
-                  onNextPage: (currentPage < totalPages && !isLoading)
-                      ? controller.nextPage 
-                      : null, 
-
-                  onPageSelected: (page) => controller.fetchEventos(page),
-                );
-              }),
             ],
           );
         }),
