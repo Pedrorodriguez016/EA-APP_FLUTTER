@@ -1,3 +1,8 @@
+import 'package:ea_seminari_9/Bindings/chat_list_binding.dart';
+import 'package:ea_seminari_9/Screen/chat_list_screen.dart';
+
+import '/Bindings/chat_binding.dart';
+import '/Screen/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'Controllers/auth_controller.dart';
@@ -114,7 +119,17 @@ class MyApp extends StatelessWidget {
             name: '/crear_evento',
             page: () => const CrearEventoScreen(),
             binding: EventosBinding(),
-          ), 
+          ),
+          GetPage(
+            name: '/chat-list',
+             page: () => const ChatListScreen(),
+             binding: ChatListBinding()
+             ),
+          GetPage(
+            name: '/chat', 
+            page: () => const ChatScreen(),
+            binding: ChatBinding()
+            ), 
       ],
       defaultTransition: Transition.cupertino,
       debugShowCheckedModeBanner: false,

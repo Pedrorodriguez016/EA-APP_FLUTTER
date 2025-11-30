@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart'; // Importar
 import '../Controllers/auth_controller.dart';
+import '../Services/socket_services.dart';
 
 class UserController extends GetxController {
   final AuthController authController = Get.find<AuthController>();
+  final SocketService _socketService;
   var isLoading = true.obs;
   var isMoreLoading = false.obs;
   var userList = <User>[].obs;
@@ -21,10 +23,11 @@ class UserController extends GetxController {
   final UserServices _userServices;
 
   final ScrollController scrollController = ScrollController();
+  UserController(this._userServices, this._socketService);
 
-  UserController(this._userServices);
   @override
   void onInit() {
+    _initSocketConnection();
     fetchUsers(1);
     super.onInit();
     scrollController.addListener(() {
@@ -275,5 +278,19 @@ void fetchFriends() async {
        colorText: Colors.white,
        snackPosition: SnackPosition.BOTTOM);
     }
+  }
+  void _initSocketConnection() {
+    // Obtenemos el ID del usuario actual desde el AuthController
+    final userId = authController.currentUser.value?.id;
+    
+    if (userId != null) {
+      print("UserController: Inicializando conexión Socket para $userId");
+      _socketService.connectWithUserId(userId);
+    }
+  }
+  @override
+  void onClose() {
+    _socketService.disconnect();
+    super.onClose();
   }
 }

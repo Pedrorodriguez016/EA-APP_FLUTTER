@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart'; // Importar
 import '../Widgets/user_card.dart';
-import '../Widgets/navigation_bar.dart';
 import '../Widgets/refresh_button.dart';
 
 class UserListScreen extends GetView<UserController> {
@@ -79,7 +78,6 @@ class UserListScreen extends GetView<UserController> {
         onRefresh: () => controller.refreshUsers(),
         message: translate('common.success'),
       ),
-      bottomNavigationBar: const CustomNavBar(currentIndex: 2),
     );
   }
 }

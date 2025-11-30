@@ -200,7 +200,7 @@ class HomeScreen extends GetView<UserController>{
                       ),
                     ),
                   );
-                }).toList();
+                }).toList(); 
                 return CustomMap(
                   height: 200,
                   center: const LatLng(41.3851, 2.1734),

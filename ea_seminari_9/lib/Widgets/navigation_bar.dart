@@ -44,6 +44,7 @@ class CustomNavBar extends StatelessWidget {
           _buildNavItem(Icons.event_available_rounded, translate('events.list_title'), 1),
           _buildNavItem(Icons.people_rounded, translate('users.list_title'), 2),
           _buildNavItem(Icons.settings_rounded, translate('settings.title'), 3),
+
         ],
       ),
     );
@@ -77,7 +78,7 @@ class CustomNavBar extends StatelessWidget {
         Get.toNamed('/eventos');
         break;
       case 2:
-        Get.toNamed('/users');
+        Get.toNamed('/chat-list');
         break;
       case 3:
         Get.toNamed('/settings');
