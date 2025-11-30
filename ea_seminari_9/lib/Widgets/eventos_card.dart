@@ -1,13 +1,45 @@
+// Archivo: lib/Widgets/eventos_card.dart (CORREGIDO)
 import 'package:flutter/material.dart';
 import '../Models/eventos.dart';
 import 'package:get/get.dart';
+import 'package:timeago/timeago.dart' as timeago;
+import 'package:intl/intl.dart'; 
 
 class EventosCard extends StatelessWidget {
   final Evento evento;
   const EventosCard({super.key, required this.evento});
 
+  // Función de formateo centralizada
+  String _formatSchedule(String scheduleString) {
+    if (scheduleString.isEmpty) {
+      return 'Fecha no disponible';
+    }
+    try {
+      final DateTime scheduleDate = DateTime.parse(scheduleString);
+      
+      // Formato Fijo (ej: "23 Nov. 2025 a las 23:48")
+      final String fixedTime = DateFormat('d MMM. yyyy HH:mm', 'es').format(scheduleDate);
+      
+      // Formato Relativo (ej: "en 2 días")
+      final String relativeTime = timeago.format(
+        scheduleDate, 
+        locale: 'es', 
+        allowFromNow: true, 
+      );
+      
+      // Combinamos ambos formatos
+      return '$fixedTime ($relativeTime)';
+    } catch (e) {
+      // Este catch debería ser rarísimo ahora que usamos la clave correcta
+      print('Fallo al parsear la fecha: $scheduleString, Error: $e');
+      return 'Error de formato'; 
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final String displayTime = _formatSchedule(evento.schedule);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Material(
@@ -46,13 +78,15 @@ class EventosCard extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 4),
+
                       Text(
-                        evento.schedule,
+                        displayTime,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey.shade600,
                         ),
-                      ),
+                      ),  
+
                       const SizedBox(height: 4),
                       Text(
                         evento.address,

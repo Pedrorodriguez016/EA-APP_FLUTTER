@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:timeago/timeago.dart' as timeago;
+import 'package:intl/date_symbol_data_local.dart';
 import 'Controllers/auth_controller.dart';
 import 'Screen/login_screen.dart';
 import 'Screen/register_screen.dart';
@@ -15,9 +17,21 @@ import '../Screen/perfil_screen.dart';
 import 'Screen/crear_evento_screen.dart';
 
 
-void main() {
+void main() async {
+  // Aseguramos que los bindings de Flutter estén inicializados (buena práctica)
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // 1. INICIALIZAR DATOS DE LOCALIZACIÓN
+  // Carga los datos de localización para todos los idiomas soportados,
+  // permitiendo que DateFormat funcione en español ('es').
+  await initializeDateFormatting('es', null);
+  
+  // 2. CONFIGURACIÓN DE TIMEAGO (Esto ya lo tenías)
+  timeago.setLocaleMessages('es', timeago.EsMessages());
+  
   runApp(const MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
