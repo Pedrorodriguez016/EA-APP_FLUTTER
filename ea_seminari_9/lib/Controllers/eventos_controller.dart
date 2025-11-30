@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'auth_controller.dart'; // ¡IMPORTANTE! Asumo que tienes este archivo
+
+// Definimos los tipos de filtro posibles
+enum EventFilter { all, myEvents }
 
 class EventoController extends GetxController {
   // --- Variables de la lista (existentes) ---
@@ -20,6 +24,10 @@ class EventoController extends GetxController {
   final TextEditingController searchEditingController = TextEditingController();
   final EventosServices _eventosServices;
   Timer? _debounce;
+
+  // --- NUEVOS ESTADOS PARA FILTRADO ---
+  var currentFilter = EventFilter.all.obs; // Estado del filtro actual
+  final AuthController _authController = Get.find<AuthController>(); // Inyectamos AuthController
 
   // --- ARREGLO: Inicializa los controllers aquí ---
   final TextEditingController tituloController = TextEditingController();
@@ -38,10 +46,18 @@ class EventoController extends GetxController {
     scrollController.addListener(() {
       if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 200) {
         if (!isLoading.value && !isMoreLoading.value && currentPage.value < totalPages.value) {
-          loadMoreUsers();
+          loadMoreEvents();
         }
       }
     });
+  }
+
+  // Nuevo método para cambiar el filtro y reiniciar la lista (página 1)
+  void setFilter(EventFilter filter) {
+    if (currentFilter.value != filter) {
+      currentFilter.value = filter;
+      refreshEventos(); // Llama a refreshEventos, que a su vez llama a fetchEventos(1)
+    }
   }
 
   // --- Limpia los campos del formulario ---
@@ -102,38 +118,62 @@ class EventoController extends GetxController {
 
   
   void fetchEventos(int page) async {
-    if (page == 1) {
+    // 1. Determinar el creatorId si el filtro es "Mis Eventos"
+    String? creatorId;
+    if (currentFilter.value == EventFilter.myEvents) {
+      // Usar el ID del usuario logueado.
+      // ¡ATENCIÓN! Asegúrate de que 'user.value?.id' sea la propiedad correcta
+      creatorId = _authController.currentUser.value?.id; 
+      
+      if (creatorId == null) {
+        // Si no hay ID de usuario logueado, no podemos cargar "Mis Eventos"
+        isLoading.value = false;
+        isMoreLoading.value = false;
+        eventosList.clear();
+        Get.snackbar('Error de Acceso', 'Debes iniciar sesión para ver tus eventos.',
+            snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red);
+        return;
+      }
+    }
+
+     // 2. Control de estado de carga
+    if (page == 1) {  
       isLoading.value = true;
     } else {
       isMoreLoading.value = true;
     }
+    
+
     try {
+      // 3. Llamada al servicio con el creatorId (que será null para 'EventFilter.all')
       final data = await _eventosServices.fetchEvents(
         page: page,
         limit: limit,
+        creatorId: creatorId, // <-- PASAMOS EL FILTRO AL SERVICIO
       );
-     final List<Evento> newEventos = data['eventos'];
-
+        
+      final List<Evento> newEventos = data['eventos'];
       if (page == 1) {
         eventosList.assignAll(newEventos);
       } else {
         eventosList.addAll(newEventos);
       }
-
       currentPage.value = data['currentPage'];
       totalPages.value = data['totalPages'];
       totalEventos.value = data['total'];
-    } catch (e) {
+      } catch (e) {
       print("Error al cargar eventos: $e");
-    } finally {
+      // En caso de error, limpiamos la lista
+      if (page == 1) eventosList.clear();
+      } finally {
       isLoading.value = false;
       isMoreLoading.value = false;
-    }
-  }
+      }
+ }
 
-  void loadMoreUsers() {
-    if (currentPage.value < totalPages.value) {
-      fetchEventos(currentPage.value + 1);
+  void loadMoreEvents() { // Renombré loadMoreUsers por loadMoreEvents
+  if (currentPage.value < totalPages.value) {
+       fetchEventos(currentPage.value + 1); 
     }
   }
 
