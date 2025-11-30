@@ -2,6 +2,7 @@ import 'package:ea_seminari_9/Models/user.dart';
 import 'package:ea_seminari_9/Services/user_services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart'; // Importar
 import '../Controllers/auth_controller.dart';
 import '../Services/socket_services.dart';
 
@@ -76,8 +77,8 @@ class UserController extends GetxController {
     }
   }
 
-  void searchUsers(String searchEditingController) async {
-   if (searchEditingController.isEmpty) {
+  void searchUsers(String query) async {
+   if (query.isEmpty) {
       refreshUsers();
       return;
     }
@@ -85,15 +86,15 @@ class UserController extends GetxController {
     try {
       isLoading(true);
       
-      final User? user = await _userServices.getUserByUsername(searchEditingController);
+      final User? user = await _userServices.getUserByUsername(query);
 
       if (user != null) {
         userList.assignAll([user]);
       } else {
         userList.clear();
         Get.snackbar(
-          'Búsqueda', 
-          'No se encontró ningún usuario con ese nombre',
+          translate('common.search'),
+          translate('users.empty_search'), // 'No se encontró ningún usuario'
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.orange,
           colorText: Colors.white,
@@ -102,8 +103,8 @@ class UserController extends GetxController {
       }
     } catch (e) {
       Get.snackbar(
-        'Error', 
-        'Ocurrió un error al buscar: $e',
+        translate('common.error'), 
+        e.toString(),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white
@@ -117,8 +118,8 @@ class UserController extends GetxController {
     searchEditingController.clear(); 
     fetchUsers(1);
     Get.snackbar(
-      'Actualizado',
-      'Lista de usuarios actualizada',
+      translate('common.update'),
+      translate('users.list_updated') ?? 'Lista de usuarios actualizada',
       snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 2),
       colorText: Colors.white,
@@ -134,8 +135,8 @@ class UserController extends GetxController {
       }
       catch(e){
         Get.snackbar(
-        "Error al cargar",
-        "No se pudo encontrar el usuario: ${e.toString()}",
+        translate('common.error'),
+        e.toString(),
         snackPosition: SnackPosition.BOTTOM,
         colorText: Colors.white,
         backgroundColor: Colors.red,
@@ -157,8 +158,8 @@ class UserController extends GetxController {
 
   } catch (e) {
       Get.snackbar(
-        "Error al cargar",
-        "No se pudo encontrar el usuario: ${e.toString()}",
+        translate('common.error'),
+        e.toString(),
         snackPosition: SnackPosition.BOTTOM,
         colorText: Colors.white,
         backgroundColor: Colors.red,
@@ -179,8 +180,8 @@ disableUserByid(String id,password) async {
 
   } catch (e) {
       Get.snackbar(
-        "Error al cargar",
-        "No se pudo encontrar el usuario: ${e.toString()}",
+        translate('common.error'),
+        e.toString(),
         snackPosition: SnackPosition.BOTTOM,
         colorText: Colors.white,
         backgroundColor: Colors.red,
@@ -221,53 +222,58 @@ void fetchFriends() async {
       await _userServices.acceptFriendRequest(userId, requester.id,);
 
       friendsRequests.removeWhere((u) => u.id == requester.id);
-      fetchFriends(); // opcional: refrescar lista de amigos
-      Get.snackbar('Solicitud', 
-      'Amistad aceptada',
-       snackPosition: SnackPosition.BOTTOM,
-       backgroundColor: Colors.green,
-       colorText: Colors.white);
+      fetchFriends(); 
+      Get.snackbar(
+        translate('common.success'), 
+        translate('users.friendship_accepted'), // 'Amistad aceptada'
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white);
     } catch (e) {
-      Get.snackbar('Error', 
-      'No se pudo aceptar la solicitud: $e',
-       snackPosition: SnackPosition.BOTTOM,
-       backgroundColor: Colors.red,
-       colorText: Colors.white);
+      Get.snackbar(
+        translate('common.error'), 
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white);
     }
   }
-  // --- Rechazar solicitud ---
+  
   void rejectFriendRequest(User requester) async {
     try {
       final userId = authController.currentUser.value!.id;
       await _userServices.rejectFriendRequest(userId, requester.id);
 
-      // actualizar lista local
       friendsRequests.removeWhere((u) => u.id == requester.id);
-      Get.snackbar('Solicitud', 
-      'Solicitud rechazada',
-       snackPosition: SnackPosition.BOTTOM,
-       backgroundColor: Colors.red,
-       colorText: Colors.white);
+      Get.snackbar(
+        translate('common.success'), 
+        translate('users.req_rejected'), // 'Solicitud rechazada'
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white);
     } catch (e) {
-      Get.snackbar('Error', 
-      'No se pudo rechazar la solicitud: $e',
-       snackPosition: SnackPosition.BOTTOM,
-       backgroundColor: Colors.red,
-       colorText: Colors.white);
+      Get.snackbar(
+        translate('common.error'), 
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white);
     }
   }
   sendFriendRequest(String targetUserId) async {
     try {
       final userId = authController.currentUser.value!.id;
       await _userServices.sendFriendRequest(userId, targetUserId);
-      Get.snackbar('Solicitud',
-       'Solicitud de amistad enviada',
+      Get.snackbar(
+       translate('common.success'),
+       translate('users.req_sent'), // 'Solicitud de amistad enviada'
        backgroundColor: Colors.green,
        colorText: Colors.white,
        snackPosition: SnackPosition.BOTTOM);
     } catch (e) {
-      Get.snackbar('Error', 
-      'No se pudo enviar la solicitud: $e',
+      Get.snackbar(
+       translate('common.error'), 
+       e.toString(),
        backgroundColor: Colors.red,
        colorText: Colors.white,
        snackPosition: SnackPosition.BOTTOM);

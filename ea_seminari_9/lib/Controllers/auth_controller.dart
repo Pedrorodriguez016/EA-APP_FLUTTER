@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart'; // Importar
 import '../Models/user.dart';
 import '../Interceptor/auth_interceptor.dart';
 
@@ -13,8 +14,9 @@ class AuthController extends GetxController {
     connectTimeout:const Duration(seconds: 5,),
     receiveTimeout: const Duration(seconds: 5,))
     );
-  UserServices() {
-    // Añadimos nuestro interceptor
+  
+  // Nota: corregido constructor, antes ponía UserServices()
+  AuthController() {
     _client.interceptors.add(AuthInterceptor());
   }
 
@@ -26,10 +28,6 @@ class AuthController extends GetxController {
           'password': password,
         },
       );
-        
-
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.data}');
 
       if (response.statusCode == 200) {
         final user = response.data;
@@ -44,21 +42,20 @@ class AuthController extends GetxController {
         token = user['token'];
         refreshToken = user['refreshToken'];
         isLoggedIn.value = true;
-        print('token $token refrehtoken, $refreshToken');
         
-        return {'success': true, 'message': 'Login exitoso'};
+        return {'success': true, 'message': translate('auth.login.success_msg')};
       } else {
         final errorData = response.data;
+        // Si el backend devuelve un mensaje, lo mostramos, si no, uno genérico traducido
         return {
           'success': false, 
-          'message': errorData['error'] ?? 'Error en el login - Código: ${response.statusCode}'
+          'message': errorData['error'] ?? translate('common.error')
         };
       }
     } catch (e) {
-      print('Error en login: $e');
       return {
         'success': false, 
-        'message': 'Error de conexión: $e'
+        'message': '${translate("common.error")}: $e'
       };
     }
   }
@@ -68,29 +65,25 @@ class AuthController extends GetxController {
       final response = await _client.post('/user', 
         data: {
           "username": newUser.username,
-        "gmail": newUser.gmail, 
-        "birthday": newUser.birthday, 
-        "password": newUser.password,
+          "gmail": newUser.gmail, 
+          "birthday": newUser.birthday, 
+          "password": newUser.password,
         },
       );
 
-      print('Register response status: ${response.statusCode}');
-      print('Register response body: ${response.data}');
-
       if (response.statusCode == 201) {
-        return {'success': true, 'message': 'Usuario registrado exitosamente'};
+        return {'success': true, 'message': translate('auth.register.success_msg')};
       } else {
         final errorData = response.data;
         return {
           'success': false, 
-          'message': errorData['error'] ?? 'Error en el registro - Código: ${response.statusCode}'
+          'message': errorData['error'] ?? translate('common.error')
         };
       }
     } catch (e) {
-      print('Error en registro: $e');
       return {
         'success': false, 
-        'message': 'Error de conexión: $e'
+        'message': '${translate("common.error")}: $e'
       };
     }
   }
@@ -100,32 +93,30 @@ class AuthController extends GetxController {
     currentUser.value = null;
     token = null;
     Get.offAllNamed('/login');
-    
   }
 
   Future<Map<String, dynamic>> deleteCurrentUser() async {
     try {
       if (currentUser.value == null || token == null) {
-        return {'success': false, 'message': 'Usuario no autenticado'};
+        return {'success': false, 'message': 'Usuario no autenticado'}; // Añadir a JSON si deseas
       }
 
-      final response = await _client.delete('/user/${currentUser.value!.id}',
-      );
+      final response = await _client.delete('/user/${currentUser.value!.id}');
 
       if (response.statusCode == 200) {
         logout();
-        return {'success': true, 'message': 'Usuario eliminado exitosamente'};
+        return {'success': true, 'message': translate('profile.delete_success') ?? 'Cuenta eliminada'};
       } else {
         final errorData = response.data;
         return {
           'success': false, 
-          'message': errorData['error'] ?? 'Error al eliminar el usuario'
+          'message': errorData['error'] ?? translate('common.error')
         };
       }
     } catch (e) {
       return {
         'success': false, 
-        'message': 'Error de conexión: $e'
+        'message': '$e'
       };
     }
   }

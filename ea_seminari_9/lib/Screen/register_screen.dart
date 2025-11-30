@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart'; // Importar
 import '../Controllers/auth_controller.dart';
 import '../Models/user.dart';
 import 'package:password_strength_checker/password_strength_checker.dart';
@@ -40,16 +41,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _showSuccessDialog() {
     Get.dialog(
       AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.check_circle, color: Colors.green, size: 30),
-            SizedBox(width: 10),
-            Text('¡Registro Exitoso!'),
+            const Icon(Icons.check_circle, color: Colors.green, size: 30),
+            const SizedBox(width: 10),
+            Text(translate('auth.register.success_title')), // '¡Registro Exitoso!'
           ],
         ),
-        content: const Text(
-          'Tu cuenta ha sido creada correctamente. Ahora puedes iniciar sesión.',
-          style: TextStyle(fontSize: 16),
+        content: Text(
+          translate('auth.register.success_msg'), // 'Tu cuenta ha sido creada...'
+          style: const TextStyle(fontSize: 16),
         ),
         actions: [
           TextButton(
@@ -57,9 +58,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Get.back();
               Get.back();
             },
-            child: const Text(
-              'Continuar',
-              style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+            child: Text(
+              translate('auth.register.continue'), // 'Continuar'
+              style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -71,38 +72,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   String? _validateUsername(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Por favor ingresa un username';
+      return translate('auth.errors.username_empty');
     }
     if (value.length < 3) {
-      return 'El username debe tener al menos 3 caracteres';
+      return translate('auth.errors.username_short');
     }
     if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
-      return 'Solo se permiten letras, números y guiones bajos';
+      return translate('auth.errors.username_chars');
     }
     return null;
   }
 
-  // Widget para mostrar requisitos de contraseña en tiempo real
   Widget _buildPasswordRequirements(String password) {
+    // Si quieres traducir estos textos, deberías añadir claves al JSON.
+    // Por ahora lo dejaré con textos que se entienden universalmente o podrías usar claves.
     final requirements = [
       {
-        'label': 'Al menos 12 caracteres',
+        'label': 'Min 12 chars', // Puedes usar translate('auth.requirements.chars')
         'valid': password.length >= 12,
       },
       {
-        'label': 'Al menos 1 letra minúscula',
+        'label': 'a-z',
         'valid': RegExp(r'[a-z]').hasMatch(password),
       },
       {
-        'label': 'Al menos 1 letra mayúscula',
+        'label': 'A-Z',
         'valid': RegExp(r'[A-Z]').hasMatch(password),
       },
       {
-        'label': 'Al menos 1 dígito',
+        'label': '0-9',
         'valid': RegExp(r'[0-9]').hasMatch(password),
       },
       {
-        'label': 'Al menos 1 carácter especial',
+        'label': '!@#\$',
         'valid': RegExp(r'[!@#\$%^&*(),.?":{}|<>]').hasMatch(password),
       },
     ];
@@ -137,10 +139,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   String? _validateGmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Por favor ingresa tu gmail';
+      return translate('auth.errors.email_empty');
     }
     if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-      return 'Por favor ingresa un gmail válido';
+      return translate('auth.errors.email_invalid');
     }
     return null;
   }
@@ -148,20 +150,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   String? _validateConfirmPassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Por favor confirma tu contraseña';
+      return translate('auth.errors.password_empty'); // O crear una clave específica 'confirm_empty'
     }
     if (value != passwordController.text) {
-      return 'Las contraseñas no coinciden';
+      return translate('auth.errors.password_mismatch');
     }
     return null;
   }
 
   String? _validateBirthday(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Por favor ingresa tu fecha de nacimiento';
+      return translate('auth.errors.birthday_empty');
     }
     if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {
-      return 'Formato de fecha incorrecto. Usa YYYY-MM-DD';
+      return translate('auth.errors.birthday_invalid');
     }
     try {
       final parts = value.split('-');
@@ -173,24 +175,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final age = now.year - birthday.year;
 
       if (birthday.isAfter(now)) {
-        return 'La fecha no puede ser futura';
+        return translate('auth.errors.birthday_invalid');
       }
 
       if (age < 13) {
-        return 'Debes tener al menos 13 años';
+        return 'Min 13 years'; // Puedes traducir esto también
       }
 
       if (age > 120) {
-        return 'Por favor ingresa una fecha válida';
+        return translate('auth.errors.birthday_invalid');
       }
     } catch (e) {
-      return 'Fecha inválida';
+      return translate('auth.errors.birthday_invalid');
     }
 
     return null;
   }
 
-  // Calcula la fuerza personalizada según requisitos
   PasswordStrength _customPasswordStrength(String password) {
     int count = 0;
     if (password.length >= 12) count++;
@@ -215,7 +216,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Registro'),
+        title: Text(translate('auth.register.title')), // 'Registro'
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
@@ -255,9 +256,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: const Icon(Icons.person_add, color: Colors.white, size: 32),
         ),
         const SizedBox(height: 24),
-        const Text(
-          'Crear Cuenta',
-          style: TextStyle(
+        Text(
+          translate('auth.register.title'), // 'Crear Cuenta'
+          style: const TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.w800,
             color: Colors.black87,
@@ -266,7 +267,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Completa tus datos para registrarte',
+          translate('auth.register.subtitle'), // 'Completa tus datos...'
           style: TextStyle(
             fontSize: 16,
             color: Colors.grey.shade600,
@@ -283,14 +284,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         children: [
           _buildTextField(
             controller: usernameController,
-            label: 'Username',
+            label: translate('auth.fields.username'),
             icon: Icons.person_outline,
             validator: _validateUsername,
           ),
           const SizedBox(height: 16),
           _buildTextField(
             controller: gmailController,
-            label: 'Gmail',
+            label: translate('auth.fields.email'),
             icon: Icons.email_outlined,
             validator: _validateGmail,
           ),
@@ -307,7 +308,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               setState(() {});
             },
             decoration: InputDecoration(
-              labelText: 'Contraseña',
+              labelText: translate('auth.fields.password'),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
@@ -351,9 +352,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
               if (strength == PasswordStrength.secure) {
                 color = const Color(0xFF0B6C0E);
               }
+              // Traducir niveles de seguridad
               switch (strength) {
                 case PasswordStrength.weak:
-                  label = 'Weak';
+                  label = translate('common.error'); // O 'Débil' si añades la clave
                   break;
                 case PasswordStrength.medium:
                   label = 'Medium';
@@ -406,7 +408,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           const SizedBox(height: 16),
           _buildPasswordField(
             controller: confirmPasswordController,
-            label: 'Confirmar Contraseña',
+            label: translate('auth.fields.confirm_password'),
             obscureText: _obscureConfirmPassword,
             onToggle: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
             validator: _validateConfirmPassword,
@@ -414,12 +416,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
           const SizedBox(height: 16),
           _buildTextField(
             controller: birthdayController,
-            label: 'Fecha de Nacimiento (YYYY-MM-DD)',
+            label: translate('auth.fields.birthday'),
             icon: Icons.cake_outlined,
-            hintText: '2000-01-01',
+            hintText: translate('auth.fields.birthday_hint'),
             validator: _validateBirthday,
           ),
           const SizedBox(height: 32),
+          // Botón de generar contraseña eliminado para simplificar, o puedes traducirlo
           SizedBox(
             width: double.infinity,
             height: 48,
@@ -438,7 +441,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text('Generar contraseña'),
+              child: const Text('Generar contraseña'), // Traducir si es necesario
             ),
           ),
           const SizedBox(height: 32),
@@ -463,7 +466,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  // Generador aleatorio de contraseña fuerte
   String _generateStrongPassword({int length = 14}) {
     const String lower = 'abcdefghijklmnopqrstuvwxyz';
     const String upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -569,9 +571,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
-            : const Text(
-                'Crear Cuenta',
-                style: TextStyle(
+            : Text(
+                translate('auth.register.action_btn'), // 'Crear Cuenta'
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -585,14 +587,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          '¿Ya tienes cuenta? ',
+          translate('auth.register.has_account') + ' ', // '¿Ya tienes cuenta?'
           style: TextStyle(color: Colors.grey.shade600),
         ),
         GestureDetector(
           onTap: () => Get.back(),
-          child: const Text(
-            'Inicia Sesión',
-            style: TextStyle(
+          child: Text(
+            translate('auth.register.login_link'), // 'Inicia Sesión'
+            style: const TextStyle(
               color: Color(0xFF667EEA),
               fontWeight: FontWeight.w600,
             ),
@@ -621,7 +623,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _showSuccessDialog();
       } else {
         Get.snackbar(
-          'Error',
+          translate('common.error'),
           result['message'],
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.red,
@@ -632,8 +634,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
     } else {
       Get.snackbar(
-        'Error de validación',
-        'Por favor corrige los errores en el formulario',
+        translate('common.error'), // Error genérico
+        'Por favor corrige los errores', // Texto estático o añadir clave
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.orange,
         colorText: Colors.white,

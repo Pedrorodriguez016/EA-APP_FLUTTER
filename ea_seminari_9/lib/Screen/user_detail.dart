@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart'; // Importar
 import '../Models/user.dart';
 import '../Controllers/user_controller.dart';
 
@@ -15,20 +16,20 @@ class UserDetailScreen extends GetView<UserController> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Detalles del Usuario'),
+        title: Text(translate('users.detail_title')), // 'Detalles del Usuario'
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(
+          return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('Cargando información del usuario...'),
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                Text(translate('common.loading')), // 'Cargando...'
               ],
             ),
           );
@@ -40,7 +41,7 @@ class UserDetailScreen extends GetView<UserController> {
               children: [
                 Icon(Icons.error_outline, size: 64, color: Colors.red),
                 SizedBox(height: 16),
-                Text("No se pudo cargar el usuario."),
+                Text("No se pudo cargar el usuario."), // Este mensaje quizás quieras añadirlo a JSON
               ],
             ),
           );
@@ -127,20 +128,20 @@ class UserDetailScreen extends GetView<UserController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Información Personal',
-            style: TextStyle(
+          Text(
+            translate('users.info_card_title'), // 'Información Personal'
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
               color: Colors.black87,
             ),
           ),
           const SizedBox(height: 20),
-          _buildInfoRow(Icons.person, 'Username:', user.username),
+          _buildInfoRow(Icons.person, '${translate("auth.fields.username")}:', user.username),
           const SizedBox(height: 16),
-          _buildInfoRow(Icons.email, 'Email:', user.gmail),
+          _buildInfoRow(Icons.email, '${translate("auth.fields.email")}:', user.gmail),
           const SizedBox(height: 16),
-          _buildInfoRow(Icons.cake, 'Fecha de Nacimiento:', user.birthday),
+          _buildInfoRow(Icons.cake, '${translate("auth.fields.birthday")}:', user.birthday),
         ],
       ),
     );

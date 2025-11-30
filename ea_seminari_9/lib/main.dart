@@ -18,10 +18,19 @@ import 'Screen/settings_screen.dart';
 import 'Bindings/user_bindings.dart';
 import '../Screen/perfil_screen.dart';
 import 'Screen/crear_evento_screen.dart';
+import 'package:flutter_translate/flutter_translate.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+   var delegate = await LocalizationDelegate.create(
+    fallbackLocale: 'es', // Idioma por defecto si falla
+    supportedLocales: ['es', 'en', 'ca', 'fr'], // Idiomas soportados
+    basePath: 'assets/i18n/', // Ruta donde guardaste los JSON
+  );
+  runApp(LocalizedApp(delegate, const MyApp()));
+ 
 }
 
 class MyApp extends StatelessWidget {
@@ -29,10 +38,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var localizationDelegate = LocalizedApp.of(context).delegate;
+
     Get.put(AuthController());
 
     return GetMaterialApp(
-      title: 'Seminario Flutter',
+      title: 'Eventer',
+      localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          localizationDelegate
+        ],
+        supportedLocales: localizationDelegate.supportedLocales,
+        locale: localizationDelegate.currentLocale,
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 
 class CustomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -39,10 +40,11 @@ class CustomNavBar extends StatelessWidget {
           fontSize: 11,
         ),
         items: [
-          _buildNavItem(Icons.home_rounded, 'Inicio', 0),
-          _buildNavItem(Icons.event_available_rounded, 'Eventos', 1),
-          _buildNavItem(Icons.chat, 'Chat', 2),
-          _buildNavItem(Icons.settings_rounded, 'Ajustes', 3),
+          _buildNavItem(Icons.home_rounded,translate('home.title'), 0),
+          _buildNavItem(Icons.event_available_rounded, translate('events.list_title'), 1),
+          _buildNavItem(Icons.people_rounded, translate('users.list_title'), 2),
+          _buildNavItem(Icons.settings_rounded, translate('settings.title'), 3),
+
         ],
       ),
     );

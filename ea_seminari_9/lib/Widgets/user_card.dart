@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart'; // Importar
 import '../Models/user.dart';
 import '../Controllers/user_controller.dart';
 
@@ -22,12 +23,11 @@ class UserCard extends GetView<UserController> {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                // --- Avatar con inicial ---
                 CircleAvatar(
                   radius: 24,
                   backgroundColor: const Color(0xFF667EEA),
                   child: Text(
-                    user.username[0].toUpperCase(),
+                    user.username.isNotEmpty ? user.username[0].toUpperCase() : '?',
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -35,10 +35,7 @@ class UserCard extends GetView<UserController> {
                     ),
                   ),
                 ),
-
                 const SizedBox(width: 16),
-
-                // --- Info principal del usuario ---
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,8 +57,6 @@ class UserCard extends GetView<UserController> {
                         ),
                       ),
                       const SizedBox(height: 6),
-
-                      // --- Estado de conexión ---
                       Row(
                         children: [
                           Container(
@@ -69,7 +64,6 @@ class UserCard extends GetView<UserController> {
                             height: 10,
                             decoration: BoxDecoration(
                               color: (user.online ?? false) ? Colors.green : Colors.grey,
-
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
@@ -83,7 +77,9 @@ class UserCard extends GetView<UserController> {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            (user.online ?? false) ? "Conectado" : "Desconectado",
+                            (user.online ?? false) 
+                                ? translate('users.status_online') // 'Conectado'
+                                : translate('users.status_offline'), // 'Desconectado'
                             style: TextStyle(
                               fontSize: 13,
                               color: (user.online ?? false)
@@ -97,9 +93,6 @@ class UserCard extends GetView<UserController> {
                     ],
                   ),
                 ),
-
-                // --- Flecha lateral ---
-                
                 Container(
                   alignment: Alignment.centerRight,
                   child: TextButton(

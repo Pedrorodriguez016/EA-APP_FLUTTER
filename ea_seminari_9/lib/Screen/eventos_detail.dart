@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../Models/eventos.dart';
 import '../Controllers/eventos_controller.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart'; // Importar
 
 class EventosDetailScreen extends GetView<EventoController> {
   final String eventoId;
@@ -19,7 +20,7 @@ class EventosDetailScreen extends GetView<EventoController> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Detalles del Evento'),
+        title: Text(translate('events.detail_title')), // 'Detalles del Evento'
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
@@ -28,28 +29,28 @@ class EventosDetailScreen extends GetView<EventoController> {
       body: Obx(() {
 
         if (controller.isLoading.value) {
-          return const Center(
+          return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('Cargando evento...'),
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                Text(translate('common.loading')), // 'Cargando...'
               ],
             ),
           );
         }
 
         if (controller.selectedEvento.value == null) {
-          return const Center(
+          return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.event_busy, size: 64, color: Colors.grey),
-                SizedBox(height: 16),
+                const Icon(Icons.event_busy, size: 64, color: Colors.grey),
+                const SizedBox(height: 16),
                 Text(
-                  'Evento no encontrado',
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                  translate('events.not_found'), // 'Evento no encontrado'
+                  style: const TextStyle(fontSize: 18, color: Colors.grey),
                 ),
               ],
             ),
@@ -71,8 +72,8 @@ class EventosDetailScreen extends GetView<EventoController> {
             child: Container(
               width: 100,
               height: 100,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
                   colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
                 ),
                 shape: BoxShape.circle,
@@ -96,8 +97,6 @@ class EventosDetailScreen extends GetView<EventoController> {
           // Información del evento
           _buildInfoCard(evento),
           const SizedBox(height: 20),
-
-
         ],
       ),
     );
@@ -122,30 +121,28 @@ class EventosDetailScreen extends GetView<EventoController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Información del Evento',
-            style: TextStyle(
+          Text(
+            translate('events.info_card_title'), // 'Información del Evento'
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
               color: Colors.black87,
             ),
           ),
           const SizedBox(height: 16),
-          _buildDetailRow(Icons.schedule, 'Horario:', evento.schedule),
+          _buildDetailRow(Icons.schedule, translate('events.schedule'), evento.schedule),
           const SizedBox(height: 12),
-          _buildDetailRow(Icons.location_on, 'Dirección:', evento.address),
+          _buildDetailRow(Icons.location_on, translate('events.field_address') + ':', evento.address),
           const SizedBox(height: 12),
           _buildDetailRow(
             Icons.people,
-            'Participantes:',
-            '${evento.participantes.length} personas',
+            translate('events.participants'),
+            '${evento.participantes.length}',
           ), 
         ],
       ),
     );
   }
-
-  
 
   Widget _buildDetailRow(IconData icon, String label, String value) {
     return Row(

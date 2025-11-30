@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:get/get.dart';
 import '../Controllers/eventos_controller.dart';
 
@@ -11,7 +12,7 @@ class CrearEventoScreen extends GetView<EventoController> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Crear Evento'),
+        title:  Text(translate('key')),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {

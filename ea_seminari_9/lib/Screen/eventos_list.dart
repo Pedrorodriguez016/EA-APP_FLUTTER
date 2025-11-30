@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart'; // Importar
 import '../Controllers/eventos_controller.dart';
 import '../Widgets/eventos_card.dart';
 import '../Widgets/navigation_bar.dart';
-import'../Widgets/refresh_button.dart';
+import '../Widgets/refresh_button.dart';
 import '../Widgets/app_bar.dart';
 
 class EventosListScreen extends GetView<EventoController> {
@@ -15,11 +16,11 @@ class EventosListScreen extends GetView<EventoController> {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: StandardAppBar(
-        title: "Eventos",
+        title: translate('events.list_title'), // 'Eventos'
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child:Obx(() {
+        child: Obx(() {
 
           if (controller.isLoading.value && controller.eventosList.isEmpty) {
             return const Center(child: CircularProgressIndicator());
@@ -29,7 +30,7 @@ class EventosListScreen extends GetView<EventoController> {
               TextField(
                 controller: controller.searchEditingController,
                 decoration: InputDecoration(
-                  hintText: "Buscar evento...",
+                  hintText: translate('events.search_hint'), // 'Buscar evento...'
                   prefixIcon: const Icon(Icons.search),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -47,7 +48,7 @@ class EventosListScreen extends GetView<EventoController> {
                   }
                 
                   if (controller.eventosList.isEmpty) {
-                     return const Center(child: Text("No se encontraron eventos"));
+                     return Center(child: Text(translate('events.empty_search'))); // 'No se encontraron eventos'
                   }
 
                   return ListView.separated(
@@ -77,19 +78,9 @@ class EventosListScreen extends GetView<EventoController> {
       ),
       floatingActionButton: RefreshButton(
         onRefresh: () => controller.refreshEventos(),
-        message: 'Lista de eventos actualizada',
+        message: translate('common.success'), // Mensaje de éxito genérico o específico
       ),
       bottomNavigationBar: const CustomNavBar(currentIndex: 1),
-    );
-  }
-
-  Widget _buildEventosList() {
-    return ListView.builder(
-      itemCount: controller.eventosList.length,
-      itemBuilder: (context, index) {
-        final evento = controller.eventosList[index];
-        return EventosCard(evento: evento);
-      },
     );
   }
 }

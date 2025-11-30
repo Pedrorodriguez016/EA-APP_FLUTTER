@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart'; // Importar
 
 class RefreshButton extends StatelessWidget {
   final VoidCallback onRefresh;
@@ -18,7 +19,7 @@ class RefreshButton extends StatelessWidget {
         onRefresh();
         if (message != null) {
           Get.snackbar(
-            'Actualizado',
+            translate('common.update'), // 'Actualizado'
             message!,
             snackPosition: SnackPosition.BOTTOM,
             backgroundColor: Colors.green,
