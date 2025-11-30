@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:get/get.dart';
 import '../Controllers/chat_list_controller.dart';
 import '../Widgets/navigation_bar.dart';
@@ -13,8 +14,8 @@ class ChatListScreen extends GetView<ChatListController> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          'Mis Chats',
+        title:  Text(
+          translate('chat.list_title'),
           style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
@@ -73,7 +74,7 @@ class ChatListScreen extends GetView<ChatListController> {
         ),
       ),
       subtitle: Text(
-        'Toca para chatear', 
+        translate('chat.subtitle'), 
         style: TextStyle(color: Colors.grey[500], fontSize: 14),
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
@@ -89,7 +90,7 @@ class ChatListScreen extends GetView<ChatListController> {
           Icon(Icons.people_outline, size: 80, color: Colors.grey[300]),
           const SizedBox(height: 16),
           Text(
-            'No tienes amigos agregados',
+            translate("chat.empty_list"),
             style: TextStyle(color: Colors.grey[600], fontSize: 16),
           ),
         ],

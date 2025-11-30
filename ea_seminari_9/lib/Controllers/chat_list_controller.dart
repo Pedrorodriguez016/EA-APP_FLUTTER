@@ -1,3 +1,4 @@
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:get/get.dart';
 import '../Services/user_services.dart';
 import '../Controllers/auth_controller.dart';
@@ -32,7 +33,7 @@ class ChatListController extends GetxController {
       }
     } catch (e) {
       print('Error cargando chats: $e');
-      Get.snackbar('Error', 'No se pudieron cargar los contactos');
+      Get.snackbar(translate('common.error'), translate('chat.errors.load_contacts'));
     } finally {
       isLoading(false);
     }

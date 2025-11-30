@@ -108,6 +108,16 @@
     "friendship_accepted": "Friendship accepted",
     "req_rejected": "Request rejected"
   },
+  "chat": {
+    "list_title": "My Chats",
+    "subtitle": "Tap to chat",
+    "empty_list": "You have no friends added",
+    "input_hint": "Send message...",
+    "default_title": "Chat",
+    "errors": {
+      "load_contacts": "Could not load contacts"
+    }
+  },
   "settings": {
     "title": "Settings",
     "config_section": "Configuration",

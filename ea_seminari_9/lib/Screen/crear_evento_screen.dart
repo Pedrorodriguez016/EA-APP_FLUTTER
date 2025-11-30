@@ -12,7 +12,7 @@ class CrearEventoScreen extends GetView<EventoController> {
 
     return Scaffold(
       appBar: AppBar(
-        title:  Text(translate('key')),
+        title:  Text(translate('events.create_title')),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -27,12 +27,12 @@ class CrearEventoScreen extends GetView<EventoController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Título del evento',
+            Text(translate('events.field_title'),
                 style: TextStyle(fontWeight: FontWeight.bold)),
             // MODIFICADO: Usa el controller de GetX
             TextField(controller: controller.tituloController),
             const SizedBox(height: 16),
-            const Text('Direccion',
+            Text(translate('events.field_address'),
                 style: TextStyle(fontWeight: FontWeight.bold)),
             // MODIFICADO: Usa el controller de GetX
             TextField(
@@ -47,7 +47,7 @@ class CrearEventoScreen extends GetView<EventoController> {
             Center(
               child: ElevatedButton.icon(
                 icon: const Icon(Icons.save),
-                label: const Text('Guardar evento'),
+                label: Text(translate('events.save_btn')),
                 style: ElevatedButton.styleFrom(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -69,7 +69,7 @@ class CrearEventoScreen extends GetView<EventoController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Fecha y hora del evento',
+        Text(translate('events.field_date'),
             style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         // Obx re-dibuja este widget cuando 'selectedSchedule' cambia
@@ -77,7 +77,7 @@ class CrearEventoScreen extends GetView<EventoController> {
           final bool isDateSelected = controller.selectedSchedule.value != null;
           
           // Formatea la fecha para mostrarla
-          String buttonText = 'Seleccionar fecha y hora';
+          String buttonText = translate('events.select_date_btn');
           if (isDateSelected) {
             final dt = controller.selectedSchedule.value!;
             // Formato simple: 13/11/2025 - 23:50

@@ -107,6 +107,16 @@
     "friendship_accepted": "Amistad aceptada",
     "req_rejected": "Solicitud rechazada"
   },
+  "chat": {
+    "list_title": "Mis Chats",
+    "subtitle": "Toca para chatear",
+    "empty_list": "No tienes amigos agregados",
+    "input_hint": "Enviar mensaje...",
+    "default_title": "Chat",
+    "errors": {
+      "load_contacts": "No se pudieron cargar los contactos"
+    }
+  },
   "settings": {
     "title": "Ajustes",
     "config_section": "Configuración",

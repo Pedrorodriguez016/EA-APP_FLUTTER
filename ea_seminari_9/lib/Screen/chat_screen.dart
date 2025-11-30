@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:get/get.dart';
 import '../Controllers/chat_controller.dart';
 import '../Models/chat.dart';
@@ -79,8 +80,8 @@ class ChatScreen extends GetView<ChatController> {
                 child: TextField(
                   controller: controller.textController,
                   focusNode: controller.focusNode,
-                  decoration: const InputDecoration(
-                    hintText: 'Enviar mensaje...',
+                  decoration: InputDecoration(
+                    hintText: translate("chat.input_hint"),
                     border: InputBorder.none,
                   ),
                   onSubmitted: (_) => controller.sendMessage(),

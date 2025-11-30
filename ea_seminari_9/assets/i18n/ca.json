@@ -108,6 +108,16 @@
     "friendship_accepted": "Amistat acceptada",
     "req_rejected": "Sol·licitud rebutjada"
   },
+  "chat": {
+    "list_title": "Els meus xats",
+    "subtitle": "Toca per xatejar",
+    "empty_list": "No tens amics afegits",
+    "input_hint": "Enviar missatge...",
+    "default_title": "Xat",
+    "errors": {
+      "load_contacts": "No s'han pogut carregar els contactes"
+    }
+  },
   "settings": {
     "title": "Ajustos",
     "config_section": "Configuració",

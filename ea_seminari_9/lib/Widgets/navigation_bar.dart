@@ -42,7 +42,7 @@ class CustomNavBar extends StatelessWidget {
         items: [
           _buildNavItem(Icons.home_rounded,translate('home.title'), 0),
           _buildNavItem(Icons.event_available_rounded, translate('events.list_title'), 1),
-          _buildNavItem(Icons.people_rounded, translate('users.list_title'), 2),
+          _buildNavItem(Icons.chat_bubble, translate('chat.list_title'), 2),
           _buildNavItem(Icons.settings_rounded, translate('settings.title'), 3),
 
         ],
