@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Controllers/auth_controller.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 
 class LogoutButton extends StatelessWidget {
   const LogoutButton({super.key});
@@ -14,30 +15,22 @@ class LogoutButton extends StatelessWidget {
       tooltip: 'Cerrar sesión',
       onPressed: () {
         Get.defaultDialog(
-          title: 'Cerrar sesión',
-          middleText: '¿Seguro que quieres cerrar sesión?',
+          title: translate('dialogs.logout.title'),
+          middleText: translate('dialogs.logout.content'),
           confirm: ElevatedButton(
             onPressed: () {
               Get.back();
               authController.logout();
-              Get.snackbar(
-                'Sesión cerrada',
-                'Has cerrado sesión correctamente',
-                snackPosition: SnackPosition.BOTTOM,
-                backgroundColor: Colors.green,
-                colorText: Colors.white,
-                borderRadius: 12,
-              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.redAccent,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Sí, salir'),
+            child:  Text(translate('dialogs.logout.confirm')),
           ),
           cancel: TextButton(
             onPressed: () => Get.back(),
-            child: const Text('Cancelar'),
+            child: Text(translate('common.cancel')),
           ),
         );
       },
