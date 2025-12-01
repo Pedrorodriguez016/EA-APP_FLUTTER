@@ -5,6 +5,8 @@ import '/Bindings/chat_binding.dart';
 import '/Screen/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:timeago/timeago.dart' as timeago;
+import 'package:intl/date_symbol_data_local.dart';
 import 'Controllers/auth_controller.dart';
 import 'Screen/login_screen.dart';
 import 'Screen/register_screen.dart';
@@ -23,15 +25,20 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 
 void main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
    var delegate = await LocalizationDelegate.create(
     fallbackLocale: 'es', // Idioma por defecto si falla
     supportedLocales: ['es', 'en', 'ca', 'fr'], // Idiomas soportados
     basePath: 'assets/i18n/', // Ruta donde guardaste los JSON
   );
+  await initializeDateFormatting('es', null);
+  timeago.setLocaleMessages('es', timeago.EsMessages());
   runApp(LocalizedApp(delegate, const MyApp()));
- 
+   
+
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

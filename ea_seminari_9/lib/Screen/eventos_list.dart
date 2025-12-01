@@ -41,6 +41,10 @@ class EventosListScreen extends GetView<EventoController> {
                 onSubmitted: (value) => controller.searchEventos(value),
               ),
               const SizedBox(height: 12),
+
+              _buildFilterTabs(),
+              const SizedBox(height: 12),
+
               Expanded(
                 child: Obx(() {
                   if (controller.isLoading.value && controller.eventosList.isEmpty) {
@@ -48,7 +52,14 @@ class EventosListScreen extends GetView<EventoController> {
                   }
                 
                   if (controller.eventosList.isEmpty) {
-                     return Center(child: Text(translate('events.empty_search'))); // 'No se encontraron eventos'
+
+                     // Mostrar mensaje diferente si se está filtrando a mis eventos
+                      final noEventsMessage = controller.currentFilter.value == EventFilter.myEvents
+                        ? "No has creado ningún evento aún."
+                        : "No se encontraron eventos.";
+
+                      return Center(child: Text(noEventsMessage));
+
                   }
 
                   return ListView.separated(
@@ -83,4 +94,93 @@ class EventosListScreen extends GetView<EventoController> {
       bottomNavigationBar: const CustomNavBar(currentIndex: 1),
     );
   }
+
+  Widget _buildEventosList() {
+    return ListView.builder(
+      itemCount: controller.eventosList.length,
+      itemBuilder: (context, index) {
+        final evento = controller.eventosList[index];
+        return EventosCard(evento: evento);
+      },
+    );
+  }
+ Widget _buildFilterTabs() {
+  return Obx(() {
+ // Obx reacciona cuando controller.currentFilter.value cambia
+return Row(
+ mainAxisAlignment: MainAxisAlignment.start,
+children: [
+// 1. Botón "Explorar eventos" (TODOS)
+ _buildFilterButton(
+label: 'Explorar eventos',
+ filter: EventFilter.all,
+ icon: Icons.explore_outlined,
+isSelected: controller.currentFilter.value == EventFilter.all,
+ ),
+ const SizedBox(width: 8),
+// 2. Botón "Mis eventos" (FILTRADO POR CREADOR)
+ _buildFilterButton(
+label: 'Mis eventos',
+ filter: EventFilter.myEvents,
+ icon: Icons.event_note_outlined,
+ isSelected: controller.currentFilter.value == EventFilter.myEvents,
+ ),
+ // Puedes añadir más filtros aquí si es necesario
+ ],
+);
+ });
+ }
+Widget _buildFilterButton({
+required String label,
+required EventFilter filter,
+required IconData icon,
+required bool isSelected,
+ }) {
+final Color primaryColor = Theme.of(Get.context!).primaryColor;
+final Color activeColor = primaryColor;
+ final Color inactiveColor = Colors.grey.shade300;
+ final Color inactiveTextColor = Colors.black87;
+ return InkWell(
+onTap: () {
+ // Llama al método del controlador para cambiar el filtro
+ controller.setFilter(filter);
+ // Asegúrate de restablecer la búsqueda si hay un término
+ controller.searchEditingController.clear();
+ },
+ child: Container(
+ padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+ decoration: BoxDecoration(
+ color: isSelected ? activeColor : inactiveColor,
+ borderRadius: BorderRadius.circular(20),
+ boxShadow: [
+ if (isSelected)
+ BoxShadow(
+color: activeColor.withOpacity(0.3),
+ blurRadius: 4,
+offset: const Offset(0, 2),
+ ),
+ ],
+ ),
+ child: Row(
+ mainAxisSize: MainAxisSize.min,
+children: [
+Icon(
+icon,
+ size: 18,
+ color: isSelected ? Colors.white : primaryColor,
+),
+ const SizedBox(width: 6),
+ Text(
+ label,
+style: TextStyle(
+ color: isSelected ? Colors.white : inactiveTextColor,
+ fontWeight: FontWeight.w600,
+),
+ ),
+ ],
+ ),
+ ),
+ );
+}
+
 }

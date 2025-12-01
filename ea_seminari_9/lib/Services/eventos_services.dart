@@ -9,6 +9,7 @@ class EventosServices {
   final String baseUrl = 'http://localhost:3000/api/event';
   final AuthController _authController = Get.find<AuthController>();
   late final Dio _client;
+  
   EventosServices(){
     _client = Dio(BaseOptions(baseUrl: baseUrl));
     _client.interceptors.add(AuthInterceptor());
@@ -51,12 +52,14 @@ class EventosServices {
     int page = 1,
     int limit = 20,
     String q = '',
+    String? creatorId,
   }) async {
     try {
       final response = await _client.get('/', queryParameters: {
         'page': page,
         'limit': limit,
         if (q.isNotEmpty) 'q': q,
+        if (creatorId != null && creatorId.isNotEmpty) 'creatorId': creatorId,
       });
 
       final responseData = response.data;
@@ -83,7 +86,6 @@ class EventosServices {
     }
   }
 
-  // --- ¡NUEVA FUNCIÓN AÑADIDA AQUÍ! ---
   Future<Evento> createEvento(Map<String, dynamic> data) async {
     try {
       final response = await _client.post('/',

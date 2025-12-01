@@ -3,11 +3,56 @@ import '../Models/eventos.dart';
 import '../Controllers/eventos_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart'; // Importar
+import 'package:intl/intl.dart'; // Añadido para el formato fijo
+import 'package:timeago/timeago.dart' as timeago; // Añadido para el tiempo relativo
+
 
 class EventosDetailScreen extends GetView<EventoController> {
   final String eventoId;
 
   const EventosDetailScreen({super.key, required this.eventoId});
+
+
+String _formatSchedule(String scheduleString) {
+    
+    final String cleanScheduleString = scheduleString.trim(); 
+    
+    if (cleanScheduleString.isEmpty) {
+      return 'Fecha no disponible';
+    }
+    
+    try {
+      final DateTime? scheduleDate = DateTime.tryParse(cleanScheduleString); 
+      
+      if (scheduleDate == null) {
+          return 'Error de formato'; 
+      }
+      
+      // 1. Formato de Fecha: Ejemplo "13 de noviembre de 2025"
+      // Usamos las comillas simples ('de') para proteger el texto literal.
+      final String formattedDate = DateFormat('d \'de\' MMMM \'de\' yyyy', 'es').format(scheduleDate);
+
+      // 2. Formato de Hora: Ejemplo "23:48" (Formato 24h)
+      final String formattedTime = DateFormat('HH:mm', 'es').format(scheduleDate);
+      
+      // 3. Tiempo Relativo: Ejemplo "(hace 17 días)"
+      final String relativeTime = timeago.format(
+        scheduleDate, 
+        locale: 'es', 
+        allowFromNow: true, 
+      );
+      
+      // 4. Combinamos todo: "13 de noviembre de 2025 a las 23:48 (hace 17 días)"
+      final String fixedTime = '$formattedDate a las $formattedTime';
+      
+      return '$fixedTime ($relativeTime)';
+      
+    } catch (e) {
+      print('Fallo al formatear la fecha en detalles: $e');
+      return 'Error de formato'; 
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -103,6 +148,7 @@ class EventosDetailScreen extends GetView<EventoController> {
   }
 
   Widget _buildInfoCard(Evento evento) {
+    final String formattedSchedule = _formatSchedule(evento.schedule);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -130,7 +176,9 @@ class EventosDetailScreen extends GetView<EventoController> {
             ),
           ),
           const SizedBox(height: 16),
-          _buildDetailRow(Icons.schedule, translate('events.schedule'), evento.schedule),
+
+           _buildDetailRow(Icons.schedule, 'Horario:', formattedSchedule),
+
           const SizedBox(height: 12),
           _buildDetailRow(Icons.location_on, translate('events.field_address') + ':', evento.address),
           const SizedBox(height: 12),

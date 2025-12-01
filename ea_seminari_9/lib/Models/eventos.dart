@@ -21,11 +21,11 @@ class Evento {
 
   factory Evento.fromJson(Map<String, dynamic> json) {
     return Evento(
-      id: json['_id'],
-      name: json['name'],
-      schedule: json['schedule'],
-      address: json['address'],
-      capacidadMaxima: json['capacidadMaxima'],
+      id: json['_id'] as String? ?? '', 
+      name: json['name'] as String? ?? '',
+      schedule: json['schedule'] as String? ?? '',
+      address: json['address'] as String? ?? '',
+      capacidadMaxima: json['capacidadMaxima'] as int?,
       lat: (json['lat'] != null) ? json['lat'].toDouble() : null,
       lng: (json['lng'] != null) ? json['lng'].toDouble() : null,
       participantes: List<dynamic>.from(json['participantes'] ?? [])
