@@ -1,13 +1,9 @@
 import '../Models/eventos.dart';
-import 'dart:convert';
-import 'package:get/get.dart';
 import 'package:dio/dio.dart';
-import '../Controllers/auth_controller.dart';
 import '../Interceptor/auth_interceptor.dart';
 
 class EventosServices {
   final String baseUrl = 'http://localhost:3000/api/event';
-  final AuthController _authController = Get.find<AuthController>();
   late final Dio _client;
   
   EventosServices(){

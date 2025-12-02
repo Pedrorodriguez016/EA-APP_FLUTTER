@@ -38,20 +38,17 @@ class ChatController extends GetxController {
       return;
     }
 
-    // 2. Llamar al SERVICIO para unirse a la sala
     _socketService.joinChatRoom(myUserId, friendId);
 
-    // 3. Llamar al SERVICIO para escuchar mensajes
-    // Pasamos la función _handleNewMessage como "callback"
     _socketService.listenToChatMessages(_handleNewMessage);
   }
 
-  // Esta función se ejecuta cada vez que el Service recibe algo del socket
+
   void _handleNewMessage(dynamic data) {
     try {
       final newMessage = ChatMessage.fromJson(data, myUserId);
       
-      // Validación lógica
+
       if (newMessage.from == friendId || newMessage.from == myUserId) {
         messages.insert(0, newMessage);
       }
@@ -67,13 +64,11 @@ class ChatController extends GetxController {
     textController.clear();
     focusNode.requestFocus();
 
-    // 4. Delegar el envío al SERVICIO
     _socketService.sendChatMessage(myUserId, friendId, text);
   }
 
   @override
   void onClose() {
-    // 5. Pedir al SERVICIO que limpie los listeners
     _socketService.stopListeningToChatMessages();
     
     textController.dispose();

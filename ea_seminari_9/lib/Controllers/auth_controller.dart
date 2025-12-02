@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart'; // Importar
@@ -105,7 +104,7 @@ class AuthController extends GetxController {
 
       if (response.statusCode == 200) {
         logout();
-        return {'success': true, 'message': translate('profile.delete_success') ?? 'Cuenta eliminada'};
+        return {'success': true, 'message': translate('profile.delete_success')};
       } else {
         final errorData = response.data;
         return {
