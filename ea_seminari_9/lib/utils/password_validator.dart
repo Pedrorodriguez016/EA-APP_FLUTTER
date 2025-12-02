@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+
 import 'package:password_strength_checker/password_strength_checker.dart';
 import 'package:flutter_translate/flutter_translate.dart'; // Importar
 

@@ -119,7 +119,7 @@ class UserController extends GetxController {
     fetchUsers(1);
     Get.snackbar(
       translate('common.update'),
-      translate('users.list_updated') ?? 'Lista de usuarios actualizada',
+      translate('users.list_updated'),
       snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 2),
       colorText: Colors.white,

@@ -4,8 +4,7 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:flutter_translate/flutter_translate.dart'; // Importar
+import 'package:flutter_translate/flutter_translate.dart';
 
 class EventoController extends GetxController {
   var isLoading = true.obs;
@@ -141,8 +140,8 @@ class EventoController extends GetxController {
       } else {
         eventosList.clear();
         Get.snackbar(
-          translate('common.search'), // 'Búsqueda'
-          translate('events.empty_search'), // 'No se encontró ningún evento...'
+          translate('common.search'),
+          translate('events.empty_search'), 
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.orange,
           colorText: Colors.white,
@@ -166,8 +165,8 @@ class EventoController extends GetxController {
     searchEditingController.clear();
     fetchEventos(1);
     Get.snackbar(
-      translate('common.update'), // 'Actualizado'
-      translate('events.list_updated') ?? 'Lista de Eventos actualizada', // Asegúrate de tener esta clave o pon el texto traducido aquí
+      translate('common.update'),
+      translate('events.list_updated'),
       snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 2),
     );
@@ -196,7 +195,7 @@ class EventoController extends GetxController {
     if (titulo.isEmpty) {
       Get.snackbar(
           translate('common.error'), 
-          translate('events.errors.title_required') ?? 'Por favor, introduce un título.',
+          translate('events.errors.title_required'),
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.orange,
           colorText: Colors.white);
@@ -206,7 +205,7 @@ class EventoController extends GetxController {
     if (selectedSchedule.value == null) {
       Get.snackbar(
           translate('common.error'), 
-          translate('events.errors.date_required') ?? 'Por favor, selecciona una fecha.',
+          translate('events.errors.date_required'),
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.orange,
           colorText: Colors.white);

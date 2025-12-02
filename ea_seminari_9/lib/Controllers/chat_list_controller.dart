@@ -4,13 +4,11 @@ import '../Controllers/auth_controller.dart';
 import '../Models/user.dart';
 
 class ChatListController extends GetxController {
-  // Inyectamos los servicios necesarios
   final UserServices _userServices;
   final AuthController _authController;
 
   ChatListController(this._userServices, this._authController);
 
-  // Estado de la UI
   var friendsList = <User>[].obs;
   var isLoading = true.obs;
 
@@ -26,7 +24,6 @@ class ChatListController extends GetxController {
       final myId = _authController.currentUser.value?.id;
       
       if (myId != null) {
-        // Usamos la función que ya tienes en UserServices
         List<User> friends = await _userServices.fetchFriends(myId);
         friendsList.assignAll(friends);
       }
@@ -38,10 +35,9 @@ class ChatListController extends GetxController {
     }
   }
 
-  // Función para navegar al chat individual
   void goToChat(User friend) {
     Get.toNamed(
-      '/chat', // Esta ruta debe coincidir con la de tu main.dart
+      '/chat',
       arguments: {
         'friendId': friend.id,
         'friendName': friend.username,
