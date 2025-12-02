@@ -110,4 +110,46 @@ class EventosServices {
       throw Exception('Error desconocido al buscar usuario: $e');
     }
   }
+
+  Future<Evento> joinEvent(String eventId) async {
+    try {
+      final response = await _client.post('/$eventId/join');
+      
+      return Evento.fromJson(response.data);
+    } catch (e) {
+      print('Error in joinEvent: $e');
+      throw Exception('Error al unirse al evento: $e');
+    }
+  }
+
+  Future<Evento> leaveEvent(String eventId) async {
+    try {
+      final response = await _client.post('/$eventId/leave');
+      
+      return Evento.fromJson(response.data);
+    } catch (e) {
+      print('Error in leaveEvent: $e');
+      throw Exception('Error al salir del evento: $e');
+    }
+  }
+  
+  Future<Map<String, List<Evento>>> getMisEventos() async {
+    try {
+      final response = await _client.get('/user/my-events'); 
+      final data = response.data;
+
+      final creados = (data['eventosCreados'] as List?)
+          ?.map((e) => Evento.fromJson(e))
+          .toList() ?? [];
+          
+      final inscritos = (data['eventosInscritos'] as List?)
+          ?.map((e) => Evento.fromJson(e))
+          .toList() ?? [];
+
+      return {'creados': creados, 'inscritos': inscritos};
+    } catch (e) {
+      print('Error al obtener mis eventos: $e');
+      throw Exception('Error al cargar mis eventos: $e');
+    }
+  }
 }

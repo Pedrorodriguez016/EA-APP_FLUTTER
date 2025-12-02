@@ -17,6 +17,8 @@ class EventoController extends GetxController {
   var isMoreLoading = false.obs;
   var eventosList = <Evento>[].obs;
   var mapEventosList = <Evento>[].obs;
+  var misEventosCreados = <Evento>[].obs;
+  var misEventosInscritos = <Evento>[].obs;
   var currentPage = 1.obs;
   var totalPages = 1.obs;
   var totalEventos = 0.obs;
@@ -65,13 +67,18 @@ class EventoController extends GetxController {
     }
   }
 
-  void setFilter(EventFilter filter) {
+ void setFilter(EventFilter filter) {
     if (currentFilter.value != filter) {
       currentFilter.value = filter;
-      currentPage.value = 1; 
-      eventosList.clear(); 
-      searchEditingController.clear(); 
-      fetchEventos(1);
+      searchEditingController.clear();
+      
+      if (filter == EventFilter.myEvents) {
+        eventosList.clear();
+        fetchMisEventosEspecificos();
+      } else {
+        currentPage.value = 1;
+        fetchEventos(1);
+      }
     }
   }
 
@@ -341,5 +348,69 @@ class EventoController extends GetxController {
     _debounce?.cancel();
     super.onClose();
   }
+  Future<void> toggleParticipation() async {
+    final user = _authController.currentUser.value;
+    final event = selectedEvento.value;
 
+    if (user == null || event == null) {
+      Get.snackbar('Error', 'Debes iniciar sesión para participar');
+      return;
+    }
+
+    final isParticipant = event.participantes.contains(user.id);
+
+    try {
+      isLoading(true); 
+      
+      Evento updatedEvento;
+
+      if (isParticipant) {
+        updatedEvento = await _eventosServices.leaveEvent(event.id);
+        Get.snackbar(
+          "Existo!", 
+          "Has salido del evento", 
+          backgroundColor: Colors.orange, 
+          colorText: Colors.white
+        );
+      } else {
+        updatedEvento = await _eventosServices.joinEvent(event.id);
+        Get.snackbar(
+          "Exito!", 
+          "Te has unido al evento", 
+          backgroundColor: Colors.green, 
+          colorText: Colors.white
+        );
+      }
+
+      selectedEvento.value = updatedEvento;
+      
+      final index = eventosList.indexWhere((e) => e.id == updatedEvento.id);
+      if (index != -1) {
+        eventosList[index] = updatedEvento;
+      }
+
+    } catch (e) {
+      Get.snackbar(
+       "Error",
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  void fetchMisEventosEspecificos() async {
+    try {
+      isLoading(true);
+      final resultado = await _eventosServices.getMisEventos();
+      misEventosCreados.assignAll(resultado['creados']!);
+      misEventosInscritos.assignAll(resultado['inscritos']!);
+    } catch (e) {
+      Get.snackbar('Error', 'No se pudieron cargar tus eventos');
+    } finally {
+      isLoading(false);
+    }
+  }
 }
