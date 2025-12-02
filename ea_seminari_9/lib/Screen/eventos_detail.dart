@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../Models/eventos.dart';
 import '../Controllers/eventos_controller.dart';
+import '../Controllers/auth_controller.dart';
 import 'package:get/get.dart'; 
 import 'package:intl/intl.dart'; // Añadido para el formato fijo
 import 'package:timeago/timeago.dart' as timeago; // Añadido para el tiempo relativo
@@ -106,6 +107,8 @@ String _formatSchedule(String scheduleString) {
     );
   }
   Widget _buildEventoDetail(Evento evento) {
+    final currentUserId = Get.find<AuthController>().currentUser.value?.id;
+    final isParticipant = evento.participantes.contains(currentUserId);
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -141,7 +144,27 @@ String _formatSchedule(String scheduleString) {
           // Información del evento
           _buildInfoCard(evento),
           const SizedBox(height: 20),
-
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: ElevatedButton(
+              onPressed: () => controller.toggleParticipation(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isParticipant ? Colors.redAccent : const Color(0xFF667EEA),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                isParticipant 
+                  ? "Salir del evento"  // Añadir a JSON: 'events.leave_btn'
+                  : "Unirme al evento", // Añadir a JSON: 'events.join_btn'
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
 
         ],
       ),

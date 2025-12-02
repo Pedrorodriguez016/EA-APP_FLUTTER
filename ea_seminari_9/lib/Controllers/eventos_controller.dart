@@ -330,5 +330,61 @@ class EventoController extends GetxController {
       );
     });
   }
-  
+
+  Future<void> toggleParticipation() async {
+    final user = _authController.currentUser.value;
+    final event = selectedEvento.value;
+
+    if (user == null || event == null) {
+      Get.snackbar('Error', 'Debes iniciar sesión para participar');
+      return;
+    }
+
+    final isParticipant = event.participantes.contains(user.id);
+
+    try {
+      isLoading(true); 
+      
+      Evento updatedEvento;
+
+      if (isParticipant) {
+        // Salir: Backend devuelve el evento sin el usuario
+        updatedEvento = await _eventosServices.leaveEvent(event.id);
+        Get.snackbar(
+          "Existo!", 
+          "Has salido del evento", 
+          backgroundColor: Colors.orange, 
+          colorText: Colors.white
+        );
+      } else {
+        // Unirse: Backend devuelve el evento con el usuario añadido
+        updatedEvento = await _eventosServices.joinEvent(event.id);
+        Get.snackbar(
+          "Exito!", 
+          "Te has unido al evento", 
+          backgroundColor: Colors.green, 
+          colorText: Colors.white
+        );
+      }
+
+      // ACTUALIZACIÓN CLAVE: Reemplazamos el objeto local con el que vino del servidor
+      selectedEvento.value = updatedEvento;
+      
+      // También actualizamos la lista general si es necesario para que se refleje al volver atrás
+      final index = eventosList.indexWhere((e) => e.id == updatedEvento.id);
+      if (index != -1) {
+        eventosList[index] = updatedEvento;
+      }
+
+    } catch (e) {
+      Get.snackbar(
+       "Error",
+        e.toString(), // O un mensaje más amigable
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
 }
