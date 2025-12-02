@@ -136,4 +136,24 @@ class EventosServices {
       throw Exception('Error al salir del evento: $e');
     }
   }
+  
+  Future<Map<String, List<Evento>>> getMisEventos() async {
+    try {
+      final response = await _client.get('/user/my-events'); 
+      final data = response.data;
+
+      final creados = (data['eventosCreados'] as List?)
+          ?.map((e) => Evento.fromJson(e))
+          .toList() ?? [];
+          
+      final inscritos = (data['eventosInscritos'] as List?)
+          ?.map((e) => Evento.fromJson(e))
+          .toList() ?? [];
+
+      return {'creados': creados, 'inscritos': inscritos};
+    } catch (e) {
+      print('Error al obtener mis eventos: $e');
+      throw Exception('Error al cargar mis eventos: $e');
+    }
+  }
 }

@@ -16,6 +16,8 @@ class EventoController extends GetxController {
   var isMoreLoading = false.obs;
   var eventosList = <Evento>[].obs;
   var mapEventosList = <Evento>[].obs;
+  var misEventosCreados = <Evento>[].obs;
+  var misEventosInscritos = <Evento>[].obs;
   var currentPage = 1.obs;
   var totalPages = 1.obs;
   var totalEventos = 0.obs;
@@ -69,13 +71,18 @@ class EventoController extends GetxController {
     }
   }
 
-  void setFilter(EventFilter filter) {
+ void setFilter(EventFilter filter) {
     if (currentFilter.value != filter) {
       currentFilter.value = filter;
-      currentPage.value = 1; 
-      eventosList.clear(); 
-      searchEditingController.clear(); 
-      fetchEventos(1);
+      searchEditingController.clear();
+      
+      if (filter == EventFilter.myEvents) {
+        eventosList.clear();
+        fetchMisEventosEspecificos();
+      } else {
+        currentPage.value = 1;
+        fetchEventos(1);
+      }
     }
   }
 
@@ -348,7 +355,6 @@ class EventoController extends GetxController {
       Evento updatedEvento;
 
       if (isParticipant) {
-        // Salir: Backend devuelve el evento sin el usuario
         updatedEvento = await _eventosServices.leaveEvent(event.id);
         Get.snackbar(
           "Existo!", 
@@ -357,7 +363,6 @@ class EventoController extends GetxController {
           colorText: Colors.white
         );
       } else {
-        // Unirse: Backend devuelve el evento con el usuario añadido
         updatedEvento = await _eventosServices.joinEvent(event.id);
         Get.snackbar(
           "Exito!", 
@@ -367,10 +372,8 @@ class EventoController extends GetxController {
         );
       }
 
-      // ACTUALIZACIÓN CLAVE: Reemplazamos el objeto local con el que vino del servidor
       selectedEvento.value = updatedEvento;
       
-      // También actualizamos la lista general si es necesario para que se refleje al volver atrás
       final index = eventosList.indexWhere((e) => e.id == updatedEvento.id);
       if (index != -1) {
         eventosList[index] = updatedEvento;
@@ -379,7 +382,7 @@ class EventoController extends GetxController {
     } catch (e) {
       Get.snackbar(
        "Error",
-        e.toString(), // O un mensaje más amigable
+        e.toString(),
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -387,4 +390,18 @@ class EventoController extends GetxController {
       isLoading(false);
     }
   }
+
+void fetchMisEventosEspecificos() async {
+    try {
+      isLoading(true);
+      final resultado = await _eventosServices.getMisEventos();
+      misEventosCreados.assignAll(resultado['creados']!);
+      misEventosInscritos.assignAll(resultado['inscritos']!);
+    } catch (e) {
+      Get.snackbar('Error', 'No se pudieron cargar tus eventos');
+    } finally {
+      isLoading(false);
+    }
+  }
+
 }

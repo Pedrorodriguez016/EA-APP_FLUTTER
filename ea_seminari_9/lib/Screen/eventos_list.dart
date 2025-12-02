@@ -11,96 +11,86 @@ class EventosListScreen extends GetView<EventoController> {
   const EventosListScreen({super.key});
 
   @override
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-      appBar: StandardAppBar(
-        title: "Eventos",
-      ),
+      appBar: StandardAppBar(title: "Eventos"), // O translate('events.list_title')
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child:Obx(() {
+        child: Column(
+          children: [
+            // Barra de búsqueda (Solo visible en Explorar)
+            Obx(() => controller.currentFilter.value == EventFilter.all
+                ? TextField(
+                    controller: controller.searchEditingController,
+                    decoration: InputDecoration(
+                      hintText: "Buscar evento...",
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    onSubmitted: (value) => controller.searchEventos(value),
+                  )
+                : const SizedBox.shrink()),
+            
+            const SizedBox(height: 12),
+            _buildFilterTabs(), // Tus pestañas de filtro
+            const SizedBox(height: 12),
 
-          if (controller.isLoading.value && controller.eventosList.isEmpty) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          return Column(
-            children: [
-              TextField(
-                controller: controller.searchEditingController,
-                decoration: InputDecoration(
-                  hintText: "Buscar evento...",
-                  prefixIcon: const Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                ),
-                onSubmitted: (value) => controller.searchEventos(value),
-              ),
-              const SizedBox(height: 12),
+            // CONTENIDO PRINCIPAL
+            Expanded(
+              child: Obx(() {
+                if (controller.isLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-              _buildFilterTabs(),
-              const SizedBox(height: 12),
+                // CASO 1: VISTA DE "MIS EVENTOS" (Dos secciones)
+                if (controller.currentFilter.value == EventFilter.myEvents) {
+                  return _buildMisEventosView();
+                }
 
-              Expanded(
-                child: Obx(() {
-                  if (controller.isLoading.value && controller.eventosList.isEmpty) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                
-                  if (controller.eventosList.isEmpty) {
-                     // Mostrar mensaje diferente si se está filtrando a mis eventos
-                      final noEventsMessage = controller.currentFilter.value == EventFilter.myEvents
-                        ? "No has creado ningún evento aún."
-                        : "No se encontraron eventos.";
+                // CASO 2: VISTA DE "EXPLORAR" (Lista normal paginada)
+                if (controller.eventosList.isEmpty) {
+                  return const Center(child: Text("No se encontraron eventos."));
+                }
 
-                      return Center(child: Text(noEventsMessage));
-                  }
-
-                  return ListView.separated(
-                    controller: controller.scrollController, 
-                    itemCount: controller.eventosList.length + 1, 
-                    separatorBuilder: (c, i) => const SizedBox(height: 10),
-                    itemBuilder: (context, index) {
-                      if (index == controller.eventosList.length) {
-                        return Obx(() => controller.isMoreLoading.value
-                          ? const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 16),
-                              child: Center(child: CircularProgressIndicator()),
-                            )
-                          : const SizedBox.shrink()
-                        );
-                      }
-
-                      final evento = controller.eventosList[index];
-                      return EventosCard(evento: evento);
-                    },
-                  );
-                }),
-              ),
-            ],
-          );
-        }),
+                return ListView.separated(
+                  controller: controller.scrollController,
+                  itemCount: controller.eventosList.length + 1,
+                  separatorBuilder: (c, i) => const SizedBox(height: 10),
+                  itemBuilder: (context, index) {
+                    if (index == controller.eventosList.length) {
+                      return Obx(() => controller.isMoreLoading.value
+                          ? const Center(child: CircularProgressIndicator())
+                          : const SizedBox.shrink());
+                    }
+                    return EventosCard(evento: controller.eventosList[index]);
+                  },
+                );
+              }),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: RefreshButton(
-        onRefresh: () => controller.refreshEventos(),
-        message: 'Lista de eventos actualizada',
+        onRefresh: () {
+          if (controller.currentFilter.value == EventFilter.myEvents) {
+            controller.fetchMisEventosEspecificos();
+          } else {
+            controller.refreshEventos();
+          }
+        },
+        message: 'Lista actualizada',
       ),
       bottomNavigationBar: const CustomNavBar(currentIndex: 1),
     );
   }
 
-  Widget _buildEventosList() {
-    return ListView.builder(
-      itemCount: controller.eventosList.length,
-      itemBuilder: (context, index) {
-        final evento = controller.eventosList[index];
-        return EventosCard(evento: evento);
-      },
-    );
-  }
+  
  Widget _buildFilterTabs() {
   return Obx(() {
  // Obx reacciona cuando controller.currentFilter.value cambia
@@ -179,6 +169,35 @@ style: TextStyle(
  ),
  );
 }
+Widget _buildMisEventosView() {
+    if (controller.misEventosCreados.isEmpty && controller.misEventosInscritos.isEmpty) {
+      return const Center(child: Text("Aún no has creado ni te has unido a eventos."));
+    }
 
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (controller.misEventosCreados.isNotEmpty) ...[
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Text("Eventos Creados por mí", 
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.indigo)),
+            ),
+            ...controller.misEventosCreados.map((e) => EventosCard(evento: e)).toList(),
+          ],
+          if (controller.misEventosInscritos.isNotEmpty) ...[
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
+              child: Text("Eventos a los que asisto", 
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green)),
+            ),
+            ...controller.misEventosInscritos.map((e) => EventosCard(evento: e)).toList(),
+          ],
+        ],
+      ),
+    );
+  }
 
 }
