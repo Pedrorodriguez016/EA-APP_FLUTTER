@@ -13,7 +13,8 @@
     "delete": "Eliminar",
     "confirm": "Confirmar",
     "yes": "Sí",
-    "no": "No"
+    "no": "No",
+    "fix_errors": "Por favor corrige los errores"
   },
   "auth": {
     "login": {
@@ -32,7 +33,9 @@
       "login_link": "Inicia Sesión",
       "success_title": "¡Registro Exitoso!",
       "success_msg": "Tu cuenta ha sido creada correctamente. Ahora puedes iniciar sesión.",
-      "continue": "Continuar"
+      "continue": "Continuar", 
+      "generate_password_btn": "Generar contraseña",
+      "chars": "Mínimo 12 caracteres"
     },
     "fields": {
       "username": "Username",
@@ -52,7 +55,15 @@
       "password_short": "La contraseña debe tener al menos 6 caracteres",
       "password_mismatch": "Las contraseñas no coinciden",
       "birthday_empty": "Por favor ingresa tu fecha de nacimiento",
-      "birthday_invalid": "Fecha inválida"
+      "birthday_invalid": "Fecha inválida",
+      "not_authenticated": "Usuario no autenticado",
+      "password_weak": "La contraseña es débil"
+    },
+    "password_strength": {
+      "medium": "Media",
+      "strong": "Fuerte",
+      "secure": "Segura",
+      "weak": "La contraseña es débil"
     }
   },
   "home": {
@@ -89,7 +100,28 @@
     "schedule": "Horario:",
     "participants": "Participantes:",
     "not_found": "Evento no encontrado",
-    "created_success": "El evento se ha creado correctamente."
+    "created_success": "El evento se ha creado correctamente.",
+    "explore_tab": "Explorar eventos",
+    "no_my_events": "Aún no has creado ni te has unido a eventos.",
+    "created_by_me": "Eventos Creados por mí",
+    "attending": "Eventos a los que asisto",
+    "join_btn": "Unirme al evento",
+    "leave_btn": "Salir del evento",
+    "date_unavailable": "Fecha no disponible",
+    "format_error": "Error de formato",
+    "joined_success": "Te has unido al evento",
+    "left_success": "Has salido del evento",
+    "my_events_tab": "Mis eventos",
+    "errors": {
+      "title_required": "El título es obligatorio",
+      "date_required": "La fecha es obligatoria",
+      "restricted_access_title": "Acceso Restringido",
+      "restricted_access_msg": "Debes iniciar sesión para ver tus eventos.",
+      "load_error_title": "Error de Carga",
+      "load_error_msg": "No se pudieron cargar los eventos",
+      "login_to_participate": "Debes iniciar sesión para participar",
+      "load_my_events": "No se pudieron cargar tus eventos"
+    }
   },
   "users": {
     "list_title": "Usuarios",
@@ -105,7 +137,8 @@
     "reject_req": "Rechazar solicitud",
     "req_sent": "Solicitud de amistad enviada",
     "friendship_accepted": "Amistad aceptada",
-    "req_rejected": "Solicitud rechazada"
+    "req_rejected": "Solicitud rechazada",
+    "load_error": "No se pudo cargar el usuario."
   },
   "chat": {
     "list_title": "Mis Chats",

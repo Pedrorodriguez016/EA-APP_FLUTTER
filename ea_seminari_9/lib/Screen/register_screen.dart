@@ -88,7 +88,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     // Por ahora lo dejaré con textos que se entienden universalmente o podrías usar claves.
     final requirements = [
       {
-        'label': 'Min 12 chars', // Puedes usar translate('auth.requirements.chars')
+        'label': translate('auth.password_requirements.chars'), // Puedes usar translate('auth.requirements.chars')
         'valid': password.length >= 12,
       },
       {
@@ -179,7 +179,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
 
       if (age < 13) {
-        return 'Min 13 years'; // Puedes traducir esto también
+        return translate('auth.errors.age_restriction');
       }
 
       if (age > 120) {
@@ -358,13 +358,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   label = translate('common.error'); // O 'Débil' si añades la clave
                   break;
                 case PasswordStrength.medium:
-                  label = 'Medium';
+                  label = translate('auth.errors.password_medium');
                   break;
                 case PasswordStrength.strong:
-                  label = 'Strong';
+                  label = translate('auth.errors.password_strong');
                   break;
                 case PasswordStrength.secure:
-                  label = 'Secure';
+                  label = translate('auth.errors.password_secure');
                   break;
                 default:
                   label = '';
@@ -441,10 +441,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text('Generar contraseña'), // Traducir si es necesario
+              child: Text(translate('auth.register.generate_password_btn')),
             ),
           ),
-          const SizedBox(height: 32),
+            const SizedBox(height: 32),
           _buildRegisterButton(),
         ],
       ),

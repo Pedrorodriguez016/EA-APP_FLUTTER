@@ -20,14 +20,14 @@ String _formatSchedule(String scheduleString) {
     final String cleanScheduleString = scheduleString.trim(); 
     
     if (cleanScheduleString.isEmpty) {
-      return 'Fecha no disponible';
+      return translate('events.date_unavailable');
     }
     
     try {
       final DateTime? scheduleDate = DateTime.tryParse(cleanScheduleString); 
       
       if (scheduleDate == null) {
-          return 'Error de formato'; 
+          return translate('events.format_error'); 
       }
       
       // 1. Formato de Fecha: Ejemplo "13 de noviembre de 2025"
@@ -160,8 +160,8 @@ String _formatSchedule(String scheduleString) {
               ),
               child: Text(
                 isParticipant 
-                  ? "Salir del evento"  // Añadir a JSON: 'events.leave_btn'
-                  : "Unirme al evento", // Añadir a JSON: 'events.join_btn'
+                  ? translate('events.leave_btn')  
+                  : translate('events.join_btn'), 
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
@@ -202,7 +202,7 @@ String _formatSchedule(String scheduleString) {
           ),
           const SizedBox(height: 16),
 
-           _buildDetailRow(Icons.schedule, 'Horario:', formattedSchedule),
+           _buildDetailRow(Icons.schedule, translate('events.schedule'), formattedSchedule),
 
           const SizedBox(height: 12),
           _buildDetailRow(Icons.location_on, translate('events.field_address') + ':', evento.address),

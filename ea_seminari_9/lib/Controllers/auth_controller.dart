@@ -3,13 +3,14 @@ import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart'; // Importar
 import '../Models/user.dart';
 import '../Interceptor/auth_interceptor.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AuthController extends GetxController {
   var isLoggedIn = false.obs;
   var currentUser = Rxn<User>();
   String? token;
   String? refreshToken;
-  final Dio _client = Dio(BaseOptions(baseUrl: 'http://localhost:3000/api',
+  final Dio _client = Dio(BaseOptions(baseUrl: '${dotenv.env['BASE_URL']}/api',
     connectTimeout:const Duration(seconds: 5,),
     receiveTimeout: const Duration(seconds: 5,))
     );

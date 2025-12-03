@@ -1,6 +1,6 @@
 import 'package:ea_seminari_9/Bindings/chat_list_binding.dart';
 import 'package:ea_seminari_9/Screen/chat_list_screen.dart';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '/Bindings/chat_binding.dart';
 import '/Screen/chat_screen.dart';
 import 'package:flutter/material.dart';
@@ -34,9 +34,9 @@ void main() async {
   );
   await initializeDateFormatting('es', null);
   timeago.setLocaleMessages('es', timeago.EsMessages());
+  await dotenv.load(fileName: ".env");
   runApp(LocalizedApp(delegate, const MyApp()));
    
-
 }
 
 

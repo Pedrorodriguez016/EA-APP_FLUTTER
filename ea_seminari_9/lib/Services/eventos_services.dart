@@ -1,9 +1,10 @@
 import '../Models/eventos.dart';
 import 'package:dio/dio.dart';
 import '../Interceptor/auth_interceptor.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class EventosServices {
-  final String baseUrl = 'http://localhost:3000/api/event';
+  final String baseUrl = '${dotenv.env['BASE_URL']}/api/event';
   late final Dio _client;
   
   EventosServices(){

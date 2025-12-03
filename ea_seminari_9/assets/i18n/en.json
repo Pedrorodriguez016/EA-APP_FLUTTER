@@ -13,13 +13,13 @@
     "delete": "Delete",
     "confirm": "Confirm",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "fix_errors": "Please fix the errors"
   },
   "auth": {
     "login": {
       "title": "Welcome",
       "subtitle": "Sign in to your account",
-      "password": "Password",
       "action_btn": "Sign In",
       "no_account": "Don't have an account?",
       "register_link": "Sign up here",
@@ -33,7 +33,9 @@
       "login_link": "Sign In",
       "success_title": "Registration Successful!",
       "success_msg": "Your account has been created successfully. You can now log in.",
-      "continue": "Continue"
+      "continue": "Continue",
+      "generate_password_btn": "Generate password",
+      "chars": "Minimum 12 characters"
     },
     "fields": {
       "username": "Username",
@@ -53,7 +55,16 @@
       "password_short": "Password must be at least 6 characters",
       "password_mismatch": "Passwords do not match",
       "birthday_empty": "Please enter your date of birth",
-      "birthday_invalid": "Invalid date"
+      "birthday_invalid": "Invalid date",
+      "age_restriction": "Minimum 13 years old",
+      "not_authenticated": "User not authenticated",
+      "password_weak": "Password is weak"
+    },
+    "password_strength": {
+      "medium": "Medium",
+      "strong": "Strong",
+      "secure": "Secure",
+      "weak": "Weak"
     }
   },
   "home": {
@@ -90,7 +101,28 @@
     "schedule": "Schedule:",
     "participants": "Participants:",
     "not_found": "Event not found",
-    "created_success": "The event has been created successfully."
+    "created_success": "The event has been created successfully.",
+    "explore_tab": "Explore events",
+    "no_my_events": "You haven't created or joined any events yet.",
+    "created_by_me": "Events created by me",
+    "attending": "Events I'm attending",
+    "join_btn": "Join event",
+    "leave_btn": "Leave event",
+    "date_unavailable": "Date unavailable",
+    "format_error": "Format error",
+    "joined_success": "You have joined the event",
+    "left_success": "You have left the event",
+    "my_events_tab": "My events",
+    "errors": {
+      "title_required": "Title is required",
+      "date_required": "Date is required",
+      "restricted_access_title": "Restricted Access",
+      "restricted_access_msg": "You must log in to see your events.",
+      "load_error_title": "Load Error",
+      "load_error_msg": "Could not load events. Please check your connection or server.",
+      "login_to_participate": "You must log in to participate",
+      "load_my_events": "Could not load your events"
+    }
   },
   "users": {
     "list_title": "Users",
@@ -106,7 +138,8 @@
     "reject_req": "Reject request",
     "req_sent": "Friend request sent",
     "friendship_accepted": "Friendship accepted",
-    "req_rejected": "Request rejected"
+    "req_rejected": "Request rejected",
+    "load_error": "Could not load user."
   },
   "chat": {
     "list_title": "My Chats",

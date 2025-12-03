@@ -1,11 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import '../Controllers/auth_controller.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AuthInterceptor extends Interceptor {
   AuthController get _auth => Get.find<AuthController>();
 
-  final Dio _tokenDio = Dio(BaseOptions(baseUrl: 'http://localhost:3000/api',
+  final Dio _tokenDio = Dio(BaseOptions(baseUrl: '${dotenv.env['BASE_URL']}/api',
     connectTimeout:const Duration(seconds: 5,),
     receiveTimeout: const Duration(seconds: 5,))
     );

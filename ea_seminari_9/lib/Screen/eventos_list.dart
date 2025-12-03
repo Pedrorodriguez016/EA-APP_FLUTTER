@@ -102,14 +102,14 @@ class EventosListScreen extends GetView<EventoController> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           _buildFilterButton(
-            label: 'Explorar eventos', // Podrías añadir translate('home.events_section.explore_btn') aquí
+            label: translate('events.explore_tab'), 
             filter: EventFilter.all,
             icon: Icons.explore_outlined,
             isSelected: controller.currentFilter.value == EventFilter.all,
           ),
           const SizedBox(width: 8),
           _buildFilterButton(
-            label: 'Mis eventos', // Podrías añadir translate('home.events_section.my_events_btn') aquí
+            label: translate('events.my_events_tab'), 
             filter: EventFilter.myEvents,
             icon: Icons.event_note_outlined,
             isSelected: controller.currentFilter.value == EventFilter.myEvents,
@@ -172,8 +172,7 @@ class EventosListScreen extends GetView<EventoController> {
 
   Widget _buildMisEventosView() {
     if (controller.misEventosCreados.isEmpty && controller.misEventosInscritos.isEmpty) {
-      // Puedes traducir este texto si añades la clave al JSON
-      return const Center(child: Text("Aún no has creado ni te has unido a eventos."));
+      return Center(child: Text(translate('events.no_my_events')));
     }
 
     return SingleChildScrollView(
@@ -182,17 +181,17 @@ class EventosListScreen extends GetView<EventoController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (controller.misEventosCreados.isNotEmpty) ...[
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 8.0),
-              child: Text("Eventos Creados por mí", 
+              child: Text(translate('events.created_by_me'), 
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.indigo)),
             ),
             ...controller.misEventosCreados.map((e) => EventosCard(evento: e)).toList(),
           ],
           if (controller.misEventosInscritos.isNotEmpty) ...[
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 0),
-              child: Text("Eventos a los que asisto", 
+              child: Text(translate('events.attending'), 
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green)),
             ),
             ...controller.misEventosInscritos.map((e) => EventosCard(evento: e)).toList(),

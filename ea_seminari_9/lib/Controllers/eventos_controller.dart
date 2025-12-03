@@ -95,7 +95,7 @@ class EventoController extends GetxController {
         eventosList.clear(); 
         
         // Esto evita que intente cargar eventos si el usuario no está logueado
-        Get.snackbar('Acceso Restringido', 'Debes iniciar sesión para ver tus eventos.',
+        Get.snackbar(translate('events.errors.restricted_access_title'), translate('events.errors.restricted_access_msg'),
             snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red);
         return;
       }
@@ -246,12 +246,6 @@ class EventoController extends GetxController {
   void refreshEventos() {
     searchEditingController.clear();
     fetchEventos(1); 
-    Get.snackbar(
-      translate('common.update'),
-      translate('events.list_updated'),
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 2),
-    );
   }
 
   fetchEventoById(String id) async {
@@ -353,7 +347,7 @@ class EventoController extends GetxController {
     final event = selectedEvento.value;
 
     if (user == null || event == null) {
-      Get.snackbar('Error', 'Debes iniciar sesión para participar');
+      Get.snackbar(translate('common.error'), translate('events.errors.login_to_participate'));
       return;
     }
 
@@ -367,16 +361,16 @@ class EventoController extends GetxController {
       if (isParticipant) {
         updatedEvento = await _eventosServices.leaveEvent(event.id);
         Get.snackbar(
-          "Existo!", 
-          "Has salido del evento", 
+          translate('common.success'),
+          translate('events.left_success'), 
           backgroundColor: Colors.orange, 
           colorText: Colors.white
         );
       } else {
         updatedEvento = await _eventosServices.joinEvent(event.id);
         Get.snackbar(
-          "Exito!", 
-          "Te has unido al evento", 
+          translate('common.success'), 
+          translate('events.joined_success'),
           backgroundColor: Colors.green, 
           colorText: Colors.white
         );
@@ -408,7 +402,7 @@ class EventoController extends GetxController {
       misEventosCreados.assignAll(resultado['creados']!);
       misEventosInscritos.assignAll(resultado['inscritos']!);
     } catch (e) {
-      Get.snackbar('Error', 'No se pudieron cargar tus eventos');
+      Get.snackbar(translate('common.error'), translate('events.errors.load_my_events'));
     } finally {
       isLoading(false);
     }

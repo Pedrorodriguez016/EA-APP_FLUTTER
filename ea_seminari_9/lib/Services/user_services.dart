@@ -3,9 +3,10 @@ import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import '../Interceptor/auth_interceptor.dart';
 import '../Controllers/auth_controller.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class UserServices {
-  final String baseUrl = 'http://localhost:3000/api/user';
+  final String baseUrl = '${dotenv.env['BASE_URL']}/api/user';
   final AuthController _authController = Get.find<AuthController>();
   
   late final Dio _client;

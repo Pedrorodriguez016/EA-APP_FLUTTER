@@ -1,9 +1,10 @@
 import 'package:get/get.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class SocketService extends GetxService {
   late IO.Socket _socket;
-  final String _url = 'http://localhost:3000'; 
+  final String _url = '${dotenv.env['BASE_URL']}'; 
 
   void connectWithUserId(String userId) {
     // Configuración del cliente

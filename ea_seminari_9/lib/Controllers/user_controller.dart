@@ -117,14 +117,6 @@ class UserController extends GetxController {
   void refreshUsers() {
     searchEditingController.clear(); 
     fetchUsers(1);
-    Get.snackbar(
-      translate('common.update'),
-      translate('users.list_updated'),
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 2),
-      colorText: Colors.white,
-      backgroundColor: Colors.green
-    );
   }
 
   fetchUserById(String id) async{

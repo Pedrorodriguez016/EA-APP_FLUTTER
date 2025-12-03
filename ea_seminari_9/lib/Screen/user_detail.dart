@@ -35,13 +35,13 @@ class UserDetailScreen extends GetView<UserController> {
           );
         }
         if (controller.selectedUser.value == null) {
-          return const Center(
+          return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.error_outline, size: 64, color: Colors.red),
                 SizedBox(height: 16),
-                Text("No se pudo cargar el usuario."), // Este mensaje quizás quieras añadirlo a JSON
+                Text(translate('users.load_error')),
               ],
             ),
           );

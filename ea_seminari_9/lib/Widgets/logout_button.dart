@@ -12,7 +12,7 @@ class LogoutButton extends StatelessWidget {
 
     return IconButton(
       icon: const Icon(Icons.logout, color: Colors.redAccent),
-      tooltip: 'Cerrar sesión',
+      tooltip: translate('dialogs.logout.title'),
       onPressed: () {
         Get.defaultDialog(
           title: translate('dialogs.logout.title'),

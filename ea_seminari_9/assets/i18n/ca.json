@@ -13,13 +13,13 @@
     "delete": "Elimina",
     "confirm": "Confirma",
     "yes": "Sí",
-    "no": "No"
+    "no": "No",
+    "fix_errors": "Si us plau, corregeix els errors"
   },
   "auth": {
     "login": {
       "title": "Benvingut",
       "subtitle": "Inicia sessió al teu compte",
-      "password": "contrasenya",
       "action_btn": "Inicia Sessió",
       "no_account": "No tens compte?",
       "register_link": "Registra't aquí",
@@ -33,7 +33,9 @@
       "login_link": "Inicia Sessió",
       "success_title": "Registre Completat!",
       "success_msg": "El teu compte s'ha creat correctament. Ara pots iniciar sessió.",
-      "continue": "Continua"
+      "continue": "Continua",
+      "generate_password_btn": "Generar contrasenya",
+      "chars": "Mínim 12 caràcters"
     },
     "fields": {
       "username": "Nom d'usuari",
@@ -53,7 +55,16 @@
       "password_short": "La contrasenya ha de tenir almenys 6 caràcters",
       "password_mismatch": "Les contrasenyes no coincideixen",
       "birthday_empty": "Si us plau, introdueix la teva data de naixement",
-      "birthday_invalid": "Data invàlida"
+      "birthday_invalid": "Data invàlida",
+      "age_restriction": "Mínim 13 anys",
+      "not_authenticated": "Usuari no autenticat",
+      "password_weak": "La contrasenya és feble"
+    },
+    "password_strength": {
+      "medium": "Mitjana",
+      "strong": "Forta",
+      "secure": "Segura",
+      "weak": "Feble"
     }
   },
   "home": {
@@ -90,7 +101,28 @@
     "schedule": "Horari:",
     "participants": "Participants:",
     "not_found": "Esdeveniment no trobat",
-    "created_success": "L'esdeveniment s'ha creat correctament."
+    "created_success": "L'esdeveniment s'ha creat correctament.",
+    "explore_tab": "Explorar esdeveniments",
+    "no_my_events": "Encara no has creat ni t'has unit a cap esdeveniment.",
+    "created_by_me": "Esdeveniments creats per mi",
+    "attending": "Esdeveniments als que assisteixo",
+    "join_btn": "Unir-me a l'esdeveniment",
+    "leave_btn": "Sortir de l'esdeveniment",
+    "date_unavailable": "Data no disponible",
+    "format_error": "Error de format",
+    "joined_success": "T'has unit a l'esdeveniment",
+    "left_success": "Has sortit de l'esdeveniment",
+    "my_events_tab": "Els meus esdeveniments",
+    "errors": {
+      "title_required": "El títol és obligatori",
+      "date_required": "La data és obligatòria",
+      "restricted_access_title": "Accés Restringit",
+      "restricted_access_msg": "Has d'iniciar sessió per veure els teus esdeveniments.",
+      "load_error_title": "Error de Càrrega",
+      "load_error_msg": "No s'han pogut carregar els esdeveniments. Revisa la connexió o el servidor.",
+      "login_to_participate": "Has d'iniciar sessió per participar",
+      "load_my_events": "No s'han pogut carregar els teus esdeveniments"
+    }
   },
   "users": {
     "list_title": "Usuaris",
@@ -106,7 +138,8 @@
     "reject_req": "Rebutja sol·licitud",
     "req_sent": "Sol·licitud d'amistat enviada",
     "friendship_accepted": "Amistat acceptada",
-    "req_rejected": "Sol·licitud rebutjada"
+    "req_rejected": "Sol·licitud rebutjada",
+    "load_error": "No s'ha pogut carregar l'usuari."
   },
   "chat": {
     "list_title": "Els meus xats",
