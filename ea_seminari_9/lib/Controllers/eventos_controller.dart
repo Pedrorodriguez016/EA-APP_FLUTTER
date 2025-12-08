@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_translate/flutter_translate.dart'; 
 import 'auth_controller.dart';
+import '../utils/logger.dart';
  
 
 // Definimos los tipos de filtro posibles
@@ -88,11 +89,13 @@ class EventoController extends GetxController {
     String? creatorId;
     if (currentFilter.value == EventFilter.myEvents) {
       creatorId = _authController.currentUser.value?.id; 
+      logger.i('📄 Cargando mis eventos, creatorId: $creatorId');
       
       if (creatorId == null) {
         isLoading.value = false;
         isMoreLoading.value = false;
-        eventosList.clear(); 
+        eventosList.clear();
+        logger.w('⚠️ Usuario no autenticado, no se pueden cargar eventos');
         
         // Esto evita que intente cargar eventos si el usuario no está logueado
         Get.snackbar(translate('events.errors.restricted_access_title'), translate('events.errors.restricted_access_msg'),
@@ -100,11 +103,6 @@ class EventoController extends GetxController {
         return;
       }
     }
-
-    // --- LÍNEA DE DEPURACIÓN CLAVE ---
-    // Mira esta línea en la consola para saber si tienes el ID del usuario.
-    print("DEBUG FILTRO: Filtro actual: ${currentFilter.value.name}, creatorId enviado: $creatorId");
-    // ----------------------------------
 
     if (page == 1) {  
       isLoading.value = true;
@@ -130,7 +128,6 @@ class EventoController extends GetxController {
       totalPages.value = data['totalPages'];
       totalEventos.value = data['total'];
     } catch (e) {
-      print("Error al cargar eventos: $e");
       if (page == 1) eventosList.clear();
       
       Get.snackbar('Error de Carga', 'No se pudieron cargar los eventos. Revise su conexión o el servidor.',
@@ -186,6 +183,7 @@ class EventoController extends GetxController {
 
   void fetchMapEvents(double north, double south, double east, double west) async {
     try {
+      logger.d('🗺️ Cargando eventos del mapa - Bounds: N:$north S:$south E:$east W:$west');
       var nuevosEventos = await _eventosServices.fetchEventsByBounds(
         north: north, 
         south: south, 
@@ -194,7 +192,7 @@ class EventoController extends GetxController {
       );
       mapEventosList.assignAll(nuevosEventos);
     } catch (e) {
-      print("Error cargando mapa: $e");
+      logger.e('❌ Error cargando mapa', error: e);
     }
   }
 

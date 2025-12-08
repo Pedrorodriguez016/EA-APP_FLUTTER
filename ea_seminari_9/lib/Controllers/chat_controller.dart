@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../Services/socket_services.dart';
 import '../Controllers/auth_controller.dart';
 import '../Models/chat.dart';
+import '../utils/logger.dart';
 
 class ChatController extends GetxController {
   // Dependencias
@@ -33,13 +34,15 @@ class ChatController extends GetxController {
     friendId = args['friendId'] ?? '';
     friendName = args['friendName'] ?? 'Chat';
 
+    logger.i('💬 Inicializando ChatController - Mi ID: $myUserId, Amigo ID: $friendId');
+
     if (friendId.isEmpty) {
+      logger.w('⚠️ Friend ID vacío, cerrando pantalla de chat');
       Get.back();
       return;
     }
 
     _socketService.joinChatRoom(myUserId, friendId);
-
     _socketService.listenToChatMessages(_handleNewMessage);
   }
 
@@ -47,20 +50,24 @@ class ChatController extends GetxController {
   void _handleNewMessage(dynamic data) {
     try {
       final newMessage = ChatMessage.fromJson(data, myUserId);
-      
+      logger.d('📥 Nuevo mensaje recibido de ${newMessage.from}: ${newMessage.text}');
 
       if (newMessage.from == friendId || newMessage.from == myUserId) {
         messages.insert(0, newMessage);
       }
     } catch (e) {
-      print('Error parsing message: $e');
+      logger.e('❌ Error al parsear mensaje', error: e);
     }
   }
 
   void sendMessage() {
     String text = textController.text.trim();
-    if (text.isEmpty) return;
+    if (text.isEmpty) {
+      logger.d('💬 Intento de enviar mensaje vacío, ignorado');
+      return;
+    }
 
+    logger.i('📤 Enviando mensaje a $friendId: $text');
     textController.clear();
     focusNode.requestFocus();
 
@@ -69,6 +76,7 @@ class ChatController extends GetxController {
 
   @override
   void onClose() {
+    logger.i('🚪 Cerrando ChatController');
     _socketService.stopListeningToChatMessages();
     
     textController.dispose();

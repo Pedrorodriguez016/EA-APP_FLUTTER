@@ -22,10 +22,11 @@ import '../Screen/perfil_screen.dart';
 import 'Screen/crear_evento_screen.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'utils/logger.dart';
 
 
 void main() async {
-
+  logger.i('🚀 Iniciando aplicación...');
   WidgetsFlutterBinding.ensureInitialized();
    var delegate = await LocalizationDelegate.create(
     fallbackLocale: 'es', // Idioma por defecto si falla
@@ -35,6 +36,7 @@ void main() async {
   await initializeDateFormatting('es', null);
   timeago.setLocaleMessages('es', timeago.EsMessages());
   await dotenv.load(fileName: ".env");
+  logger.i('✅ Configuración completada, iniciando aplicación');
   runApp(LocalizedApp(delegate, const MyApp()));
    
 }

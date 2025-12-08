@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import '../Models/eventos.dart';
 import 'package:get/get.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:intl/intl.dart'; 
+import 'package:intl/intl.dart';
+import '../utils/logger.dart'; 
 
 class EventosCard extends StatelessWidget {
   final Evento evento;
@@ -31,7 +32,7 @@ class EventosCard extends StatelessWidget {
       return '$fixedTime ($relativeTime)';
     } catch (e) {
       // Este catch debería ser rarísimo ahora que usamos la clave correcta
-      print('Fallo al parsear la fecha: $scheduleString, Error: $e');
+      logger.w('⚠️ Fallo al parsear la fecha: $scheduleString, Error: $e');
       return 'Error de formato'; 
     }
   }

@@ -4,9 +4,9 @@ import '../Controllers/eventos_controller.dart';
 import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart'; // Importar
 import '../Controllers/auth_controller.dart';
-import 'package:get/get.dart'; 
 import 'package:intl/intl.dart'; // Añadido para el formato fijo
 import 'package:timeago/timeago.dart' as timeago; // Añadido para el tiempo relativo
+import '../utils/logger.dart';
 
 
 class EventosDetailScreen extends GetView<EventoController> {
@@ -50,7 +50,7 @@ String _formatSchedule(String scheduleString) {
       return '$fixedTime ($relativeTime)';
       
     } catch (e) {
-      print('Fallo al formatear la fecha en detalles: $e');
+      logger.w('⚠️ Fallo al formatear la fecha en detalles: $e');
       return 'Error de formato'; 
     }
   }

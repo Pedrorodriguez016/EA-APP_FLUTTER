@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart'; // Importar
 import '../Controllers/auth_controller.dart';
 import '../Services/socket_services.dart';
+import '../utils/logger.dart';
 
 class UserController extends GetxController {
   final AuthController authController = Get.find<AuthController>();
@@ -64,7 +65,7 @@ class UserController extends GetxController {
       totalUsers.value = data['total'];
       
     } catch (e) {
-      print("Error al cargar usuarios: $e");
+      Get.snackbar(translate('common.error'), translate('chat.errors.load_contacts'));
     } finally {
       isLoading.value = false;
       isMoreLoading.value = false; 
@@ -84,13 +85,16 @@ class UserController extends GetxController {
     }
 
     try {
+      logger.i('🔍 Búsqueda de usuario: $query');
       isLoading(true);
       
       final User? user = await _userServices.getUserByUsername(query);
 
       if (user != null) {
+        logger.i('✅ Usuario encontrado: ${user.username}');
         userList.assignAll([user]);
       } else {
+        logger.w('⚠️ No se encontró usuario con el nombre: $query');
         userList.clear();
         Get.snackbar(
           translate('common.search'),
@@ -102,6 +106,7 @@ class UserController extends GetxController {
         );
       }
     } catch (e) {
+      logger.e('❌ Error en búsqueda de usuario', error: e);
       Get.snackbar(
         translate('common.error'), 
         e.toString(),
@@ -139,9 +144,11 @@ class UserController extends GetxController {
   }
   updateUserByid(String id, Map<String, dynamic> newData) async {
   try {
+    logger.i('📁 Actualizando usuario: $id');
     isLoading(true);
     var user = await _userServices.updateUserById(id, newData);
     selectedUser.value = user;
+    logger.i('✅ Usuario actualizado exitosamente');
 
     final authController = Get.find<AuthController>();
     if (authController.currentUser.value?.id == id) {
@@ -199,7 +206,7 @@ void fetchFriends() async {
     try {
       var id = authController.currentUser.value!.id;
       isLoading(true);
-      print("Creando lista de solicitudes");
+      logger.d('📄 Creando lista de solicitudes');
       var friends = await _userServices.fetchRequest(id); 
       if (friends.isNotEmpty) {
         friendsRequests.assignAll(friends);
@@ -276,7 +283,7 @@ void fetchFriends() async {
     final userId = authController.currentUser.value?.id;
     
     if (userId != null) {
-      print("UserController: Inicializando conexión Socket para $userId");
+      logger.i('🔌 Inicializando conexión Socket para $userId');
       _socketService.connectWithUserId(userId);
     }
   }

@@ -2,6 +2,7 @@ import '../Models/eventos.dart';
 import 'package:dio/dio.dart';
 import '../Interceptor/auth_interceptor.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../utils/logger.dart';
 
 class EventosServices {
   final String baseUrl = '${dotenv.env['BASE_URL']}/api/event';
@@ -19,6 +20,7 @@ class EventosServices {
     required double west,
   }) async {
     try {
+      logger.d('🗺️ Obteniendo eventos por límites geográficos');
       final response = await _client.get('/by-bounds', queryParameters: {
         'north': north,
         'south': south,
@@ -37,10 +39,10 @@ class EventosServices {
       } else {
         eventosList = [];
       }
-      print('Eventos fetched by bounds: $eventosList');
+      logger.i('✅ Eventos obtenidos por bounds: ${eventosList.length}');
       return eventosList.map((json) => Evento.fromJson(json)).toList();
     } catch (e) {
-      print('Error in fetchEventsByBounds: $e');
+      logger.e('❌ Error en fetchEventsByBounds', error: e);
       return []; 
     }
   }
@@ -52,15 +54,16 @@ class EventosServices {
     String? creatorId,
   }) async {
     try {
+      logger.d('📄 Obteniendo eventos - Página: $page, Límite: $limit');
       final response = await _client.get('/', queryParameters: {
         'page': page,
         'limit': limit,
-        if (q.isNotEmpty) 'q': q,
         if (creatorId != null && creatorId.isNotEmpty) 'creatorId': creatorId,
       });
 
       final responseData = response.data;
       final List<dynamic> eventosList = responseData['data'];
+      logger.i('✅ Eventos obtenidos: ${eventosList.length}');
 
       return {
         'eventos': eventosList.map((json) => Evento.fromJson(json)).toList(),
@@ -69,67 +72,79 @@ class EventosServices {
         'total': responseData['totalItems'] ?? 0,
       };
     } catch (e) {
+      logger.e('❌ Error al cargar eventos', error: e);
       throw Exception('Error al cargar eventos: $e');
     }
   }
 
   Future<Evento> fetchEventById(String id) async {
     try {
+      logger.d('📄 Obteniendo evento con ID: $id');
       final response = await _client.get('/$id');
+      logger.i('✅ Evento obtenido: ${response.data['title'] ?? id}');
         return Evento.fromJson(response.data);
     } catch (e) {
-      print('Error in fetchUserById: $e');
+      logger.e('❌ Error al cargar evento', error: e);
       throw Exception('Error al cargar el usuario: $e');
     }
   }
 
   Future<Evento> createEvento(Map<String, dynamic> data) async {
     try {
+      logger.i('📁 Creando nuevo evento: ${data['title'] ?? "sin título"}');
       final response = await _client.post('/',
         data: data, // Envía los datos del nuevo evento
       );
+      logger.i('✅ Evento creado exitosamente');
       return Evento.fromJson(response.data);
     } catch (e) {
-      print('Error in createEvento: $e');
+      logger.e('❌ Error al crear evento', error: e);
       throw Exception('Error al crear el evento: $e');
     }
   }
 
   Future<Evento?> getEventoByName(String name) async {
     try {
+      logger.d('📄 Búsqueda de evento por nombre: $name');
       final response = await _client.get('/by-name/$name');
+      logger.i('✅ Evento encontrado: $name');
       return Evento.fromJson(response.data);
       
     } on DioException catch (e) {
       if (e.response?.statusCode == 404) {
-        print('Usuario no encontrado: $name');
+        logger.w('⚠️ Evento no encontrado: $name');
         return null; 
       }
-      
+      logger.e('❌ Error al buscar evento', error: e);
       throw Exception('Error al buscar usuario por username: ${e.message}');
     } catch (e) {
+      logger.e('❌ Error desconocido al buscar evento', error: e);
       throw Exception('Error desconocido al buscar usuario: $e');
     }
   }
 
   Future<Evento> joinEvent(String eventId) async {
     try {
+      logger.i('💪 Uniendose al evento: $eventId');
       final response = await _client.post('/$eventId/join');
+      logger.i('✅ Suscripción al evento exitosa');
       
       return Evento.fromJson(response.data);
     } catch (e) {
-      print('Error in joinEvent: $e');
+      logger.e('❌ Error al unirse al evento', error: e);
       throw Exception('Error al unirse al evento: $e');
     }
   }
 
   Future<Evento> leaveEvent(String eventId) async {
     try {
+      logger.i('🚪 Saliendo del evento: $eventId');
       final response = await _client.post('/$eventId/leave');
+      logger.i('✅ Salida del evento exitosa');
       
       return Evento.fromJson(response.data);
     } catch (e) {
-      print('Error in leaveEvent: $e');
+      logger.e('❌ Error al salir del evento', error: e);
       throw Exception('Error al salir del evento: $e');
     }
   }
@@ -149,7 +164,7 @@ class EventosServices {
 
       return {'creados': creados, 'inscritos': inscritos};
     } catch (e) {
-      print('Error al obtener mis eventos: $e');
+      logger.e('❌ Error al obtener mis eventos', error: e);
       throw Exception('Error al cargar mis eventos: $e');
     }
   }
