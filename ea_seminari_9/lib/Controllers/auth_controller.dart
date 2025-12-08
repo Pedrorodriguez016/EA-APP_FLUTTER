@@ -1,138 +1,145 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
-import 'package:flutter_translate/flutter_translate.dart'; // Importar
+import 'package:flutter_translate/flutter_translate.dart';
+import 'package:flutter/material.dart';
 import '../Models/user.dart';
-import '../Interceptor/auth_interceptor.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import '../utils/logger.dart';
+import '../Services/auth_service.dart'; 
+import '../Services/storage_service.dart';
 
 class AuthController extends GetxController {
+  // Dependencias
+  final AuthService _authService = Get.find<AuthService>();
+  StorageService get _storageService => Get.find<StorageService>();
+  
+  final GlobalKey<FormState> loginFormKey = GlobalKey<FormState>();
+  final TextEditingController loginUserCtrl = TextEditingController();
+  final TextEditingController loginPassCtrl = TextEditingController();
+  
+  var isLoginLoading = false.obs;  
+  var isObscurePassword = true.obs;
+  // Estado
   var isLoggedIn = false.obs;
   var currentUser = Rxn<User>();
   String? token;
   String? refreshToken;
-  final Dio _client = Dio(BaseOptions(baseUrl: '${dotenv.env['BASE_URL']}/api',
-    connectTimeout:const Duration(seconds: 5,),
-    receiveTimeout: const Duration(seconds: 5,))
-    );
-  
-  // Nota: corregido constructor, antes ponía UserServices()
-  AuthController() {
-    _client.interceptors.add(AuthInterceptor());
+
+
+@override
+  void onInit() {
+    super.onInit();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+       _checkAutoLogin();
+    });
   }
 
-  Future<Map<String, dynamic>> login(String username, String password) async {
+
+  Future <void> _checkAutoLogin() async {
+    User? savedUser = _storageService.getUser();
+    if (savedUser != null) {
+      currentUser.value = savedUser;
+      token = savedUser.token;
+      refreshToken = savedUser.refreshToken;
+      isLoggedIn.value = true;
+      Get.offAllNamed('/home'); 
+    }
+  }
+
+  Future<void> submitLogin() async {
+    if (!loginFormKey.currentState!.validate()) return;
+
     try {
-      logger.i('🔐 Iniciando login para usuario: $username');
-      final response = await _client.post('/user/auth/login', 
-        data: {
-          'username': username,
-          'password': password,
-        },
+      isLoginLoading.value = true; // Activar spinner
+
+      final username = loginUserCtrl.text.trim();
+      final password = loginPassCtrl.text.trim();
+
+      final data = await _authService.login(username, password);
+
+      final userData = data['user'];
+      final user = User.fromJson({
+        ...userData,
+        'token': data['token'],
+        'refreshToken': data['refreshToken'],
+      });
+
+      currentUser.value = user;
+      token = data['token'];
+      refreshToken = data['refreshToken'];
+      isLoggedIn.value = true;
+
+      await _storageService.saveSession(user);
+      loginUserCtrl.clear();
+      loginPassCtrl.clear();
+
+      Get.offAllNamed('/home');
+      
+      Get.snackbar(
+        translate('common.success'), 
+        translate('auth.login.success_msg'),
+        backgroundColor: Colors.green, 
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM
       );
 
-      if (response.statusCode == 200) {
-        final user = response.data;
-        final userData = user['user'];
-        
-        currentUser.value = User.fromJson({
-          ...userData,
-          'token': user['token'],
-          'refreshToken': user['refreshToken'],
-        });
-        
-        token = user['token'];
-        refreshToken = user['refreshToken'];
-        isLoggedIn.value = true;
-        logger.i('✅ Login exitoso para usuario: $username');
-        
-        return {'success': true, 'message': translate('auth.login.success_msg')};
-      } else {
-        final errorData = response.data;
-        logger.w('❌ Login fallido: ${errorData['error']}');
-        // Si el backend devuelve un mensaje, lo mostramos, si no, uno genérico traducido
-        return {
-          'success': false, 
-          'message': errorData['error'] ?? translate('common.error')
-        };
-      }
+    } on DioException catch (e) {
+      final errorData = e.response?.data;
+      String msg = errorData != null && errorData['error'] != null 
+          ? errorData['error'] 
+          : translate('common.error');
+      Get.snackbar(translate('common.error'), msg, 
+          backgroundColor: Colors.red, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
     } catch (e) {
-      logger.e('❌ Error durante login', error: e);
-      return {
-        'success': false, 
-        'message': '${translate("common.error")}: $e'
-      };
+      Get.snackbar(translate('common.error'), '$e', 
+          backgroundColor: Colors.red, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
+    } finally {
+      isLoginLoading.value = false; 
     }
+  }
+
+
+  void logout() {
+    isLoggedIn.value = false;
+    currentUser.value = null;
+    token = null;
+    refreshToken = null;
+    _storageService.clearSession();
+    // Sesión eliminada del Storage
+    // Opcional: limpiar campos de texto
+    loginUserCtrl.clear();
+    loginPassCtrl.clear();
+    isObscurePassword.value = true;
+
+    Get.offAllNamed('/login');
   }
 
   Future<Map<String, dynamic>> register(User newUser) async {
     try {
-      logger.i('📝 Registrando nuevo usuario: ${newUser.username}');
-      final response = await _client.post('/user', 
-        data: {
-          "username": newUser.username,
-          "gmail": newUser.gmail, 
-          "birthday": newUser.birthday, 
-          "password": newUser.password,
-        },
-      );
+      await _authService.register(newUser);
+      return {'success': true, 'message': translate('auth.register.success_msg')};
 
-      if (response.statusCode == 201) {
-        logger.i('✅ Registro exitoso para usuario: ${newUser.username}');
-        return {'success': true, 'message': translate('auth.register.success_msg')};
-      } else {
-        final errorData = response.data;
-        logger.w('❌ Registro fallido: ${errorData['error']}');
-        return {
-          'success': false, 
-          'message': errorData['error'] ?? translate('common.error')
-        };
-      }
+    } on DioException catch (e) {
+      final errorData = e.response?.data;
+      return {
+        'success': false, 
+        'message': errorData != null && errorData['error'] != null 
+            ? errorData['error'] 
+            : translate('common.error')
+      };
     } catch (e) {
-      logger.e('❌ Error durante registro', error: e);
       return {
         'success': false, 
         'message': '${translate("common.error")}: $e'
       };
     }
   }
-
-  void logout() {
-    logger.i('🚪 Usuario cerrando sesión');
-    isLoggedIn.value = false;
-    currentUser.value = null;
-    token = null;
-    Get.offAllNamed('/login');
+  void togglePasswordVisibility() {
+    isObscurePassword.value = !isObscurePassword.value;
   }
+@override
+  void onClose() {
 
-  Future<Map<String, dynamic>> deleteCurrentUser() async {
-    try {
-      if (currentUser.value == null || token == null) {
-        logger.w('⚠️ Intento de eliminar usuario sin autenticación');
-        return {'success': false, 'message': 'Usuario no autenticado'}; // Añadir a JSON si deseas
-      }
-
-      logger.i('🗑️ Eliminando usuario: ${currentUser.value!.id}');
-      final response = await _client.delete('/user/${currentUser.value!.id}');
-
-      if (response.statusCode == 200) {
-        logger.i('✅ Usuario eliminado exitosamente');
-        logout();
-        return {'success': true, 'message': translate('profile.delete_success')};
-      } else {
-        final errorData = response.data;
-        logger.w('❌ Error al eliminar usuario: ${errorData['error']}');
-        return {
-          'success': false, 
-          'message': errorData['error'] ?? translate('common.error')
-        };
-      }
-    } catch (e) {
-      logger.e('❌ Error durante eliminación de usuario', error: e);
-      return {
-        'success': false, 
-        'message': '$e'
-      };
-    }
+    loginUserCtrl.dispose();
+    loginPassCtrl.dispose();
+    super.onClose();
   }
 }

@@ -1,3 +1,4 @@
+import 'package:ea_seminari_9/Bindings/auth_bindings.dart';
 import 'package:ea_seminari_9/Bindings/chat_list_binding.dart';
 import 'package:ea_seminari_9/Screen/chat_list_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -7,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:intl/date_symbol_data_local.dart';
-import 'Controllers/auth_controller.dart';
+import 'Services/storage_service.dart';
 import 'Screen/login_screen.dart';
 import 'Screen/register_screen.dart';
 import 'Screen/home.dart';
@@ -36,7 +37,12 @@ void main() async {
   await initializeDateFormatting('es', null);
   timeago.setLocaleMessages('es', timeago.EsMessages());
   await dotenv.load(fileName: ".env");
-  logger.i('✅ Configuración completada, iniciando aplicación');
+  logger.i('✅ Configuración completada, inicializando servicios');
+
+  // Inicializar StorageService antes de crear controllers que lo requieran
+  await Get.putAsync<StorageService>(() async => await StorageService().init());
+
+  logger.i('✅ Servicios inicializados, iniciando aplicación');
   runApp(LocalizedApp(delegate, const MyApp()));
    
 }
@@ -49,10 +55,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     var localizationDelegate = LocalizedApp.of(context).delegate;
 
-    Get.put(AuthController());
 
     return GetMaterialApp(
       title: 'Eventer',
+      initialBinding: AuthBinding(),
       localizationsDelegates: [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
@@ -85,10 +91,12 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: '/login',
           page: () => const LoginScreen(),
+          binding: AuthBinding()
         ),
         GetPage(
           name: '/register',
           page: () => const RegisterScreen(),
+          binding: AuthBinding()
         ),
         GetPage(
           name: '/home',
@@ -108,6 +116,7 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: '/settings',
           page: () => SettingsScreen(),
+          binding: UserBinding(),
         ),
         GetPage(
           name: '/user/:id',

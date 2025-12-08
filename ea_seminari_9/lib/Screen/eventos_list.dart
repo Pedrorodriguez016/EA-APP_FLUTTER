@@ -92,7 +92,7 @@ class EventosListScreen extends GetView<EventoController> {
         },
         message: translate('common.success'),
       ),
-      bottomNavigationBar: const CustomNavBar(currentIndex: 1),
+      bottomNavigationBar: CustomNavBar(currentIndex: 1),
     );
   }
 

@@ -38,7 +38,7 @@ class HomeScreen extends GetView<UserController>{
           ],
         ),
       ),
-      bottomNavigationBar: const CustomNavBar(currentIndex: 0),
+      bottomNavigationBar: CustomNavBar(currentIndex: 0),
       
     );
   }

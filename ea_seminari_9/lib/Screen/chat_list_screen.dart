@@ -46,7 +46,7 @@ class ChatListScreen extends GetView<ChatListController> {
           },
         );
       }),
-      bottomNavigationBar: const CustomNavBar(currentIndex: 2),
+      bottomNavigationBar: CustomNavBar(currentIndex: 2),
     );
   }
 

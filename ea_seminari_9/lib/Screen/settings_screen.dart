@@ -1,24 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart'; 
-import '../Controllers/auth_controller.dart';
+import '../Controllers/user_controller.dart';
 import '../Widgets/navigation_bar.dart';
 import '../Widgets/user_info.dart';
 
-class SettingsScreen extends StatelessWidget {
-  final AuthController authController = Get.find<AuthController>();
-  
+class SettingsScreen extends GetView<UserController> {
   SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Obtenemos el idioma actual para pasarlo a la sección de ajustes
     var currentLocale = LocalizedApp.of(context).delegate.currentLocale;
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
-        title: Text(translate('settings.title')), // 'Ajustes'
+        title: Text(translate('settings.title')),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
@@ -27,22 +24,26 @@ class SettingsScreen extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            UserInfoBasic(
-              name: authController.currentUser.value!.username, 
-              email: authController.currentUser.value!.gmail,
-            ),
-            // CORREGIDO: Pasamos 'context' y el código de idioma
+            Obx(() {
+              final user = controller.authController.currentUser.value;
+              if (user == null) {
+                return const SizedBox.shrink();
+              }
+              return UserInfoBasic(
+                name: user.username,
+                email: user.gmail,
+              );
+            }),
             _buildSettingsSection(context, currentLocale.languageCode),
             const SizedBox(height: 20),
             _buildAboutSection()
           ],
         ),
       ),
-      bottomNavigationBar: const CustomNavBar(currentIndex: 3),
+      bottomNavigationBar: CustomNavBar(currentIndex: 3),
     );
   }
 
-  // CORREGIDO: Recibimos 'context' y 'currentLangCode' como parámetros
   Widget _buildSettingsSection(BuildContext context, String currentLangCode) {
     return Container(
       width: double.infinity,
