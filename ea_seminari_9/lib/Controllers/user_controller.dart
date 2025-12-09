@@ -30,6 +30,7 @@ class UserController extends GetxController {
   void onInit() {
     _initSocketConnection();
     fetchUsers(1);
+    fetchFriends();
     super.onInit();
     scrollController.addListener(() {
       if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 200) {

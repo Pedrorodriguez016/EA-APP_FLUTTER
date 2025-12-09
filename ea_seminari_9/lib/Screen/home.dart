@@ -43,7 +43,7 @@ class HomeScreen extends GetView<UserController>{
     );
   }
 
-  AppBar _buildAppBar() {
+    AppBar _buildAppBar() {
     return AppBar(
       title: Text(translate('home.title')), // 'Inicio'
       backgroundColor: Colors.white,
