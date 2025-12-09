@@ -22,7 +22,6 @@ class UserCard extends GetView<UserController> {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                // --- Avatar con inicial ---
                 CircleAvatar(
                   radius: 24,
                   backgroundColor: const Color(0xFF667EEA),
@@ -61,53 +60,61 @@ class UserCard extends GetView<UserController> {
                       ),
                       const SizedBox(height: 6),
 
-                      // --- Estado de conexión ---
-                      Row(
-                        children: [
-                          Container(
-                            width: 10,
-                            height: 10,
-                            decoration: BoxDecoration(
-                              color: (user.online ?? false) ? Colors.green : Colors.grey,
+                      
+                      Obx(() {
+                        final bool isFriend = controller.friendsList.any((f) => f.id == user.id);
+                        if (!isFriend) return const SizedBox.shrink();
 
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: (user.online ?? false)
-                                  ? Colors.green.withOpacity(0.4)
-                                  : Colors.grey.withOpacity(0.4),
-                                  blurRadius: 4,
-                                ),
-                              ],
+                        final bool isOnline = user.online ?? false;
+                        return Row(
+                          children: [
+                            Container(
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: isOnline ? Colors.green : Colors.grey,
+                                shape: BoxShape.circle,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: isOnline
+                                        ? Colors.green.withOpacity(0.4)
+                                        : Colors.grey.withOpacity(0.4),
+                                    blurRadius: 4,
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            (user.online ?? false) ? "Conectado" : "Desconectado",
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: (user.online ?? false)
-                              ? Colors.green.shade700
-                              : Colors.grey.shade700,
-                              fontWeight: FontWeight.w500,
+                            const SizedBox(width: 6),
+                            Text(
+                              isOnline ? "Conectado" : "Desconectado",
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: isOnline ? Colors.green.shade700 : Colors.grey.shade700,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        );
+                      }),
                     ],
                   ),
                 ),
 
-                // --- Flecha lateral ---
-                Container(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
-                    onPressed: () {
-                      controller.sendFriendRequest(user.id);
-                    },
-                    child: const Icon(Icons.person_add, color: Colors.blue),
-                  ),
-                ),
+                Obx(() {
+                  final bool isFriend = controller.friendsList.any((f) => f.id == user.id);
+                  if (isFriend) {
+                    return const Icon(Icons.arrow_forward, color: Colors.grey);
+                  }
+                  return Container(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {
+                        controller.sendFriendRequest(user.id);
+                      },
+                      child: const Icon(Icons.person_add, color: Colors.blue),
+                    ),
+                  );
+                }),
               ],
             ),
           ),

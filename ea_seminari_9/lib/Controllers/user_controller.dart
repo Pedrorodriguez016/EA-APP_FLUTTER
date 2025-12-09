@@ -24,6 +24,7 @@ class UserController extends GetxController {
   @override
   void onInit() {
     fetchUsers(1);
+    fetchFriends();
     super.onInit();
   }
 
