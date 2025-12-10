@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_translate/flutter_translate.dart'; // Importar
+import 'package:flutter_translate/flutter_translate.dart';
 import '../Controllers/auth_controller.dart';
 import '../Models/user.dart';
+import '../utils/app_theme.dart';
 import 'package:password_strength_checker/password_strength_checker.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -22,16 +23,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
       case PasswordStrength.weak:
         return Colors.red;
       default:
-        return Colors.grey.shade200;
+        return Get.theme.dividerColor;
     }
   }
-  final ValueNotifier<PasswordStrength?> passwordStrengthNotifier = ValueNotifier<PasswordStrength?>(null);
+
+  final ValueNotifier<PasswordStrength?> passwordStrengthNotifier =
+      ValueNotifier<PasswordStrength?>(null);
   final AuthController authController = Get.find<AuthController>();
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController gmailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   final TextEditingController birthdayController = TextEditingController();
+
   bool isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -41,16 +46,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _showSuccessDialog() {
     Get.dialog(
       AlertDialog(
+        backgroundColor: context.theme.cardColor,
         title: Row(
           children: [
-            const Icon(Icons.check_circle, color: Colors.green, size: 30),
+            const Icon(
+              Icons.check_circle_rounded,
+              color: Colors.green,
+              size: 30,
+            ),
             const SizedBox(width: 10),
-            Text(translate('auth.register.success_title')), // '¡Registro Exitoso!'
+            Text(
+              translate('auth.register.success_title'),
+              style: context.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ],
         ),
         content: Text(
-          translate('auth.register.success_msg'), // 'Tu cuenta ha sido creada...'
-          style: const TextStyle(fontSize: 16),
+          translate('auth.register.success_msg'),
+          style: context.textTheme.bodyMedium?.copyWith(fontSize: 16),
         ),
         actions: [
           TextButton(
@@ -59,12 +74,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Get.back();
             },
             child: Text(
-              translate('auth.register.continue'), // 'Continuar'
-              style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+              translate('auth.register.continue'),
+              style: TextStyle(
+                color: context.theme.colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
       barrierDismissible: false,
     );
@@ -84,87 +102,80 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _buildPasswordRequirements(String password) {
-    // Si quieres traducir estos textos, deberías añadir claves al JSON.
-    // Por ahora lo dejaré con textos que se entienden universalmente o podrías usar claves.
     final requirements = [
       {
-        'label': translate('auth.password_requirements.chars'), // Puedes usar translate('auth.requirements.chars')
+        'label': translate('auth.password_requirements.chars'),
         'valid': password.length >= 12,
       },
-      {
-        'label': 'a-z',
-        'valid': RegExp(r'[a-z]').hasMatch(password),
-      },
-      {
-        'label': 'A-Z',
-        'valid': RegExp(r'[A-Z]').hasMatch(password),
-      },
-      {
-        'label': '0-9',
-        'valid': RegExp(r'[0-9]').hasMatch(password),
-      },
+      {'label': 'a-z', 'valid': RegExp(r'[a-z]').hasMatch(password)},
+      {'label': 'A-Z', 'valid': RegExp(r'[A-Z]').hasMatch(password)},
+      {'label': '0-9', 'valid': RegExp(r'[0-9]').hasMatch(password)},
       {
         'label': '!@#\$',
         'valid': RegExp(r'[!@#\$%^&*(),.?":{}|<>]').hasMatch(password),
       },
     ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: requirements.map((req) {
         Color color;
-        if (req['valid'] as bool) {
+        bool isValid = req['valid'] as bool;
+
+        if (isValid) {
           color = Colors.green;
         } else if (password.isEmpty) {
-          color = Colors.grey;
+          color = context.theme.disabledColor;
         } else {
           color = Colors.red;
         }
-        return Row(
-          children: [
-            Icon(
-              req['valid'] as bool ? Icons.check_circle : Icons.cancel,
-              color: color,
-              size: 18,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              req['label'] as String,
-              style: TextStyle(color: color, fontSize: 14),
-            ),
-          ],
+
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 4),
+          child: Row(
+            children: [
+              Icon(
+                isValid ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                color: color,
+                size: 16,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                req['label'] as String,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
         );
       }).toList(),
     );
   }
 
   String? _validateGmail(String? value) {
-    if (value == null || value.isEmpty) {
+    if (value == null || value.isEmpty)
       return translate('auth.errors.email_empty');
-    }
-    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value))
       return translate('auth.errors.email_invalid');
-    }
     return null;
   }
 
-
   String? _validateConfirmPassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return translate('auth.errors.password_empty'); // O crear una clave específica 'confirm_empty'
-    }
-    if (value != passwordController.text) {
+    if (value == null || value.isEmpty)
+      return translate('auth.errors.password_empty');
+    if (value != passwordController.text)
       return translate('auth.errors.password_mismatch');
-    }
     return null;
   }
 
   String? _validateBirthday(String? value) {
-    if (value == null || value.isEmpty) {
+    if (value == null || value.isEmpty)
       return translate('auth.errors.birthday_empty');
-    }
-    if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {
+    if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value))
       return translate('auth.errors.birthday_invalid');
-    }
     try {
       final parts = value.split('-');
       final year = int.parse(parts[0]);
@@ -174,21 +185,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final now = DateTime.now();
       final age = now.year - birthday.year;
 
-      if (birthday.isAfter(now)) {
+      if (birthday.isAfter(now))
         return translate('auth.errors.birthday_invalid');
-      }
-
-      if (age < 13) {
-        return translate('auth.errors.age_restriction');
-      }
-
-      if (age > 120) {
-        return translate('auth.errors.birthday_invalid');
-      }
+      if (age < 13) return translate('auth.errors.age_restriction');
+      if (age > 120) return translate('auth.errors.birthday_invalid');
     } catch (e) {
       return translate('auth.errors.birthday_invalid');
     }
-
     return null;
   }
 
@@ -213,26 +216,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(translate('auth.register.title')), // 'Registro'
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        elevation: 0,
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: isDark ? AppGradients.darkSpaceBg : AppGradients.lightBg,
+        ),
+        child: SafeArea(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
-              _buildHeader(),
-              const SizedBox(height: 32),
-              _buildRegisterForm(),
-              const SizedBox(height: 24),
-              _buildFooter(),
+              AppBar(
+                title: Text(
+                  translate('auth.register.title'),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+                backgroundColor: Colors.transparent,
+                foregroundColor: context.theme.colorScheme.onBackground,
+                elevation: 0,
+                centerTitle: true,
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 10,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeader(),
+                      const SizedBox(height: 32),
+                      _buildRegisterForm(),
+                      const SizedBox(height: 24),
+                      _buildFooter(),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -241,39 +262,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _buildHeader() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+    return Center(
+      child: Column(
+        children: [
+          Container(
+            width: 70,
+            height: 70,
+            decoration: BoxDecoration(
+              gradient: AppGradients.primaryBtn,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: context.theme.colorScheme.primary.withValues(
+                    alpha: 0.3,
+                  ),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
-            borderRadius: BorderRadius.circular(16),
+            child: const Icon(
+              Icons.person_add_rounded,
+              color: Colors.white,
+              size: 36,
+            ),
           ),
-          child: const Icon(Icons.person_add, color: Colors.white, size: 32),
-        ),
-        const SizedBox(height: 24),
-        Text(
-          translate('auth.register.title'), // 'Crear Cuenta'
-          style: const TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.w800,
-            color: Colors.black87,
-            height: 1.2,
+          const SizedBox(height: 20),
+          Text(
+            translate('auth.register.subtitle'),
+            textAlign: TextAlign.center,
+            style: context.textTheme.bodyLarge?.copyWith(
+              fontSize: 16,
+              color: context.theme.colorScheme.onBackground.withValues(
+                alpha: 0.7,
+              ),
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          translate('auth.register.subtitle'), // 'Completa tus datos...'
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey.shade600,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -285,7 +311,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           _buildTextField(
             controller: usernameController,
             label: translate('auth.fields.username'),
-            icon: Icons.person_outline,
+            icon: Icons.person_outline_rounded,
             validator: _validateUsername,
           ),
           const SizedBox(height: 16),
@@ -297,65 +323,85 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
           const SizedBox(height: 16),
           Padding(
-            padding: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.only(bottom: 12),
             child: _buildPasswordRequirements(passwordController.text),
           ),
-          TextFormField(
-            controller: passwordController,
-            obscureText: _obscurePassword,
-            onChanged: (value) {
-              passwordStrengthNotifier.value = _customPasswordStrength(value);
-              setState(() {});
-            },
-            decoration: InputDecoration(
-              labelText: translate('auth.fields.password'),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: _getPasswordBorderColor(passwordStrengthNotifier.value),
-                  width: 2,
+
+          // PRIMARY PASSWORD FIELD
+          Container(
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
                 ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: _getPasswordBorderColor(passwordStrengthNotifier.value),
-                  width: 2,
+              ],
+            ),
+            child: TextFormField(
+              controller: passwordController,
+              obscureText: _obscurePassword,
+              style: context.textTheme.bodyLarge,
+              onChanged: (value) {
+                passwordStrengthNotifier.value = _customPasswordStrength(value);
+                setState(() {});
+              },
+              decoration: InputDecoration(
+                labelText: translate('auth.fields.password'),
+                // Dynamic styling
+                fillColor: context.isDarkMode
+                    ? context.theme.colorScheme.surface.withValues(alpha: 0.5)
+                    : Colors.white,
+                filled: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
                 ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(
-                  color: _getPasswordBorderColor(passwordStrengthNotifier.value),
-                  width: 2,
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
                 ),
-              ),
-              fillColor: Colors.grey.shade50,
-              filled: true,
-              prefixIcon: const Icon(Icons.lock_outline, color: Colors.grey),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                  color: Colors.grey,
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(
+                    color: context.theme.colorScheme.primary,
+                  ),
                 ),
-                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                prefixIcon: Icon(
+                  Icons.lock_outline_rounded,
+                  color: context.theme.colorScheme.primary,
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscurePassword
+                        ? Icons.visibility_off_rounded
+                        : Icons.visibility_rounded,
+                    color: context.theme.colorScheme.onSurface.withValues(
+                      alpha: 0.6,
+                    ),
+                  ),
+                  onPressed: () =>
+                      setState(() => _obscurePassword = !_obscurePassword),
+                ),
+                contentPadding: const EdgeInsets.all(20),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             ),
           ),
-          const SizedBox(height: 8),
+
+          const SizedBox(height: 12),
+
+          // STRENGTH BAR
           ValueListenableBuilder<PasswordStrength?>(
             valueListenable: passwordStrengthNotifier,
             builder: (context, strength, _) {
               String label = '';
               Color color = _getPasswordBorderColor(strength);
-              if (strength == PasswordStrength.secure) {
+              if (strength == PasswordStrength.secure)
                 color = const Color(0xFF0B6C0E);
-              }
-              // Traducir niveles de seguridad
+
               switch (strength) {
                 case PasswordStrength.weak:
-                  label = translate('common.error'); // O 'Débil' si añades la clave
+                  label = translate('common.error');
                   break;
                 case PasswordStrength.medium:
                   label = translate('auth.errors.password_medium');
@@ -369,6 +415,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 default:
                   label = '';
               }
+
               return Row(
                 children: [
                   Container(
@@ -378,21 +425,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       style: TextStyle(
                         color: color,
                         fontWeight: FontWeight.bold,
+                        fontSize: 12,
                       ),
                     ),
                   ),
                   Expanded(
                     child: Container(
-                      height: 8,
+                      height: 6,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
-                        color: Colors.grey.shade300,
+                        color: context.isDarkMode
+                            ? Colors.grey.shade800
+                            : Colors.grey.shade200,
                       ),
                       child: FractionallySizedBox(
                         alignment: Alignment.centerLeft,
                         widthFactor: _getStrengthWidth(strength),
-                        child: Container(
-                          height: 8,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          height: 6,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(8),
                             color: color,
@@ -405,46 +456,57 @@ class _RegisterScreenState extends State<RegisterScreen> {
               );
             },
           ),
+
           const SizedBox(height: 16),
           _buildPasswordField(
             controller: confirmPasswordController,
             label: translate('auth.fields.confirm_password'),
             obscureText: _obscureConfirmPassword,
-            onToggle: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+            onToggle: () => setState(
+              () => _obscureConfirmPassword = !_obscureConfirmPassword,
+            ),
             validator: _validateConfirmPassword,
           ),
           const SizedBox(height: 16),
           _buildTextField(
             controller: birthdayController,
             label: translate('auth.fields.birthday'),
-            icon: Icons.cake_outlined,
+            icon: Icons.cake_rounded,
             hintText: translate('auth.fields.birthday_hint'),
             validator: _validateBirthday,
           ),
           const SizedBox(height: 32),
-          // Botón de generar contraseña eliminado para simplificar, o puedes traducirlo
+
+          // GENERATE PASSWORD BUTTON
           SizedBox(
             width: double.infinity,
-            height: 48,
-            child: ElevatedButton(
+            height: 50,
+            child: TextButton.icon(
               onPressed: () {
                 final generated = _generateStrongPassword();
                 passwordController.text = generated;
-                passwordStrengthNotifier.value = PasswordStrength.calculate(text: generated);
+                passwordStrengthNotifier.value = PasswordStrength.calculate(
+                  text: generated,
+                );
                 setState(() {});
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey.shade200,
-                foregroundColor: Colors.black87,
-                elevation: 0,
+              icon: const Icon(Icons.vpn_key_rounded),
+              style: TextButton.styleFrom(
+                backgroundColor: context.theme.colorScheme.primary.withValues(
+                  alpha: 0.1,
+                ),
+                foregroundColor: context.theme.colorScheme.primary,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                 ),
               ),
-              child: Text(translate('auth.register.generate_password_btn')),
+              label: Text(
+                translate('auth.register.generate_password_btn'),
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           ),
-            const SizedBox(height: 32),
+          const SizedBox(height: 24),
           _buildRegisterButton(),
         ],
       ),
@@ -494,19 +556,38 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: TextFormField(
         controller: controller,
-        style: const TextStyle(fontSize: 16),
+        style: context.textTheme.bodyLarge,
         decoration: InputDecoration(
           labelText: label,
           hintText: hintText,
-          border: InputBorder.none,
-          prefixIcon: Icon(icon, color: Colors.grey),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          fillColor: context.isDarkMode
+              ? context.theme.colorScheme.surface.withValues(alpha: 0.5)
+              : Colors.white,
+          filled: true,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(color: context.theme.colorScheme.primary),
+          ),
+          prefixIcon: Icon(icon, color: context.theme.colorScheme.primary),
+          contentPadding: const EdgeInsets.all(20),
         ),
         validator: validator,
       ),
@@ -522,26 +603,50 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: TextFormField(
         controller: controller,
         obscureText: obscureText,
-        style: const TextStyle(fontSize: 16),
+        style: context.textTheme.bodyLarge,
         decoration: InputDecoration(
           labelText: label,
-          border: InputBorder.none,
-          prefixIcon: const Icon(Icons.lock_outline, color: Colors.grey),
+          fillColor: context.isDarkMode
+              ? context.theme.colorScheme.surface.withValues(alpha: 0.5)
+              : Colors.white,
+          filled: true,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(color: context.theme.colorScheme.primary),
+          ),
+          prefixIcon: Icon(
+            Icons.lock_outline_rounded,
+            color: context.theme.colorScheme.primary,
+          ),
           suffixIcon: IconButton(
             icon: Icon(
-              obscureText ? Icons.visibility_off : Icons.visibility,
-              color: Colors.grey,
+              obscureText
+                  ? Icons.visibility_off_rounded
+                  : Icons.visibility_rounded,
+              color: context.theme.colorScheme.onSurface.withValues(alpha: 0.6),
             ),
             onPressed: onToggle,
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding: const EdgeInsets.all(20),
         ),
         validator: validator,
       ),
@@ -549,33 +654,45 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _buildRegisterButton() {
-    return SizedBox(
+    return Container(
       width: double.infinity,
-      height: 56,
+      height: 58,
+      decoration: BoxDecoration(
+        gradient: AppGradients.primaryBtn,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: context.theme.colorScheme.primary.withValues(alpha: 0.4),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
       child: ElevatedButton(
         onPressed: _handleRegister,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF667EEA),
+          backgroundColor: Colors.transparent,
           foregroundColor: Colors.white,
-          elevation: 0,
+          shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
         ),
         child: isLoading
             ? const SizedBox(
-                width: 20,
-                height: 20,
+                width: 24,
+                height: 24,
                 child: CircularProgressIndicator(
-                  strokeWidth: 2,
+                  strokeWidth: 2.5,
                   valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               )
             : Text(
-                translate('auth.register.action_btn'), // 'Crear Cuenta'
+                translate('auth.register.action_btn'),
                 style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
                 ),
               ),
       ),
@@ -587,16 +704,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          translate('auth.register.has_account') + ' ', // '¿Ya tienes cuenta?'
-          style: TextStyle(color: Colors.grey.shade600),
+          translate('auth.register.has_account') + ' ',
+          style: TextStyle(
+            color: context.theme.colorScheme.onBackground.withValues(
+              alpha: 0.6,
+            ),
+          ),
         ),
         GestureDetector(
           onTap: () => Get.back(),
           child: Text(
-            translate('auth.register.login_link'), // 'Inicia Sesión'
-            style: const TextStyle(
-              color: Color(0xFF667EEA),
-              fontWeight: FontWeight.w600,
+            translate('auth.register.login_link'),
+            style: TextStyle(
+              color: context.theme.colorScheme.primary,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
             ),
           ),
         ),
@@ -634,8 +756,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
     } else {
       Get.snackbar(
-        translate('common.error'), // Error genérico
-        'Por favor corrige los errores', // Texto estático o añadir clave
+        translate('common.error'),
+        'Por favor corrige los errores',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.orange,
         colorText: Colors.white,

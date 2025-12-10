@@ -7,9 +7,11 @@ class ChatListBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut<UserServices>(() => UserServices());
-    Get.lazyPut<ChatListController>(() => ChatListController(
-      Get.find<UserServices>(), 
-      Get.find<AuthController>() 
-    ));
+    Get.lazyPut<ChatListController>(
+      () => ChatListController(
+        Get.find<UserServices>(),
+        Get.find<AuthController>(),
+      ),
+    );
   }
 }

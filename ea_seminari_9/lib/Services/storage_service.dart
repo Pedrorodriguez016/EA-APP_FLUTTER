@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Models/user.dart';
+import 'package:flutter/material.dart';
 
 class StorageService extends GetxService {
   late SharedPreferences _prefs;
@@ -14,7 +15,6 @@ class StorageService extends GetxService {
 
   // --- GUARDAR SESIÓN ---
   Future<void> saveSession(User user) async {
-
     await _prefs.setString('user_data', jsonEncode(user.toJson()));
 
     if (user.token != null) {
@@ -42,7 +42,6 @@ class StorageService extends GetxService {
     return null;
   }
 
-
   Future<void> clearSession() async {
     await _prefs.remove('user_data');
     await _prefs.remove('auth_token');
@@ -50,4 +49,16 @@ class StorageService extends GetxService {
   }
 
   String? get token => _prefs.getString('auth_token');
+
+  Future<void> saveTheme(bool isDarkMode) async {
+    await _prefs.setBool('is_dark_mode', isDarkMode);
+  }
+
+  ThemeMode getThemeMode() {
+    final bool? isDark = _prefs.getBool('is_dark_mode');
+
+    if (isDark == null)
+      return ThemeMode.system; // Si nunca eligió, usar el del móvil
+    return isDark ? ThemeMode.dark : ThemeMode.light;
+  }
 }

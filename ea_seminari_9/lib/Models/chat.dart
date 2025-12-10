@@ -21,7 +21,9 @@ class ChatMessage {
       from: json['from'] ?? '',
       to: json['to'] ?? '',
       text: json['text'] ?? '',
-      createdAt: DateTime.parse(json['createdAt'] ?? DateTime.now().toIso8601String()),
+      createdAt: DateTime.parse(
+        json['createdAt'] ?? DateTime.now().toIso8601String(),
+      ),
       // Determinamos si es mío comparando el 'from' con mi ID
       isMine: (json['from'] == myUserId),
     );

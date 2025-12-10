@@ -2,49 +2,56 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import '../Controllers/auth_controller.dart';
+import '../utils/app_theme.dart'; // Import AppTheme for AppGradients
 
-// AHORA SÍ: GetView<AuthController>
 class LoginScreen extends GetView<AuthController> {
   const LoginScreen({Key? key}) : super(key: key);
 
-  // Validaciones (pueden ser estáticas o estar en el controller, aquí están bien como helper)
   String? _validateUsername(String? value) {
-    if (value == null || value.isEmpty) return translate('auth.errors.username_empty');
+    if (value == null || value.isEmpty)
+      return translate('auth.errors.username_empty');
     if (value.length < 3) return translate('auth.errors.username_short');
     return null;
   }
 
   String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) return translate('auth.errors.password_empty');
+    if (value == null || value.isEmpty)
+      return translate('auth.errors.password_empty');
     if (value.length < 6) return translate('auth.errors.password_short');
     return null;
   }
 
   @override
   Widget build(BuildContext context) {
-    // Redirección de seguridad (usando Obx para reaccionar al cambio)
     return Obx(() {
       if (controller.isLoggedIn.value) {
-        // Si ya estamos logueados, nos vamos (útil para el auto-login rápido)
         Future.microtask(() => Get.offAllNamed('/home'));
         return const Scaffold(body: Center(child: CircularProgressIndicator()));
       }
 
+      final isDark = context.isDarkMode;
+
       return Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 40),
-                _buildWelcomeHeader(),
-                const SizedBox(height: 48),
-                _buildLoginForm(),
-                const SizedBox(height: 32),
-                _buildFooter(),
-              ],
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: isDark ? AppGradients.darkSpaceBg : AppGradients.lightBg,
+          ),
+          child: SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildWelcomeHeader(context),
+                    const SizedBox(height: 48),
+                    _buildLoginForm(context),
+                    const SizedBox(height: 32),
+                    _buildFooter(context),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -52,138 +59,237 @@ class LoginScreen extends GetView<AuthController> {
     });
   }
 
-  Widget _buildWelcomeHeader() {
+  Widget _buildWelcomeHeader(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: 60,
-          height: 60,
+          width: 70,
+          height: 70,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-            ),
-            borderRadius: BorderRadius.circular(16),
+            gradient: AppGradients.primaryBtn,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: context.theme.colorScheme.primary.withValues(alpha: 0.3),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
-          child: const Icon(Icons.event, color: Colors.white, size: 32),
+          child: const Icon(
+            Icons.event_note_rounded,
+            color: Colors.white,
+            size: 36,
+          ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 32),
         Text(
           translate('auth.login.title'),
-          style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w800, color: Colors.black87, height: 1.2),
+          style: context.textTheme.displaySmall?.copyWith(
+            fontWeight: FontWeight.w900,
+            color: context.theme.colorScheme.onBackground,
+            letterSpacing: -0.5,
+          ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         Text(
           translate('auth.login.subtitle'),
-          style: TextStyle(fontSize: 16, color: Colors.grey.shade600),
+          style: context.textTheme.bodyLarge?.copyWith(
+            color: context.theme.colorScheme.onBackground.withValues(
+              alpha: 0.7,
+            ),
+            fontSize: 18,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildLoginForm() {
+  Widget _buildLoginForm(BuildContext context) {
+    final isDark = context.isDarkMode;
+    // Enhanced Input Decoration
+    final inputDecoration = (String label, IconData icon) => InputDecoration(
+      labelText: label,
+      prefixIcon: Icon(icon, color: context.theme.colorScheme.primary),
+      filled: true,
+      fillColor: isDark
+          ? context.theme.colorScheme.surface.withValues(alpha: 0.5)
+          : Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(
+          color: context.theme.colorScheme.outline.withValues(alpha: 0.3),
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(
+          color: context.theme.colorScheme.primary,
+          width: 1.5,
+        ),
+      ),
+      contentPadding: const EdgeInsets.all(20),
+      labelStyle: TextStyle(
+        color: context.theme.colorScheme.onSurface.withValues(alpha: 0.6),
+      ),
+    );
+
     return Form(
-      key: controller.loginFormKey, // Usamos la key del controller
+      key: controller.loginFormKey,
       child: Column(
         children: [
-          // CAMPO USUARIO
+          // USERNAME
           Container(
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade200),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 15,
+                  offset: const Offset(0, 5),
+                ),
+              ],
             ),
             child: TextFormField(
-              controller: controller.loginUserCtrl, // Usamos controller
-              style: const TextStyle(fontSize: 16),
-              decoration: InputDecoration(
-                labelText: translate('auth.fields.username'),
-                border: InputBorder.none,
-                prefixIcon: const Icon(Icons.person_outline, color: Colors.grey),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              controller: controller.loginUserCtrl,
+              style: context.textTheme.bodyLarge,
+              decoration: inputDecoration(
+                translate('auth.fields.username'),
+                Icons.person_rounded,
               ),
               validator: _validateUsername,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
 
-          // CAMPO CONTRASEÑA (REACTIVO CON OBX)
-          Obx(() => Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade200),
-                ),
-                child: TextFormField(
-                  controller: controller.loginPassCtrl, // Usamos controller
-                  obscureText: controller.isObscurePassword.value, // Leemos valor reactivo
-                  style: const TextStyle(fontSize: 16),
-                  decoration: InputDecoration(
-                    labelText: translate('auth.fields.password'),
-                    border: InputBorder.none,
-                    prefixIcon: const Icon(Icons.lock_outline, color: Colors.grey),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        controller.isObscurePassword.value ? Icons.visibility_off : Icons.visibility,
-                        color: Colors.grey,
-                      ),
-                      onPressed: controller.togglePasswordVisibility, // Llamamos método del controller
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          // PASSWORD
+          Obx(
+            () => Container(
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
                   ),
-                  validator: _validatePassword,
-                ),
-              )),
-          const SizedBox(height: 24),
-
-          // BOTÓN LOGIN (REACTIVO CON OBX)
-          SizedBox(
-            width: double.infinity,
-            height: 56,
-            child: Obx(() => ElevatedButton(
-                  onPressed: controller.isLoginLoading.value ? null : controller.submitLogin,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF667EEA),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: controller.isLoginLoading.value
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ],
+              ),
+              child: TextFormField(
+                controller: controller.loginPassCtrl,
+                obscureText: controller.isObscurePassword.value,
+                style: context.textTheme.bodyLarge,
+                decoration:
+                    inputDecoration(
+                      translate('auth.fields.password'),
+                      Icons.lock_rounded,
+                    ).copyWith(
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          controller.isObscurePassword.value
+                              ? Icons.visibility_off_rounded
+                              : Icons.visibility_rounded,
+                          color: context.theme.colorScheme.onSurface.withValues(
+                            alpha: 0.6,
                           ),
-                        )
-                      : Text(
-                          translate('auth.login.action_btn'),
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                         ),
-                )),
+                        onPressed: controller.togglePasswordVisibility,
+                      ),
+                    ),
+                validator: _validatePassword,
+              ),
+            ),
+          ),
+          const SizedBox(height: 32),
+
+          // BUTTON
+          Container(
+            width: double.infinity,
+            height: 58,
+            decoration: BoxDecoration(
+              gradient: AppGradients.primaryBtn,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: context.theme.colorScheme.primary.withValues(
+                    alpha: 0.4,
+                  ),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Obx(
+              () => ElevatedButton(
+                onPressed: controller.isLoginLoading.value
+                    ? null
+                    : controller.submitLogin,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: Colors.white,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: controller.isLoginLoading.value
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
+                        ),
+                      )
+                    : Text(
+                        translate('auth.login.action_btn'),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildFooter() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          translate('auth.login.no_account') + ' ',
-          style: TextStyle(color: Colors.grey.shade600),
-        ),
-        GestureDetector(
-          onTap: () => Get.toNamed('/register'),
-          child: Text(
-            translate('auth.login.register_link'),
-            style: const TextStyle(color: Color(0xFF667EEA), fontWeight: FontWeight.w600),
+  Widget _buildFooter(BuildContext context) {
+    return Center(
+      child: RichText(
+        text: TextSpan(
+          text: translate('auth.login.no_account') + ' ',
+          style: context.textTheme.bodyMedium?.copyWith(
+            color: context.theme.colorScheme.onBackground.withValues(
+              alpha: 0.6,
+            ),
           ),
+          children: [
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: GestureDetector(
+                onTap: () => Get.toNamed('/register'),
+                child: Text(
+                  translate('auth.login.register_link'),
+                  style: TextStyle(
+                    color: context.theme.colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

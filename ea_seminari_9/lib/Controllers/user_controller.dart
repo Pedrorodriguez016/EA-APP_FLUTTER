@@ -33,13 +33,17 @@ class UserController extends GetxController {
     fetchFriends();
     super.onInit();
     scrollController.addListener(() {
-      if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 200) {
-        if (!isLoading.value && !isMoreLoading.value && currentPage.value < totalPages.value) {
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent - 200) {
+        if (!isLoading.value &&
+            !isMoreLoading.value &&
+            currentPage.value < totalPages.value) {
           loadMoreUsers();
         }
       }
     });
   }
+
   Future<void> fetchUsers(int page) async {
     if (page == 1) {
       isLoading.value = true;
@@ -48,10 +52,7 @@ class UserController extends GetxController {
     }
 
     try {
-      final data = await _userServices.fetchUsers(
-        page: page,
-        limit: limit,
-      );
+      final data = await _userServices.fetchUsers(page: page, limit: limit);
 
       final List<User> newUsers = data['users'];
 
@@ -64,12 +65,14 @@ class UserController extends GetxController {
       currentPage.value = data['currentPage'];
       totalPages.value = data['totalPages'];
       totalUsers.value = data['total'];
-      
     } catch (e) {
-      Get.snackbar(translate('common.error'), translate('chat.errors.load_contacts'));
+      Get.snackbar(
+        translate('common.error'),
+        translate('chat.errors.load_contacts'),
+      );
     } finally {
       isLoading.value = false;
-      isMoreLoading.value = false; 
+      isMoreLoading.value = false;
     }
   }
 
@@ -80,7 +83,7 @@ class UserController extends GetxController {
   }
 
   void searchUsers(String query) async {
-   if (query.isEmpty) {
+    if (query.isEmpty) {
       refreshUsers();
       return;
     }
@@ -88,7 +91,7 @@ class UserController extends GetxController {
     try {
       logger.i('🔍 Búsqueda de usuario: $query');
       isLoading(true);
-      
+
       final User? user = await _userServices.getUserByUsername(query);
 
       if (user != null) {
@@ -103,17 +106,17 @@ class UserController extends GetxController {
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.orange,
           colorText: Colors.white,
-          duration: const Duration(seconds: 2)
+          duration: const Duration(seconds: 2),
         );
       }
     } catch (e) {
       logger.e('❌ Error en búsqueda de usuario', error: e);
       Get.snackbar(
-        translate('common.error'), 
+        translate('common.error'),
         e.toString(),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
-        colorText: Colors.white
+        colorText: Colors.white,
       );
     } finally {
       isLoading(false);
@@ -121,18 +124,17 @@ class UserController extends GetxController {
   }
 
   void refreshUsers() {
-    searchEditingController.clear(); 
+    searchEditingController.clear();
     fetchUsers(1);
   }
 
-  fetchUserById(String id) async{
+  fetchUserById(String id) async {
     try {
       isLoading(true);
       var user = await _userServices.fetchUserById(id);
       selectedUser.value = user;
-      }
-      catch(e){
-        Get.snackbar(
+    } catch (e) {
+      Get.snackbar(
         translate('common.error'),
         e.toString(),
         snackPosition: SnackPosition.BOTTOM,
@@ -143,59 +145,58 @@ class UserController extends GetxController {
       isLoading(false);
     }
   }
+
   updateUserByid(String id, Map<String, dynamic> newData) async {
-  try {
-    logger.i('📁 Actualizando usuario: $id');
-    isLoading(true);
-    var user = await _userServices.updateUserById(id, newData);
-    selectedUser.value = user;
-    logger.i('✅ Usuario actualizado exitosamente');
+    try {
+      logger.i('📁 Actualizando usuario: $id');
+      isLoading(true);
+      var user = await _userServices.updateUserById(id, newData);
+      selectedUser.value = user;
+      logger.i('✅ Usuario actualizado exitosamente');
 
-    final authController = Get.find<AuthController>();
-    if (authController.currentUser.value?.id == id) {
-      authController.currentUser.value = user;
-    }
-
-  } catch (e) {
+      final authController = Get.find<AuthController>();
+      if (authController.currentUser.value?.id == id) {
+        authController.currentUser.value = user;
+      }
+    } catch (e) {
       Get.snackbar(
         translate('common.error'),
         e.toString(),
         snackPosition: SnackPosition.BOTTOM,
         colorText: Colors.white,
         backgroundColor: Colors.red,
-    );
-  } finally {
-    isLoading(false);
-  }
-}
-
-disableUserByid(String id,password) async {
-  try {
-    isLoading(true);
-    bool disableuser  = await _userServices.disableUserById(id, password);
-    if (disableuser == true){
+      );
+    } finally {
       isLoading(false);
-      Get.offAllNamed('/login');
     }
+  }
 
-  } catch (e) {
+  disableUserByid(String id, password) async {
+    try {
+      isLoading(true);
+      bool disableuser = await _userServices.disableUserById(id, password);
+      if (disableuser == true) {
+        isLoading(false);
+        Get.offAllNamed('/login');
+      }
+    } catch (e) {
       Get.snackbar(
         translate('common.error'),
         e.toString(),
         snackPosition: SnackPosition.BOTTOM,
         colorText: Colors.white,
         backgroundColor: Colors.red,
-    );
-  } finally {
-    isLoading(false);
+      );
+    } finally {
+      isLoading(false);
+    }
   }
-}
 
-void fetchFriends() async {
+  void fetchFriends() async {
     try {
       var id = authController.currentUser.value!.id;
       isLoading(true);
-      var friends = await _userServices.fetchFriends(id); 
+      var friends = await _userServices.fetchFriends(id);
       if (friends.isNotEmpty) {
         friendsList.assignAll(friends);
       }
@@ -203,12 +204,13 @@ void fetchFriends() async {
       isLoading(false);
     }
   }
+
   void fetchRequest() async {
     try {
       var id = authController.currentUser.value!.id;
       isLoading(true);
       logger.d('📄 Creando lista de solicitudes');
-      var friends = await _userServices.fetchRequest(id); 
+      var friends = await _userServices.fetchRequest(id);
       if (friends.isNotEmpty) {
         friendsRequests.assignAll(friends);
       }
@@ -216,29 +218,32 @@ void fetchFriends() async {
       isLoading(false);
     }
   }
+
   void acceptFriendRequest(User requester) async {
-   try {
+    try {
       final userId = authController.currentUser.value!.id;
-      await _userServices.acceptFriendRequest(userId, requester.id,);
+      await _userServices.acceptFriendRequest(userId, requester.id);
 
       friendsRequests.removeWhere((u) => u.id == requester.id);
-      fetchFriends(); 
+      fetchFriends();
       Get.snackbar(
-        translate('common.success'), 
+        translate('common.success'),
         translate('users.friendship_accepted'), // 'Amistad aceptada'
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.green,
-        colorText: Colors.white);
+        colorText: Colors.white,
+      );
     } catch (e) {
       Get.snackbar(
-        translate('common.error'), 
+        translate('common.error'),
         e.toString(),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
-        colorText: Colors.white);
+        colorText: Colors.white,
+      );
     }
   }
-  
+
   void rejectFriendRequest(User requester) async {
     try {
       final userId = authController.currentUser.value!.id;
@@ -246,48 +251,55 @@ void fetchFriends() async {
 
       friendsRequests.removeWhere((u) => u.id == requester.id);
       Get.snackbar(
-        translate('common.success'), 
+        translate('common.success'),
         translate('users.req_rejected'), // 'Solicitud rechazada'
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
-        colorText: Colors.white);
+        colorText: Colors.white,
+      );
     } catch (e) {
       Get.snackbar(
-        translate('common.error'), 
+        translate('common.error'),
         e.toString(),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
-        colorText: Colors.white);
+        colorText: Colors.white,
+      );
     }
   }
+
   sendFriendRequest(String targetUserId) async {
     try {
       final userId = authController.currentUser.value!.id;
       await _userServices.sendFriendRequest(userId, targetUserId);
       Get.snackbar(
-       translate('common.success'),
-       translate('users.req_sent'), // 'Solicitud de amistad enviada'
-       backgroundColor: Colors.green,
-       colorText: Colors.white,
-       snackPosition: SnackPosition.BOTTOM);
+        translate('common.success'),
+        translate('users.req_sent'), // 'Solicitud de amistad enviada'
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
     } catch (e) {
       Get.snackbar(
-       translate('common.error'), 
-       e.toString(),
-       backgroundColor: Colors.red,
-       colorText: Colors.white,
-       snackPosition: SnackPosition.BOTTOM);
+        translate('common.error'),
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
+
   void _initSocketConnection() {
     // Obtenemos el ID del usuario actual desde el AuthController
     final userId = authController.currentUser.value?.id;
-    
+
     if (userId != null) {
       logger.i('🔌 Inicializando conexión Socket para $userId');
       _socketService.connectWithUserId(userId);
     }
   }
+
   @override
   void onClose() {
     _socketService.disconnect();

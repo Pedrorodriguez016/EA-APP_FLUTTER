@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_translate/flutter_translate.dart'; 
+import 'package:flutter_translate/flutter_translate.dart';
 import '../Controllers/user_controller.dart';
 import '../Widgets/navigation_bar.dart';
 import '../Widgets/user_info.dart';
+import '../Services/storage_service.dart';
 
 class SettingsScreen extends GetView<UserController> {
   SettingsScreen({super.key});
@@ -13,13 +14,8 @@ class SettingsScreen extends GetView<UserController> {
     var currentLocale = LocalizedApp.of(context).delegate.currentLocale;
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        title: Text(translate('settings.title')),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        elevation: 0,
-      ),
+      backgroundColor: context.theme.scaffoldBackgroundColor,
+      appBar: AppBar(title: Text(translate('settings.title')), elevation: 0),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -29,14 +25,12 @@ class SettingsScreen extends GetView<UserController> {
               if (user == null) {
                 return const SizedBox.shrink();
               }
-              return UserInfoBasic(
-                name: user.username,
-                email: user.gmail,
-              );
+              return UserInfoBasic(name: user.username, email: user.gmail);
             }),
+            const SizedBox(height: 20),
             _buildSettingsSection(context, currentLocale.languageCode),
             const SizedBox(height: 20),
-            _buildAboutSection()
+            _buildAboutSection(context),
           ],
         ),
       ),
@@ -48,11 +42,11 @@ class SettingsScreen extends GetView<UserController> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.theme.cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: context.theme.shadowColor.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -64,22 +58,24 @@ class SettingsScreen extends GetView<UserController> {
           Padding(
             padding: const EdgeInsets.all(20),
             child: Text(
-              translate('settings.config_section'), // 'Configuración'
-              style: const TextStyle(
-                fontSize: 18,
+              translate('settings.config_section'),
+              style: context.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: Colors.black87,
               ),
             ),
           ),
           _buildSettingItem(
+            context: context,
             icon: Icons.person_outline,
-            title: translate('settings.profile'), // 'Perfil'
+            title: translate('settings.profile'),
             subtitle: translate('settings.profile_subtitle'),
             onTap: () => Get.toNamed('/profile'),
           ),
           const Divider(height: 1),
+          _buildThemeSwitchTile(context),
+          const Divider(height: 1),
           _buildSettingItem(
+            context: context,
             icon: Icons.notifications_outlined,
             title: translate('settings.notifications'),
             subtitle: translate('settings.coming_soon'),
@@ -87,18 +83,10 @@ class SettingsScreen extends GetView<UserController> {
           ),
           const Divider(height: 1),
           _buildSettingItem(
-            icon: Icons.security_outlined,
-            title: translate('settings.privacy'),
-            subtitle: translate('settings.coming_soon'),
-            onTap: () => _showComingSoon(translate('settings.privacy')),
-          ),
-          const Divider(height: 1),
-          _buildSettingItem(
+            context: context,
             icon: Icons.language_outlined,
             title: translate('settings.language'),
-            // Mostramos el nombre del idioma actual
-            subtitle: _getLanguageName(currentLangCode), 
-            // CORREGIDO: Ahora podemos usar 'context' aquí
+            subtitle: _getLanguageName(currentLangCode),
             onTap: () => _showLanguageSelector(context),
           ),
         ],
@@ -106,15 +94,60 @@ class SettingsScreen extends GetView<UserController> {
     );
   }
 
-  Widget _buildAboutSection() {
+  Widget _buildThemeSwitchTile(BuildContext context) {
+    final bool isDark = context.isDarkMode;
+
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: const Color(0xFF667EEA).withValues(alpha: 0.1),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          isDark ? Icons.dark_mode : Icons.light_mode,
+          color: const Color(0xFF667EEA),
+        ),
+      ),
+      title: Text(
+        translate('settings.theme_mode') == 'settings.theme_mode'
+            ? 'Modo Oscuro'
+            : translate('settings.theme_mode'),
+        style: context.textTheme.bodyLarge?.copyWith(
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      subtitle: Text(
+        isDark ? 'Activado' : 'Desactivado',
+        style: context.textTheme.bodyMedium?.copyWith(
+          color: context.theme.hintColor,
+        ),
+      ),
+      trailing: Switch(
+        value: isDark,
+        activeColor: const Color(0xFF667EEA),
+        onChanged: (val) {
+          Get.changeThemeMode(val ? ThemeMode.dark : ThemeMode.light);
+
+          try {
+            Get.find<StorageService>().saveTheme(val);
+          } catch (e) {
+            print("StorageService error: $e");
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildAboutSection(BuildContext context) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.theme.cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: context.theme.shadowColor.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -126,31 +159,32 @@ class SettingsScreen extends GetView<UserController> {
           Padding(
             padding: const EdgeInsets.all(20),
             child: Text(
-              translate('settings.about_section'), // 'Acerca de'
-              style: const TextStyle(
-                fontSize: 18,
+              translate('settings.about_section'),
+              style: context.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
-                color: Colors.black87,
               ),
             ),
           ),
           _buildSettingItem(
+            context: context,
             icon: Icons.info_outline,
-            title: translate('settings.version'), // 'Versión'
+            title: translate('settings.version'),
             subtitle: '1.0.0',
             onTap: () {},
           ),
           const Divider(height: 1),
           _buildSettingItem(
+            context: context,
             icon: Icons.help_outline,
-            title: translate('settings.help'), // 'Ayuda y Soporte'
+            title: translate('settings.help'),
             subtitle: translate('settings.coming_soon'),
             onTap: () => _showComingSoon(translate('settings.help')),
           ),
           const Divider(height: 1),
           _buildSettingItem(
+            context: context,
             icon: Icons.description_outlined,
-            title: translate('settings.terms'), // 'Términos y Condiciones'
+            title: translate('settings.terms'),
             subtitle: translate('settings.coming_soon'),
             onTap: () => _showComingSoon(translate('settings.terms')),
           ),
@@ -160,6 +194,7 @@ class SettingsScreen extends GetView<UserController> {
   }
 
   Widget _buildSettingItem({
+    required BuildContext context,
     required IconData icon,
     required String title,
     required String subtitle,
@@ -169,33 +204,34 @@ class SettingsScreen extends GetView<UserController> {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: const Color(0xFF667EEA).withOpacity(0.1),
+          color: const Color(0xFF667EEA).withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
         child: Icon(icon, color: const Color(0xFF667EEA)),
       ),
       title: Text(
         title,
-        style: const TextStyle(
-          fontSize: 16,
+        style: context.textTheme.bodyLarge?.copyWith(
           fontWeight: FontWeight.w600,
-          color: Colors.black87,
         ),
       ),
       subtitle: Text(
         subtitle,
-        style: TextStyle(
-          fontSize: 14,
-          color: Colors.grey.shade600,
+        style: context.textTheme.bodyMedium?.copyWith(
+          color: context.theme.hintColor,
         ),
       ),
       trailing: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.grey.shade100,
+          color: context.theme.dividerColor.withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
-        child: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+        child: Icon(
+          Icons.arrow_forward_ios,
+          size: 16,
+          color: context.theme.iconTheme.color,
+        ),
       ),
       onTap: onTap,
     );
@@ -206,7 +242,7 @@ class SettingsScreen extends GetView<UserController> {
       translate('settings.coming_soon'),
       '$feature ${translate("settings.coming_soon")}',
       snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.blue,
+      backgroundColor: const Color(0xFF667EEA),
       colorText: Colors.white,
       borderRadius: 12,
       margin: const EdgeInsets.all(16),
@@ -215,18 +251,23 @@ class SettingsScreen extends GetView<UserController> {
 
   String _getLanguageName(String code) {
     switch (code) {
-      case 'es': return 'Español';
-      case 'en': return 'English';
-      case 'ca': return 'Català';
-      case 'fr': return 'Français';
-      default: return code.toUpperCase();
+      case 'es':
+        return 'Español';
+      case 'en':
+        return 'English';
+      case 'ca':
+        return 'Català';
+      case 'fr':
+        return 'Français';
+      default:
+        return code.toUpperCase();
     }
   }
 
   void _showLanguageSelector(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: context.theme.scaffoldBackgroundColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -237,18 +278,21 @@ class SettingsScreen extends GetView<UserController> {
             children: [
               const SizedBox(height: 12),
               Container(
-                width: 40, 
-                height: 4, 
+                width: 40,
+                height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey[300], 
-                  borderRadius: BorderRadius.circular(2)
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 child: Text(
                   translate('settings.language'),
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               _buildLanguageOption(context, 'Español', 'es'),
@@ -264,26 +308,27 @@ class SettingsScreen extends GetView<UserController> {
   }
 
   Widget _buildLanguageOption(BuildContext context, String name, String code) {
-    // Verificamos si este es el idioma seleccionado actualmente
-    final currentCode = LocalizedApp.of(context).delegate.currentLocale.languageCode;
+    final currentCode = LocalizedApp.of(
+      context,
+    ).delegate.currentLocale.languageCode;
     final isSelected = currentCode == code;
 
     return ListTile(
-      leading: isSelected 
+      leading: isSelected
           ? const Icon(Icons.radio_button_checked, color: Color(0xFF667EEA))
           : const Icon(Icons.radio_button_unchecked, color: Colors.grey),
       title: Text(
-        name, 
+        name,
         style: TextStyle(
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-          color: isSelected ? const Color(0xFF667EEA) : Colors.black87
-        )
+          color: isSelected
+              ? const Color(0xFF667EEA)
+              : context.theme.textTheme.bodyLarge?.color,
+        ),
       ),
       onTap: () {
-        // Cambia el idioma de la app al instante
         changeLocale(context, code);
-        // Cierra el selector
-        Navigator.pop(context);
+        Get.back();
       },
     );
   }

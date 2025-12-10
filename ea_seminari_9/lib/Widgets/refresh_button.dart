@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_translate/flutter_translate.dart'; // Importar
+import 'package:flutter_translate/flutter_translate.dart';
 
 class RefreshButton extends StatelessWidget {
   final VoidCallback onRefresh;
   final String? message;
 
-  const RefreshButton({
-    Key? key,
-    required this.onRefresh,
-    this.message,
-  }) : super(key: key);
+  const RefreshButton({Key? key, required this.onRefresh, this.message})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,17 +16,19 @@ class RefreshButton extends StatelessWidget {
         onRefresh();
         if (message != null) {
           Get.snackbar(
-            translate('common.update'), // 'Actualizado'
+            translate('common.update'),
             message!,
             snackPosition: SnackPosition.BOTTOM,
-            backgroundColor: Colors.green,
+            backgroundColor:
+                context.theme.colorScheme.primary, // Dynamic primary color
             colorText: Colors.white,
             borderRadius: 12,
+            margin: const EdgeInsets.all(16),
           );
         }
       },
-      backgroundColor: const Color(0xFF667EEA),
-      child: const Icon(Icons.refresh, color: Colors.white),
+      backgroundColor: context.theme.colorScheme.primary,
+      child: const Icon(Icons.refresh_rounded, color: Colors.white),
     );
   }
 }

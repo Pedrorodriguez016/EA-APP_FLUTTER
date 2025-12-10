@@ -1,4 +1,3 @@
-
 import 'package:password_strength_checker/password_strength_checker.dart';
 import 'package:flutter_translate/flutter_translate.dart'; // Importar
 
@@ -10,12 +9,14 @@ class PasswordValidator {
       return translate('auth.errors.password_empty'); // 'Por favor ingresa...'
     }
     if (password.length < 6) {
-      return translate('auth.errors.password_short'); // '...al menos 6 caracteres'
+      return translate(
+        'auth.errors.password_short',
+      ); // '...al menos 6 caracteres'
     }
     final strength = PasswordStrength.calculate(text: password);
     if (strength == PasswordStrength.weak) {
       // Puedes añadir esta clave a tu JSON: "password_weak": "La contraseña es débil..."
-      return translate('auth.errors.password_weak'); 
+      return translate('auth.errors.password_weak');
     }
     return null;
   }

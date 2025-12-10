@@ -6,20 +6,20 @@ import 'package:get/get.dart';
 class CustomMap extends StatelessWidget {
   final LatLng center;
   final double zoom;
-  final double? height; 
-  final bool enableExpansion; 
-  final List<Marker> markers; 
-  
-  final void Function(MapPosition position, bool hasGesture)? onPositionChanged; 
+  final double? height;
+  final bool enableExpansion;
+  final List<Marker> markers;
+
+  final void Function(MapPosition position, bool hasGesture)? onPositionChanged;
 
   const CustomMap({
     Key? key,
     this.center = const LatLng(41.3851, 2.1734),
     this.zoom = 13.0,
-    this.height, 
-    this.enableExpansion = false, 
+    this.height,
+    this.enableExpansion = false,
     this.markers = const [],
-    this.onPositionChanged, 
+    this.onPositionChanged,
   }) : super(key: key);
 
   @override
@@ -29,21 +29,19 @@ class CustomMap extends StatelessWidget {
         initialCenter: center,
         initialZoom: zoom,
         interactionOptions: const InteractionOptions(
-          flags: InteractiveFlag.all, 
+          flags: InteractiveFlag.all,
         ),
-        // 3. LO CONECTAMOS AL MAPA
         onPositionChanged: (camera, hasGesture) {
           if (onPositionChanged != null) {
             onPositionChanged!(camera, hasGesture);
           }
-        } 
+        },
       ),
       children: [
         TileLayer(
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
           userAgentPackageName: 'com.tu_app.eventos',
         ),
-        // Lógica de marcadores (la mantenemos igual)
         if (markers.isNotEmpty)
           MarkerLayer(markers: markers)
         else
@@ -53,7 +51,11 @@ class CustomMap extends StatelessWidget {
                 point: center,
                 width: 40,
                 height: 40,
-                child: const Icon(Icons.location_on, color: Colors.red, size: 40),
+                child: Icon(
+                  Icons.location_on,
+                  color: context.theme.colorScheme.primary,
+                  size: 40,
+                ),
               ),
             ],
           ),
@@ -65,11 +67,20 @@ class CustomMap extends StatelessWidget {
             height: height,
             width: double.infinity,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: context.theme.colorScheme.outline.withValues(alpha: 0.1),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(20),
               child: mapWidget,
             ),
           )
@@ -81,21 +92,21 @@ class CustomMap extends StatelessWidget {
       children: [
         content,
         Positioned(
-          right: 8,
-          bottom: 8,
+          right: 12,
+          bottom: 12,
           child: Material(
-            color: Colors.white,
+            color: context.theme.cardColor,
             elevation: 4,
             shape: const CircleBorder(),
             child: InkWell(
               borderRadius: BorderRadius.circular(50),
-              onTap: () => _openExpandedMap(),
+              onTap: () => _openExpandedMap(context),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(10.0),
                 child: Icon(
-                  Icons.open_in_full,
-                  size: 20,
-                  color: Colors.indigo.shade800,
+                  Icons.open_in_full_rounded,
+                  size: 22,
+                  color: context.theme.colorScheme.primary,
                 ),
               ),
             ),
@@ -105,13 +116,13 @@ class CustomMap extends StatelessWidget {
     );
   }
 
-  void _openExpandedMap() {
+  void _openExpandedMap(BuildContext context) {
     Get.bottomSheet(
       Container(
-        height: Get.height * 0.85,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        height: Get.height * 0.9,
+        decoration: BoxDecoration(
+          color: context.theme.scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           children: [
@@ -120,27 +131,30 @@ class CustomMap extends StatelessWidget {
               width: 50,
               height: 5,
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: context.theme.dividerColor,
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Expanded(
-              child: CustomMap(
-                center: center,
-                zoom: 15.0,
-                markers: markers,
-                enableExpansion: false,
-                // 4. PASAMOS EL CALLBACK TAMBIÉN AL MAPA EXPANDIDO
-                // (Para que cargue eventos si te mueves en el mapa grande)
-                onPositionChanged: onPositionChanged, 
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(24),
+                ),
+                child: CustomMap(
+                  center: center,
+                  zoom: 15.0,
+                  markers: markers,
+                  enableExpansion: false,
+                  onPositionChanged: onPositionChanged,
+                ),
               ),
             ),
           ],
         ),
       ),
       isScrollControlled: true,
-      barrierColor: Colors.black.withOpacity(0.5),
+      barrierColor: Colors.black.withValues(alpha: 0.7),
     );
   }
 }

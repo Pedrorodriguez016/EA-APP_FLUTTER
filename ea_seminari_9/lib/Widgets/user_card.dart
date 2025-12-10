@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_translate/flutter_translate.dart'; // Importar
+import 'package:flutter_translate/flutter_translate.dart';
 import '../Models/user.dart';
 import '../Controllers/user_controller.dart';
+import '../utils/app_theme.dart';
 
 class UserCard extends GetView<UserController> {
   final User user;
@@ -12,26 +13,45 @@ class UserCard extends GetView<UserController> {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: context.theme.cardColor,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Material(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        elevation: 2,
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
         child: InkWell(
           onTap: () => Get.toNamed('/user/${user.id}'),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: const Color(0xFF667EEA),
-                  child: Text(
-                    user.username.isNotEmpty ? user.username[0].toUpperCase() : '?',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: AppGradients.primaryBtn,
+                  ),
+                  child: CircleAvatar(
+                    radius: 26,
+                    backgroundColor: context.theme.scaffoldBackgroundColor,
+                    child: Text(
+                      user.username.isNotEmpty
+                          ? user.username[0].toUpperCase()
+                          : '?',
+                      style: TextStyle(
+                        color: context.theme.colorScheme.primary,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 20,
+                      ),
                     ),
                   ),
                 ),
@@ -42,51 +62,57 @@ class UserCard extends GetView<UserController> {
                     children: [
                       Text(
                         user.username,
-                        style: const TextStyle(
+                        style: context.textTheme.bodyLarge?.copyWith(
                           fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         user.gmail,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey.shade600,
+                        style: context.textTheme.bodySmall?.copyWith(
+                          fontSize: 13,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 6),
                       Obx(() {
-                        final bool isFriend = controller.friendsList.any((f) => f.id == user.id);
+                        final bool isFriend = controller.friendsList.any(
+                          (f) => f.id == user.id,
+                        );
                         if (!isFriend) return const SizedBox.shrink();
 
                         final bool isOnline = user.online ?? false;
+                        final statusColor = isOnline
+                            ? Colors.green
+                            : context.theme.disabledColor;
+
                         return Row(
                           children: [
                             Container(
-                              width: 10,
-                              height: 10,
+                              width: 8,
+                              height: 8,
                               decoration: BoxDecoration(
-                                color: isOnline ? Colors.green : Colors.grey,
+                                color: statusColor,
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: isOnline
-                                        ? Colors.green.withOpacity(0.4)
-                                        : Colors.grey.withOpacity(0.4),
-                                    blurRadius: 4,
+                                    color: statusColor.withValues(alpha: 0.4),
+                                    blurRadius: 6,
                                   ),
                                 ],
                               ),
                             ),
-                            const SizedBox(width: 6),
+                            const SizedBox(width: 8),
                             Text(
-                              isOnline ? "Conectado" : "Desconectado",
+                              isOnline
+                                  ? translate('common.online')
+                                  : translate('common.offline'),
                               style: TextStyle(
-                                fontSize: 13,
-                                color: isOnline ? Colors.green.shade700 : Colors.grey.shade700,
-                                fontWeight: FontWeight.w500,
+                                fontSize: 12,
+                                color: statusColor,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
@@ -97,17 +123,35 @@ class UserCard extends GetView<UserController> {
                 ),
 
                 Obx(() {
-                  final bool isFriend = controller.friendsList.any((f) => f.id == user.id);
+                  final bool isFriend = controller.friendsList.any(
+                    (f) => f.id == user.id,
+                  );
                   if (isFriend) {
-                    return const Icon(Icons.arrow_forward, color: Colors.grey);
+                    return Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 16,
+                      color: context.theme.hintColor,
+                    );
                   }
                   return Container(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        controller.sendFriendRequest(user.id);
-                      },
-                      child: const Icon(Icons.person_add, color: Colors.blue),
+                    decoration: BoxDecoration(
+                      color: context.theme.colorScheme.primary.withValues(
+                        alpha: 0.1,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.person_add_rounded,
+                        color: context.theme.colorScheme.primary,
+                        size: 22,
+                      ),
+                      onPressed: () => controller.sendFriendRequest(user.id),
+                      constraints: const BoxConstraints(
+                        minWidth: 40,
+                        minHeight: 40,
+                      ),
+                      padding: EdgeInsets.zero,
                     ),
                   );
                 }),
