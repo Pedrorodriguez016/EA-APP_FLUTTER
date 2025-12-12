@@ -96,6 +96,8 @@
     "field_address": "Adreça",
     "field_date": "Data i hora de l'esdeveniment",
     "select_date_btn": "Selecciona data i hora",
+    "field_category": "Categoria",
+    "select_category_hint": "Selecciona una categoria",
     "detail_title": "Detalls de l'Esdeveniment",
     "info_card_title": "Informació de l'Esdeveniment",
     "schedule": "Horari:",
@@ -116,6 +118,7 @@
     "errors": {
       "title_required": "El títol és obligatori",
       "date_required": "La data és obligatòria",
+      "category_required": "La categoria és obligatòria",
       "restricted_access_title": "Accés Restringit",
       "restricted_access_msg": "Has d'iniciar sessió per veure els teus esdeveniments.",
       "load_error_title": "Error de Càrrega",

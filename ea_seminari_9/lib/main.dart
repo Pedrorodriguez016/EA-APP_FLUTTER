@@ -14,7 +14,7 @@ import 'Screen/register_screen.dart';
 import 'Screen/home.dart';
 import 'Screen/user_list.dart';
 import 'Screen/eventos_detail.dart';
-import 'Bindings/eventos_binding.dart';
+
 import 'Screen/user_detail.dart';
 import 'Screen/eventos_list.dart';
 import 'Screen/settings_screen.dart';
@@ -24,12 +24,13 @@ import 'Screen/crear_evento_screen.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'utils/logger.dart';
-
+import 'Screen/chatbot_screen.dart';
+import 'Bindings/chatbot_binding.dart';
 
 void main() async {
   logger.i('🚀 Iniciando aplicación...');
   WidgetsFlutterBinding.ensureInitialized();
-   var delegate = await LocalizationDelegate.create(
+  var delegate = await LocalizationDelegate.create(
     fallbackLocale: 'es', // Idioma por defecto si falla
     supportedLocales: ['es', 'en', 'ca', 'fr'], // Idiomas soportados
     basePath: 'assets/i18n/', // Ruta donde guardaste los JSON
@@ -44,9 +45,7 @@ void main() async {
 
   logger.i('✅ Servicios inicializados, iniciando aplicación');
   runApp(LocalizedApp(delegate, const MyApp()));
-   
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -55,18 +54,17 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     var localizationDelegate = LocalizedApp.of(context).delegate;
 
-
     return GetMaterialApp(
       title: 'Eventer',
       initialBinding: AuthBinding(),
       localizationsDelegates: [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-          localizationDelegate
-        ],
-        supportedLocales: localizationDelegate.supportedLocales,
-        locale: localizationDelegate.currentLocale,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        localizationDelegate,
+      ],
+      supportedLocales: localizationDelegate.supportedLocales,
+      locale: localizationDelegate.currentLocale,
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
@@ -91,27 +89,27 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: '/login',
           page: () => const LoginScreen(),
-          binding: AuthBinding()
+          binding: AuthBinding(),
         ),
         GetPage(
           name: '/register',
           page: () => const RegisterScreen(),
-          binding: AuthBinding()
+          binding: AuthBinding(),
         ),
         GetPage(
           name: '/home',
-          page: () =>  HomeScreen(),
+          page: () => HomeScreen(),
           binding: UserBinding(),
         ),
         GetPage(
           name: '/eventos',
           page: () => EventosListScreen(),
-          binding: EventosBinding(), 
+          binding: UserBinding(),
         ),
         GetPage(
           name: '/users',
           page: () => const UserListScreen(),
-          binding: UserBinding(), 
+          binding: UserBinding(),
         ),
         GetPage(
           name: '/settings',
@@ -123,31 +121,35 @@ class MyApp extends StatelessWidget {
           page: () => UserDetailScreen(userId: Get.parameters['id']!),
           binding: UserBinding(),
         ),
-         GetPage(
+        GetPage(
           name: '/evento/:id',
           page: () => EventosDetailScreen(eventoId: Get.parameters['id']!),
-          binding: EventosBinding(),
-         ),
-         GetPage(
+        ),
+        GetPage(
           name: '/profile',
           page: () => ProfileScreen(),
           binding: UserBinding(),
         ),
-          GetPage(
-            name: '/crear_evento',
-            page: () => const CrearEventoScreen(),
-            binding: EventosBinding(),
-          ),
-          GetPage(
-            name: '/chat-list',
-             page: () => const ChatListScreen(),
-             binding: ChatListBinding()
-             ),
-          GetPage(
-            name: '/chat', 
-            page: () => const ChatScreen(),
-            binding: ChatBinding()
-            ), 
+        GetPage(
+          name: '/crear_evento',
+          page: () => const CrearEventoScreen(),
+          binding: UserBinding(),
+        ),
+        GetPage(
+          name: '/chat-list',
+          page: () => const ChatListScreen(),
+          binding: ChatListBinding(),
+        ),
+        GetPage(
+          name: '/chat',
+          page: () => const ChatScreen(),
+          binding: ChatBinding(),
+        ),
+        GetPage(
+          name: '/chatbot',
+          page: () => const ChatBotScreen(),
+          binding: ChatBotBinding(),
+        ),
       ],
       defaultTransition: Transition.cupertino,
       debugShowCheckedModeBanner: false,

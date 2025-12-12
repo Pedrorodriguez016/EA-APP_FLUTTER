@@ -95,6 +95,8 @@
     "field_address": "Dirección",
     "field_date": "Fecha y hora del evento",
     "select_date_btn": "Seleccionar fecha y hora",
+    "field_category": "Categoría",
+    "select_category_hint": "Selecciona una categoría",
     "detail_title": "Detalles del Evento",
     "info_card_title": "Información del Evento",
     "schedule": "Horario:",
@@ -115,6 +117,7 @@
     "errors": {
       "title_required": "El título es obligatorio",
       "date_required": "La fecha es obligatoria",
+      "category_required": "La categoría es obligatoria",
       "restricted_access_title": "Acceso Restringido",
       "restricted_access_msg": "Debes iniciar sesión para ver tus eventos.",
       "load_error_title": "Error de Carga",
