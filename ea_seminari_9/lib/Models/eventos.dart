@@ -8,6 +8,9 @@ class Evento {
   final int? capacidadMaxima;
   final List<String> participantes;
 
+  // Lista de URLs de las fotos del álbum
+  final List<String> fotos;
+
   Evento({
     required this.id,
     required this.name,
@@ -17,6 +20,7 @@ class Evento {
     this.lat,
     this.lng,
     required this.participantes,
+    this.fotos = const [],
   });
 
   factory Evento.fromJson(Map<String, dynamic> json) {
@@ -31,6 +35,9 @@ class Evento {
       participantes: List<dynamic>.from(json['participantes'] ?? [])
           .map((p) => p.toString())
           .toList(),
+      fotos: List<dynamic>.from(json['fotos'] ?? [])
+          .map((foto) => foto.toString())
+          .toList(),
     );
   }
    Map<String, dynamic> toJson() {
@@ -39,6 +46,7 @@ class Evento {
       'schedule': schedule,
       'address': address,
       'participantes': participantes,
+      'fotos': fotos,
     };
   }
 }

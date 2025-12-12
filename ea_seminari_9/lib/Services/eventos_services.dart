@@ -1,9 +1,10 @@
 import '../Models/eventos.dart';
 import 'dart:convert';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide FormData, MultipartFile;
 import 'package:dio/dio.dart';
 import '../Controllers/auth_controller.dart';
 import '../Interceptor/auth_interceptor.dart';
+import 'dart:typed_data'; // Necesario para Uint8List
 
 class EventosServices {
   final String baseUrl = 'http://localhost:3000/api/event';
@@ -156,4 +157,35 @@ class EventosServices {
       throw Exception('Error al cargar mis eventos: $e');
     }
   }
+
+  // --- MÉTODO PARA SUBIR FOTO (WEB COMPATIBLE) ---
+  Future<Evento> uploadFoto(String eventId, Uint8List fileBytes, String filename) async {
+    try {
+      // 1. Preparamos el FormData. 
+      // 'image' es el nombre del campo que tu Multer en Node debe esperar.
+      // Si tu backend espera 'file' o 'foto', cambia 'image' por ese nombre.
+      FormData formData = FormData.fromMap({
+        'image': MultipartFile.fromBytes(
+          fileBytes, 
+          filename: filename
+        ),
+      });
+
+      // 2. Hacemos el POST. Asumo la ruta '/:id/upload-photo'. 
+      // Ajusta '/upload-photo' a la ruta real de tu backend.
+      final response = await _client.post(
+        '/$eventId/upload-photo', 
+        data: formData
+      );
+
+      // 3. Devolvemos el evento actualizado con la nueva foto en la lista
+      return Evento.fromJson(response.data);
+    } catch (e) {
+      print('Error subiendo foto: $e');
+      throw Exception('Error al subir la imagen: $e');
+    }
+  }
+
+
+
 }

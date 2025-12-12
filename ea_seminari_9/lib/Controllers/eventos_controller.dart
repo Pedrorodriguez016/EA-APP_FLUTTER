@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'auth_controller.dart'; 
+import 'auth_controller.dart';
+import 'package:image_picker/image_picker.dart'; // Para seleccionar imágenes
+import 'dart:typed_data'; // Para manejar bytes en Web
 
 // Definimos los tipos de filtro posibles
 enum EventFilter { all, myEvents }
@@ -36,6 +38,9 @@ class EventoController extends GetxController {
   final TextEditingController direccionController = TextEditingController();
   var selectedSchedule = Rxn<DateTime>();
 
+  // --- NUEVO: Instancia del Image Picker ---
+  final ImagePicker _picker = ImagePicker();
+  
   EventoController(this._eventosServices);
   final ScrollController scrollController = ScrollController();
 
@@ -146,8 +151,7 @@ class EventoController extends GetxController {
     }
   }
   
-  // --- [Resto de las funciones sin cambios, solo para completar el archivo] ---
-
+  
   void loadMoreEvents() { 
     if (currentPage.value < totalPages.value) {
        fetchEventos(currentPage.value + 1); 
@@ -403,5 +407,67 @@ void fetchMisEventosEspecificos() async {
       isLoading(false);
     }
   }
+
+  // --- NUEVO MÉTODO: SELECCIONAR Y SUBIR FOTO ---
+  Future<void> pickAndUploadPhoto() async {
+    if (selectedEvento.value == null) return;
+
+    try {
+      // 1. Seleccionar imagen de la galería
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80, // Optimización ligera
+      );
+
+      if (image == null) return; // Usuario canceló
+
+      isLoading.value = true; // Mostrar spinner
+
+      // 2. Leer bytes (Crítico para Flutter Web)
+      final Uint8List bytes = await image.readAsBytes();
+      final String fileName = image.name;
+
+      // 3. Llamar al servicio
+      final updatedEvento = await _eventosServices.uploadFoto(
+        selectedEvento.value!.id,
+        bytes,
+        fileName,
+      );
+
+      // 4. Actualizar estado local
+      selectedEvento.value = updatedEvento;
+      
+      // Actualizar también en la lista general para mantener consistencia
+      final index = eventosList.indexWhere((e) => e.id == updatedEvento.id);
+      if (index != -1) {
+        eventosList[index] = updatedEvento;
+      }
+
+      Get.snackbar(
+        '¡Foto subida!', 
+        'Tu foto se ha añadido al álbum del evento',
+        backgroundColor: Colors.green.withOpacity(0.8),
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+
+    } catch (e) {
+      print('Error subiendo foto: $e');
+      Get.snackbar(
+        'Error', 
+        'No se pudo subir la foto. Inténtalo de nuevo.',
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+
+
+
+
+
 
 }

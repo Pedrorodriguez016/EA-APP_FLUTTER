@@ -1,59 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart'; // Necesario para DateFormat
+import 'package:timeago/timeago.dart' as timeago; // Necesario para timeago
+
+// Tus importaciones
 import '../Models/eventos.dart';
 import '../Controllers/eventos_controller.dart';
 import '../Controllers/auth_controller.dart';
-import 'package:get/get.dart'; 
-import 'package:intl/intl.dart'; // Añadido para el formato fijo
-import 'package:timeago/timeago.dart' as timeago; // Añadido para el tiempo relativo
-
 
 class EventosDetailScreen extends GetView<EventoController> {
   final String eventoId;
 
   const EventosDetailScreen({super.key, required this.eventoId});
 
-
-String _formatSchedule(String scheduleString) {
-    
-    final String cleanScheduleString = scheduleString.trim(); 
-    
-    if (cleanScheduleString.isEmpty) {
-      return 'Fecha no disponible';
-    }
+  // --- 1. FUNCIÓN QUE FALTABA (_formatSchedule) ---
+  String _formatSchedule(String scheduleString) {
+    final String cleanScheduleString = scheduleString.trim();
+    if (cleanScheduleString.isEmpty) return 'Fecha no disponible';
     
     try {
-      final DateTime? scheduleDate = DateTime.tryParse(cleanScheduleString); 
+      final DateTime? scheduleDate = DateTime.tryParse(cleanScheduleString);
+      if (scheduleDate == null) return 'Fecha inválida';
       
-      if (scheduleDate == null) {
-          return 'Error de formato'; 
-      }
-      
-      // 1. Formato de Fecha: Ejemplo "13 de noviembre de 2025"
-      // Usamos las comillas simples ('de') para proteger el texto literal.
+      // Requiere inicializar locale 'es' en main.dart
       final String formattedDate = DateFormat('d \'de\' MMMM \'de\' yyyy', 'es').format(scheduleDate);
-
-      // 2. Formato de Hora: Ejemplo "23:48" (Formato 24h)
       final String formattedTime = DateFormat('HH:mm', 'es').format(scheduleDate);
+      final String relativeTime = timeago.format(scheduleDate, locale: 'es', allowFromNow: true);
       
-      // 3. Tiempo Relativo: Ejemplo "(hace 17 días)"
-      final String relativeTime = timeago.format(
-        scheduleDate, 
-        locale: 'es', 
-        allowFromNow: true, 
-      );
-      
-      // 4. Combinamos todo: "13 de noviembre de 2025 a las 23:48 (hace 17 días)"
-      final String fixedTime = '$formattedDate a las $formattedTime';
-      
-      return '$fixedTime ($relativeTime)';
-      
+      return '$formattedDate a las $formattedTime ($relativeTime)';
     } catch (e) {
-      print('Fallo al formatear la fecha en detalles: $e');
-      return 'Error de formato'; 
+      return 'Error de formato';
     }
   }
 
-
+  // --- 2. Método Build ---
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -65,188 +45,169 @@ String _formatSchedule(String scheduleString) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Detalles del Evento'),
+        title: const Text('Detalles del Evento', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        centerTitle: true,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          onPressed: () => Get.back(),
+        ),
       ),
-
       body: Obx(() {
-
         if (controller.isLoading.value) {
-          return const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('Cargando evento...'),
-              ],
-            ),
-          );
+          return const Center(child: CircularProgressIndicator(color: Color(0xFF667EEA)));
         }
-
         if (controller.selectedEvento.value == null) {
-          return const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.event_busy, size: 64, color: Colors.grey),
-                SizedBox(height: 16),
-                Text(
-                  'Evento no encontrado',
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
-                ),
-              ],
-            ),
-          );
+          return const Center(child: Text('Evento no encontrado'));
         }
         final evento = controller.selectedEvento.value!;
-        return _buildEventoDetail(evento);
+        return _buildEventoDetail(context, evento);
       }),
     );
   }
-  Widget _buildEventoDetail(Evento evento) {
-    final currentUserId = Get.find<AuthController>().currentUser.value?.id;
+
+  // --- 3. Cuerpo del Detalle ---
+  Widget _buildEventoDetail(BuildContext context, Evento evento) {
+    final authController = Get.find<AuthController>();
+    final currentUserId = authController.currentUser.value?.id;
     final isParticipant = evento.participantes.contains(currentUserId);
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header con icono
+          // Icono
           Center(
             child: Container(
-              width: 100,
-              height: 100,
+              width: 90, height: 90,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-                ),
+                gradient: const LinearGradient(colors: [Color(0xFF667EEA), Color(0xFF764BA2)]),
                 shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: const Color(0xFF667EEA).withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 5))],
               ),
-              child: const Icon(Icons.event, color: Colors.white, size: 48),
-            ),
-          ),
-          const SizedBox(height: 32),
-
-          // Nombre del evento
-          Text(
-            evento.name,
-            style: const TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w800,
-              color: Colors.black87,
+              child: const Icon(Icons.calendar_month_rounded, color: Colors.white, size: 40),
             ),
           ),
           const SizedBox(height: 24),
+          
+          // Título
+          Text(evento.name, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.black87), textAlign: TextAlign.center),
+          const SizedBox(height: 32),
 
-          // Información del evento
+          // Info Card (Aquí se usa _formatSchedule)
           _buildInfoCard(evento),
-          const SizedBox(height: 20),
+          const SizedBox(height: 32),
+
+          // Álbum
+          _buildPhotoAlbum(context, evento),
+          const SizedBox(height: 32),
+
+          // Botón
           SizedBox(
-            width: double.infinity,
-            height: 50,
+            width: double.infinity, height: 55,
             child: ElevatedButton(
               onPressed: () => controller.toggleParticipation(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: isParticipant ? Colors.redAccent : const Color(0xFF667EEA),
+                backgroundColor: isParticipant ? Colors.red.shade400 : const Color(0xFF667EEA),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
-              child: Text(
-                isParticipant 
-                  ? "Salir del evento"  // Añadir a JSON: 'events.leave_btn'
-                  : "Unirme al evento", // Añadir a JSON: 'events.join_btn'
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
+              child: Text(isParticipant ? "Salir del evento" : "Unirme al evento", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ),
           ),
           const SizedBox(height: 20),
-
         ],
       ),
     );
   }
 
+  // --- 4. Info Card ---
   Widget _buildInfoCard(Evento evento) {
+    // AQUÍ SE LLAMA A LA FUNCIÓN QUE DABA ERROR
     final String formattedSchedule = _formatSchedule(evento.schedule);
+    
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      width: double.infinity, padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        color: Colors.white, borderRadius: BorderRadius.circular(20),
+        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.08), blurRadius: 20, offset: const Offset(0, 4))],
         border: Border.all(color: Colors.grey.shade100),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Información del Evento',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 16),
-           _buildDetailRow(Icons.schedule, 'Horario:', formattedSchedule),
-          const SizedBox(height: 12),
-          _buildDetailRow(Icons.location_on, 'Dirección:', evento.address),
-          const SizedBox(height: 12),
-          _buildDetailRow(
-            Icons.people,
-            'Participantes:',
-            '${evento.participantes.length} personas',
-          ), 
+          const Text('Información', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF667EEA))),
+          const Divider(height: 30),
+          _buildDetailRow(Icons.access_time_filled_rounded, 'Horario', formattedSchedule),
+          const SizedBox(height: 20),
+          _buildDetailRow(Icons.location_on_rounded, 'Ubicación', evento.address),
+          const SizedBox(height: 20),
+          _buildDetailRow(Icons.groups_rounded, 'Participantes', '${evento.participantes.length} personas'),
         ],
       ),
     );
   }
 
-  
+  // --- 5. Álbum de Fotos ---
+  Widget _buildPhotoAlbum(BuildContext context, Evento evento) {
+    List<String> displayfotos = List.from(evento.fotos);
+    
+    // FOTOS DE PRUEBA (Borrar cuando tengas fotos reales)
+    if (displayfotos.isEmpty) {
+      displayfotos = [
+        'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=500&q=60',
+        'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=500&q=60',
+        'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=500&q=60',
+      ];
+    }
+    
+    if (displayfotos.isEmpty) return const SizedBox.shrink();
 
-  Widget _buildDetailRow(IconData icon, String label, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
       children: [
-        Icon(icon, color: const Color(0xFF667EEA), size: 20),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey.shade600,
-                  fontWeight: FontWeight.w500,
+        const Row(children: [Text('Galería', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))]),
+        const SizedBox(height: 16),
+        GridView.builder(
+          shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
+          itemCount: displayfotos.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, crossAxisSpacing: 10, mainAxisSpacing: 10),
+          itemBuilder: (context, index) {
+            final url = displayfotos[index];
+            return GestureDetector(
+              onTap: () => _openFullScreenImage(context, url),
+              child: Hero(tag: url, child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  image: DecorationImage(image: NetworkImage(url), fit: BoxFit.cover),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-              ),
-            ],
-          ),
+              )),
+            );
+          },
         ),
       ],
     );
+  }
+
+  // --- 6. Helpers ---
+  void _openFullScreenImage(BuildContext context, String imageUrl) {
+    Get.to(() => Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(backgroundColor: Colors.black, iconTheme: const IconThemeData(color: Colors.white)),
+      body: Center(child: Hero(tag: imageUrl, child: Image.network(imageUrl, fit: BoxFit.contain))),
+    ));
+  }
+
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Row(children: [
+      Icon(icon, color: Colors.grey.shade700, size: 22),
+      const SizedBox(width: 16),
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(label, style: TextStyle(fontSize: 13, color: Colors.grey.shade500)),
+        Text(value, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+      ])),
+    ]);
   }
 }
