@@ -49,4 +49,5 @@ class Evento {
       'fotos': fotos,
     };
   }
+  
 }

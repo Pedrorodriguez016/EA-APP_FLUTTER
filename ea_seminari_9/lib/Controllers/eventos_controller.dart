@@ -8,6 +8,7 @@ import 'package:latlong2/latlong.dart';
 import 'auth_controller.dart';
 import 'package:image_picker/image_picker.dart'; // Para seleccionar imágenes
 import 'dart:typed_data'; // Para manejar bytes en Web
+import 'package:http/http.dart' as http;
 
 // Definimos los tipos de filtro posibles
 enum EventFilter { all, myEvents }
@@ -465,9 +466,55 @@ void fetchMisEventosEspecificos() async {
   }
 
 
+  Future<void> uploadPhoto() async {
+    try {
+      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      
+      if (image != null && selectedEvento.value != null) {
+        String eventId = selectedEvento.value!.id;
+        
+        // 1. Mostrar estado de carga
+        Get.showSnackbar(const GetSnackBar(
+          message: 'Subiendo imagen...', 
+          duration: Duration(seconds: 1),
+          showProgressIndicator: true,
+        ));
 
+        // 2. Preparar la petición al servidor
+        // CAMBIA ESTO POR TU URL REAL:
+        var uri = Uri.parse('http://localhost:3000/api/eventos/$eventId/upload'); 
+        
+        var request = http.MultipartRequest('POST', uri);
+        
+        // Adjuntamos el archivo
+        // 'image' es el nombre del campo que espera tu backend (Multer, etc.)
+        request.files.add(await http.MultipartFile.fromPath('image', image.path));
+        
+        // 3. Enviar
+        var streamedResponse = await request.send();
+        var response = await http.Response.fromStream(streamedResponse);
 
-
-
-
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          // 4. Si el servidor responde OK, asumimos que devuelve la nueva URL
+          // Ejemplo de respuesta del server: { "url": "http://server.com/uploads/foto1.jpg" }
+          // Si tu server no devuelve la URL, tendrás que volver a llamar a fetchEventoById(eventId).
+          
+          // FORZAR ACTUALIZACIÓN VISUAL (Para que el usuario lo vea al instante)
+          // Asumiendo que el server ya lo guardó en MongoDB:
+          
+          // OPCIÓN A: Recargar todo el evento desde la BD
+          fetchEventoById(eventId); 
+          
+          Get.snackbar('Éxito', 'Imagen guardada en la base de datos');
+          
+        } else {
+          print('Error del servidor: ${response.body}');
+          Get.snackbar('Error', 'El servidor rechazó la imagen');
+        }
+      }
+    } catch (e) {
+      print('Error al subir foto: $e');
+      Get.snackbar('Error', 'Fallo de conexión');
+    }
+  }
 }
