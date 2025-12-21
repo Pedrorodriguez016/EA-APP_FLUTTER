@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Services/chatbot_service.dart';
+import 'auth_controller.dart';
 
 class BotMessage {
   final String text;
@@ -50,7 +51,10 @@ class ChatBotController extends GetxController {
     isLoading.value = true;
     try {
       // 2. Llamar al servicio
-      final result = await _service.sendQuery(text);
+      final authController = Get.find<AuthController>();
+      final userId = authController.currentUser.value?.id ?? '';
+
+      final result = await _service.sendQuery(text, userId);
 
       final String responseText = result['text'];
       final List events = result['events'] ?? [];

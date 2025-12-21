@@ -12,12 +12,15 @@ class ChatBotService {
     _client.interceptors.add(AuthInterceptor());
   }
 
-  Future<Map<String, dynamic>> sendQuery(String query) async {
+  Future<Map<String, dynamic>> sendQuery(String query, String userId) async {
     try {
-      logger.d('🤖 Enviando query al chatbot: $query');
+      logger.d('🤖 Enviando query al chatbot: $query (UID: $userId)');
       logger.d('🔗 URL completa: ${_client.options.baseUrl}/search');
 
-      final response = await _client.post('/search', data: {'query': query});
+      final response = await _client.post(
+        '/search',
+        data: {'query': query, 'userId': userId},
+      );
 
       logger.i('✅ Respuesta del chatbot recibida');
 
