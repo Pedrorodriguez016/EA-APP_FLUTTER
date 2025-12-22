@@ -5,56 +5,58 @@ import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart'; // Importar
 import '../Controllers/auth_controller.dart';
 import 'package:intl/intl.dart'; // Añadido para el formato fijo
-import 'package:timeago/timeago.dart' as timeago; // Añadido para el tiempo relativo
+import 'package:timeago/timeago.dart'
+    as timeago; // Añadido para el tiempo relativo
 import '../utils/logger.dart';
-
 
 class EventosDetailScreen extends GetView<EventoController> {
   final String eventoId;
 
   const EventosDetailScreen({super.key, required this.eventoId});
 
+  String _formatSchedule(String scheduleString) {
+    final String cleanScheduleString = scheduleString.trim();
 
-String _formatSchedule(String scheduleString) {
-    
-    final String cleanScheduleString = scheduleString.trim(); 
-    
     if (cleanScheduleString.isEmpty) {
       return translate('events.date_unavailable');
     }
-    
+
     try {
-      final DateTime? scheduleDate = DateTime.tryParse(cleanScheduleString); 
-      
+      final DateTime? scheduleDate = DateTime.tryParse(cleanScheduleString);
+
       if (scheduleDate == null) {
-          return translate('events.format_error'); 
+        return translate('events.format_error');
       }
-      
+
       // 1. Formato de Fecha: Ejemplo "13 de noviembre de 2025"
       // Usamos las comillas simples ('de') para proteger el texto literal.
-      final String formattedDate = DateFormat('d \'de\' MMMM \'de\' yyyy', 'es').format(scheduleDate);
+      final String formattedDate = DateFormat(
+        'd \'de\' MMMM \'de\' yyyy',
+        'es',
+      ).format(scheduleDate);
 
       // 2. Formato de Hora: Ejemplo "23:48" (Formato 24h)
-      final String formattedTime = DateFormat('HH:mm', 'es').format(scheduleDate);
-      
+      final String formattedTime = DateFormat(
+        'HH:mm',
+        'es',
+      ).format(scheduleDate);
+
       // 3. Tiempo Relativo: Ejemplo "(hace 17 días)"
       final String relativeTime = timeago.format(
-        scheduleDate, 
-        locale: 'es', 
-        allowFromNow: true, 
+        scheduleDate,
+        locale: 'es',
+        allowFromNow: true,
       );
-      
+
       // 4. Combinamos todo: "13 de noviembre de 2025 a las 23:48 (hace 17 días)"
       final String fixedTime = '$formattedDate a las $formattedTime';
-      
+
       return '$fixedTime ($relativeTime)';
-      
     } catch (e) {
       logger.w('⚠️ Fallo al formatear la fecha en detalles: $e');
-      return 'Error de formato'; 
+      return 'Error de formato';
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +76,6 @@ String _formatSchedule(String scheduleString) {
       ),
 
       body: Obx(() {
-
         if (controller.isLoading.value) {
           return Center(
             child: Column(
@@ -108,6 +109,7 @@ String _formatSchedule(String scheduleString) {
       }),
     );
   }
+
   Widget _buildEventoDetail(Evento evento) {
     final currentUserId = Get.find<AuthController>().currentUser.value?.id;
     final isParticipant = evento.participantes.contains(currentUserId);
@@ -152,17 +154,22 @@ String _formatSchedule(String scheduleString) {
             child: ElevatedButton(
               onPressed: () => controller.toggleParticipation(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: isParticipant ? Colors.redAccent : const Color(0xFF667EEA),
+                backgroundColor: isParticipant
+                    ? Colors.redAccent
+                    : const Color(0xFF667EEA),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
               child: Text(
-                isParticipant 
-                  ? translate('events.leave_btn')  
-                  : translate('events.join_btn'), 
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                isParticipant
+                    ? translate('events.leave_btn')
+                    : translate('events.join_btn'),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -202,7 +209,11 @@ String _formatSchedule(String scheduleString) {
           ),
           const SizedBox(height: 16),
 
-           _buildDetailRow(Icons.schedule, translate('events.schedule'), formattedSchedule),
+          _buildDetailRow(
+            Icons.schedule,
+            translate('events.schedule'),
+            formattedSchedule,
+          ),
 
           const SizedBox(height: 12),
           _buildDetailRow(Icons.location_on, translate('events.field_address') + ':', evento.address),
@@ -211,7 +222,13 @@ String _formatSchedule(String scheduleString) {
             Icons.people,
             translate('events.participants'),
             '${evento.participantes.length}',
-          ), 
+          ),
+          const SizedBox(height: 12),
+          _buildDetailRow(
+            Icons.category,
+            translate('events.field_category') + ':',
+            evento.categoria,
+          ),
         ],
       ),
     );

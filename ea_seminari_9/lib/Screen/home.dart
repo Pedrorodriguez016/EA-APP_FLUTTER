@@ -14,14 +14,15 @@ import '../Services/eventos_services.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map/flutter_map.dart';
 
-class HomeScreen extends GetView<UserController>{
+class HomeScreen extends GetView<UserController> {
   HomeScreen({Key? key}) : super(key: key);
   final AuthController authController = Get.find<AuthController>();
-  final EventoController eventoController = Get.put(EventoController(EventosServices()));
+  final EventoController eventoController = Get.put(
+    EventoController(EventosServices()),
+  );
 
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       appBar: _buildAppBar(),
@@ -39,11 +40,15 @@ class HomeScreen extends GetView<UserController>{
         ),
       ),
       bottomNavigationBar: CustomNavBar(currentIndex: 0),
-      
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Get.toNamed('/chatbot'),
+        backgroundColor: const Color(0xFF667EEA),
+        child: const Icon(Icons.smart_toy, color: Colors.white),
+      ),
     );
   }
 
-    AppBar _buildAppBar() {
+  AppBar _buildAppBar() {
     return AppBar(
       title: Text(translate('home.title')), // 'Inicio'
       backgroundColor: Colors.white,
@@ -106,7 +111,9 @@ class HomeScreen extends GetView<UserController>{
           ),
           const SizedBox(height: 16),
           Text(
-            translate('home.welcome_card.subtitle'), // 'Bienvenido a tu aplicación...'
+            translate(
+              'home.welcome_card.subtitle',
+            ), // 'Bienvenido a tu aplicación...'
             style: TextStyle(
               color: Colors.white.withOpacity(0.9),
               fontSize: 16,
@@ -127,11 +134,14 @@ class HomeScreen extends GetView<UserController>{
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(translate('home.events_section.title'), // 'Eventos'
-                style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87)),
+            Text(
+              translate('home.events_section.title'), // 'Eventos'
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
             const SizedBox(height: 16),
             Wrap(
               spacing: 12,
@@ -140,37 +150,55 @@ class HomeScreen extends GetView<UserController>{
                 ElevatedButton.icon(
                   onPressed: () => Get.toNamed('/crear_evento'),
                   icon: const Icon(Icons.add_circle),
-                  label: Text(translate('home.events_section.create_btn')), // 'Crear evento'
+                  label: Text(
+                    translate('home.events_section.create_btn'),
+                  ), // 'Crear evento'
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF667EEA), 
+                    backgroundColor: const Color(0xFF667EEA),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
                 TextButton.icon(
                   onPressed: () => Get.toNamed('/eventos'),
                   icon: const Icon(Icons.search),
-                  label: Text(translate('home.events_section.explore_btn')), // 'Explorar eventos'
+                  label: Text(
+                    translate('home.events_section.explore_btn'),
+                  ), // 'Explorar eventos'
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.indigo.shade50,
                     foregroundColor: Colors.indigo.shade800,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
                 TextButton.icon(
                   onPressed: () => Get.toNamed('/eventos?mine=true'),
                   icon: const Icon(Icons.calendar_today),
-                  label: Text(translate('home.events_section.my_events_btn')), // 'Mis eventos'
+                  label: Text(
+                    translate('home.events_section.my_events_btn'),
+                  ), // 'Mis eventos'
                   style: TextButton.styleFrom(
                     backgroundColor: Colors.indigo.shade50,
                     foregroundColor: Colors.indigo.shade800,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                 ),
               ],
@@ -182,32 +210,40 @@ class HomeScreen extends GetView<UserController>{
                 final myMarkers = eventos
                     .where((e) => e.lat != null && e.lng != null)
                     .map((evento) {
-                  return Marker(
-                    point: LatLng(evento.lat!.toDouble(), evento.lng!.toDouble()),
-                    width: 45,
-                    height: 45,
-                    child: GestureDetector(
-                      onTap: () {
-                         Get.toNamed('/evento/${evento.id}');
-                      },
-                      child: const Icon(
-                        Icons.location_on,
-                        color: Color(0xFF667EEA),
-                        size: 45,
-                        shadows: [
-                          Shadow(blurRadius: 10, color: Colors.black26, offset: Offset(2, 2))
-                        ],
-                      ),
-                    ),
-                  );
-                }).toList(); 
+                      return Marker(
+                        point: LatLng(
+                          evento.lat!.toDouble(),
+                          evento.lng!.toDouble(),
+                        ),
+                        width: 45,
+                        height: 45,
+                        child: GestureDetector(
+                          onTap: () {
+                            Get.toNamed('/evento/${evento.id}');
+                          },
+                          child: const Icon(
+                            Icons.location_on,
+                            color: Color(0xFF667EEA),
+                            size: 45,
+                            shadows: [
+                              Shadow(
+                                blurRadius: 10,
+                                color: Colors.black26,
+                                offset: Offset(2, 2),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    })
+                    .toList();
                 return CustomMap(
                   height: 200,
                   center: const LatLng(41.3851, 2.1734),
                   zoom: 12,
                   enableExpansion: true,
-                  markers: myMarkers, 
-                  
+                  markers: myMarkers,
+
                   // Lógica de recarga al mover el mapa
                   onPositionChanged: (MapPosition position, bool hasGesture) {
                     final bounds = position.bounds;
@@ -216,7 +252,7 @@ class HomeScreen extends GetView<UserController>{
                         bounds.north,
                         bounds.south,
                         bounds.east,
-                        bounds.west
+                        bounds.west,
                       );
                     }
                   },
@@ -236,121 +272,148 @@ class HomeScreen extends GetView<UserController>{
       controller.fetchRequest();
     });
     return Card(
-    elevation: 2,
-    shadowColor: Colors.black.withOpacity(0.1),
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min, 
-        children: [
-          Row(
-            children: [
-              Text(translate('home.friends_section.title'), // 'Amigos'
+      elevation: 2,
+      shadowColor: Colors.black.withOpacity(0.1),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Text(
+                  translate('home.friends_section.title'), // 'Amigos'
                   style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87)),
-              const SizedBox(width: 8),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(12),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
                 ),
-                child: Obx(() => Text(
-                      controller.friendsList.length.toString(), 
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Obx(
+                    () => Text(
+                      controller.friendsList.length.toString(),
                       style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black54),
-                    )),
-              ),
-            ]
-          ),
-              const SizedBox(width: 16),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child:Row(
-            children: [
-
-              TextButton.icon(
-                onPressed: () {
-                 final List<User> users = controller.friendsRequests;
-                 FriendRequestsDialog.show(context, requests: users, 
-                 onAccept: (user) => controller.acceptFriendRequest(user),
-                 onReject: (user) => controller.rejectFriendRequest(user),
-                 );},
-                icon: const Icon(Icons.group_add, size: 20),
-                label: Text(translate('home.friends_section.requests_btn')), // 'Solicitudes'
-                style: TextButton.styleFrom(
-                  backgroundColor: Colors.indigo.shade50,
-                  foregroundColor: Colors.indigo.shade800,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-              const SizedBox(width: 12),
-              ElevatedButton.icon(
-                      onPressed: () => Get.toNamed('/users'),
-                      icon: const Icon(Icons.search, size: 20),
-                      label: Text(translate('home.friends_section.search_btn')), // 'Buscar amigos'
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey.shade200,
-                        foregroundColor: Colors.black87,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black54,
                       ),
-                ),
-            ],
-          ),
-          ),
-          const SizedBox(height: 20),
-
-          Obx(() {
-            if (controller.isLoading.value) { 
-              return const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
-
-            if (controller.friendsList.isEmpty) { 
-              return Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      translate('home.friends_section.empty_msg'), // 'Aún no tienes amigos...'
-                      style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontStyle: FontStyle.italic),
-                      textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 12),
-                  ],
+                  ),
                 ),
+              ],
+            ),
+            const SizedBox(width: 16),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  TextButton.icon(
+                    onPressed: () {
+                      final List<User> users = controller.friendsRequests;
+                      FriendRequestsDialog.show(
+                        context,
+                        requests: users,
+                        onAccept: (user) =>
+                            controller.acceptFriendRequest(user),
+                        onReject: (user) =>
+                            controller.rejectFriendRequest(user),
+                      );
+                    },
+                    icon: const Icon(Icons.group_add, size: 20),
+                    label: Text(
+                      translate('home.friends_section.requests_btn'),
+                    ), // 'Solicitudes'
+                    style: TextButton.styleFrom(
+                      backgroundColor: Colors.indigo.shade50,
+                      foregroundColor: Colors.indigo.shade800,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  ElevatedButton.icon(
+                    onPressed: () => Get.toNamed('/users'),
+                    icon: const Icon(Icons.search, size: 20),
+                    label: Text(
+                      translate('home.friends_section.search_btn'),
+                    ), // 'Buscar amigos'
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey.shade200,
+                      foregroundColor: Colors.black87,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+
+              if (controller.friendsList.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        translate(
+                          'home.friends_section.empty_msg',
+                        ), // 'Aún no tienes amigos...'
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+                  ),
+                );
+              }
+              return ListView.builder(
+                shrinkWrap: true,
+                primary: false,
+                itemCount: controller.friendsList.length,
+                itemBuilder: (context, index) {
+                  final user = controller.friendsList[index];
+                  return UserCard(user: user);
+                },
               );
-            }
-            return ListView.builder(
-              shrinkWrap: true,
-              primary: false,
-              itemCount: controller.friendsList.length,
-              itemBuilder: (context, index) {
-              final user = controller.friendsList[index];
-              return UserCard(user: user);
-              } ,
-            );
-          }), 
-        ],
+            }),
+          ],
+        ),
       ),
-    ),
-  );
+    );
   }
 }

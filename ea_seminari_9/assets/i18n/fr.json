@@ -96,6 +96,8 @@
     "field_address": "Adresse",
     "field_date": "Date et heure de l'événement",
     "select_date_btn": "Sélectionner la date et l'heure",
+    "field_category": "Catégorie",
+    "select_category_hint": "Sélectionnez une catégorie",
     "detail_title": "Détails de l'événement",
     "info_card_title": "Informations sur l'événement",
     "schedule": "Horaire :",
@@ -116,6 +118,7 @@
     "errors": {
       "title_required": "Le titre est obligatoire",
       "date_required": "La date est obligatoire",
+      "category_required": "La catégorie est obligatoire",
       "restricted_access_title": "Accès Restreint",
       "restricted_access_msg": "Vous devez vous connecter pour voir vos événements.",
       "load_error_title": "Erreur de Chargement",

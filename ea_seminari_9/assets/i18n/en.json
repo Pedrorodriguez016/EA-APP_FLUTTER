@@ -96,6 +96,8 @@
     "field_address": "Address",
     "field_date": "Event date and time",
     "select_date_btn": "Select date and time",
+    "field_category": "Category",
+    "select_category_hint": "Select a category",
     "detail_title": "Event Details",
     "info_card_title": "Event Information",
     "schedule": "Schedule:",
@@ -116,6 +118,7 @@
     "errors": {
       "title_required": "Title is required",
       "date_required": "Date is required",
+      "category_required": "Category is required",
       "restricted_access_title": "Restricted Access",
       "restricted_access_msg": "You must log in to see your events.",
       "load_error_title": "Load Error",
