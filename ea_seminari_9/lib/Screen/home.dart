@@ -10,16 +10,15 @@ import '../Widgets/user_card.dart';
 import '../Widgets/solicitudes.dart';
 import '../Widgets/mapa.dart';
 import '../Controllers/eventos_controller.dart';
-import '../Services/eventos_services.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map/flutter_map.dart';
 
 class HomeScreen extends GetView<UserController> {
   HomeScreen({Key? key}) : super(key: key);
+
   final AuthController authController = Get.find<AuthController>();
-  final EventoController eventoController = Get.put(
-    EventoController(EventosServices()),
-  );
+  final EventoController eventoController = Get.find<EventoController>();
+
 
   @override
   Widget build(BuildContext context) {
@@ -40,11 +39,14 @@ class HomeScreen extends GetView<UserController> {
         ),
       ),
       bottomNavigationBar: CustomNavBar(currentIndex: 0),
+<<<<<<< HEAD
       floatingActionButton: FloatingActionButton(
         onPressed: () => Get.toNamed('/chatbot'),
         backgroundColor: const Color(0xFF667EEA),
         child: const Icon(Icons.smart_toy, color: Colors.white),
       ),
+=======
+>>>>>>> Google-Oauth
     );
   }
 
