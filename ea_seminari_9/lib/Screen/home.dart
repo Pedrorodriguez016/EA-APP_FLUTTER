@@ -39,14 +39,12 @@ class HomeScreen extends GetView<UserController> {
         ),
       ),
       bottomNavigationBar: CustomNavBar(currentIndex: 0),
-<<<<<<< HEAD
       floatingActionButton: FloatingActionButton(
         onPressed: () => Get.toNamed('/chatbot'),
         backgroundColor: const Color(0xFF667EEA),
         child: const Icon(Icons.smart_toy, color: Colors.white),
       ),
-=======
->>>>>>> Google-Oauth
+
     );
   }
 
