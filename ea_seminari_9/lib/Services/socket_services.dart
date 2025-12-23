@@ -5,22 +5,28 @@ import '../utils/logger.dart';
 
 class SocketService extends GetxService {
   late IO.Socket _socket;
-  final String _url = '${dotenv.env['BASE_URL']}'; 
+  String get _url => dotenv.env['BASE_URL'] ?? 'http://localhost:3000';
+
+  @override
+  void onInit() {
+    super.onInit();
+    _socket = IO.io(
+      _url,
+      IO.OptionBuilder()
+          .setTransports(['websocket'])
+          .disableAutoConnect()
+          .build(),
+    );
+  }
 
   void connectWithUserId(String userId) {
-    logger.i('🔌 Iniciando conexión Socket con usuario: $userId');
-    // Configuración del cliente
-    _socket = IO.io(_url, IO.OptionBuilder()
-        .setTransports(['websocket']) // forzar WebSockets
-        .disableAutoConnect()         // conectamos manualmente
-        .build()
-    );
-
-    _socket.connect();
+    if (!_socket.connected) {
+      _socket.connect();
+    }
 
     _socket.onConnect((_) {
       logger.i('✅ Conectado al Socket Server');
-      
+
       // Emitimos el evento que tu backend espera en la línea 63
       _socket.emit('user:online', userId);
       logger.d('📤 Evento user:online emitido para: $userId');
@@ -32,7 +38,7 @@ class SocketService extends GetxService {
 
     _socket.onDisconnect((_) => logger.i('❌ Desconectado del Socket'));
   }
-    void joinChatRoom(String myUserId, String friendId) {
+  void joinChatRoom(String myUserId, String friendId) {
     logger.i('💬 Uniendose a sala de chat - Mi ID: $myUserId, Amigo ID: $friendId');
     _socket.emit('chat:join', {
       'userId': myUserId,
@@ -57,6 +63,36 @@ class SocketService extends GetxService {
   void stopListeningToChatMessages() {
     _socket.off('chat:message');
   }
+
+  // EVENT CHAT
+  void joinEventChatRoom(String eventId) {
+    logger.i('🏟️ Uniendose a sala de chat de evento: $eventId');
+    _socket.emit('eventChat:join', {'eventId': eventId});
+  }
+
+  void sendEventChatMessage(
+    String eventId,
+    String userId,
+    String username,
+    String text,
+  ) {
+    logger.d('📤 Enviando mensaje al evento $eventId de $username: $text');
+    _socket.emit('eventChat:message', {
+      'eventId': eventId,
+      'userId': userId,
+      'username': username,
+      'text': text,
+    });
+  }
+
+  void listenToEventChatMessages(Function(dynamic) onMessageReceived) {
+    _socket.on('eventChat:message', onMessageReceived);
+  }
+
+  void stopListeningToEventChatMessages() {
+    _socket.off('eventChat:message');
+  }
+
   void disconnect() {
     try {
       if (_socket.connected) {
@@ -68,4 +104,3 @@ class SocketService extends GetxService {
     }
   }
 }
-  

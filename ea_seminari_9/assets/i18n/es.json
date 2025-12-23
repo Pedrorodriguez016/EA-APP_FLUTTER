@@ -33,7 +33,7 @@
       "login_link": "Inicia Sesión",
       "success_title": "¡Registro Exitoso!",
       "success_msg": "Tu cuenta ha sido creada correctamente. Ahora puedes iniciar sesión.",
-      "continue": "Continuar", 
+      "continue": "Continuar",
       "generate_password_btn": "Generar contraseña",
       "chars": "Mínimo 12 caracteres"
     },
@@ -124,7 +124,10 @@
       "load_error_msg": "No se pudieron cargar los eventos",
       "login_to_participate": "Debes iniciar sesión para participar",
       "load_my_events": "No se pudieron cargar tus eventos"
-    }
+    },
+    "chat_btn": "Chat del evento",
+    "chat_subtitle": "Conversación grupal",
+    "chat_hint": "Escribe un mensaje..."
   },
   "users": {
     "list_title": "Usuarios",
@@ -146,12 +149,18 @@
   "chat": {
     "list_title": "Mis Chats",
     "subtitle": "Toca para chatear",
-    "empty_list": "No tienes amigos agregados",
+    "empty_list": "No tienes chats aún",
     "input_hint": "Enviar mensaje...",
     "default_title": "Chat",
     "errors": {
       "load_contacts": "No se pudieron cargar los contactos"
-    }
+    },
+    "events_section": "Grupos de Eventos",
+    "friends_section": "Amigos",
+    "event_group_subtitle": "Chat grupal del evento",
+    "filter_all": "Todos",
+    "filter_friends": "Amigos",
+    "filter_events": "Eventos"
   },
   "settings": {
     "title": "Ajustes",

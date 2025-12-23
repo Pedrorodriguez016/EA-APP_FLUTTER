@@ -125,7 +125,10 @@
       "load_error_msg": "Could not load events. Please check your connection or server.",
       "login_to_participate": "You must log in to participate",
       "load_my_events": "Could not load your events"
-    }
+    },
+    "chat_btn": "Enter chat",
+    "chat_subtitle": "Event chat",
+    "chat_hint": "Write something in the event..."
   },
   "users": {
     "list_title": "Users",
@@ -152,7 +155,13 @@
     "default_title": "Chat",
     "errors": {
       "load_contacts": "Could not load contacts"
-    }
+    },
+    "events_section": "Event Groups",
+    "friends_section": "Friends",
+    "event_group_subtitle": "Event group chat",
+    "filter_all": "All",
+    "filter_friends": "Friends",
+    "filter_events": "Events"
   },
   "settings": {
     "title": "Settings",
