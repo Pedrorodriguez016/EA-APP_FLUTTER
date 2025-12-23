@@ -49,17 +49,40 @@ class ChatController extends GetxController {
   }
 
   void _handleNewMessage(dynamic data) {
+    logger.d('📥 [ChatController] _handleNewMessage called with data: $data');
     try {
       final newMessage = ChatMessage.fromJson(data, myUserId);
       logger.d(
-        '📥 Nuevo mensaje recibido de ${newMessage.from}: ${newMessage.text}',
+        '📥 [ChatController] Parsed message from ${newMessage.from}: ${newMessage.text} (ID: ${newMessage.id})',
       );
 
-      if (newMessage.from == friendId || newMessage.from == myUserId) {
+      // Evitar duplicados si el mensaje ya fue agregado por el optimistic update
+      final exists = messages.any(
+        (msg) =>
+            msg.id == newMessage.id ||
+            (msg.isMine &&
+                msg.text == newMessage.text &&
+                msg.createdAt.difference(newMessage.createdAt).inSeconds.abs() <
+                    2),
+      );
+
+      if (exists) {
+        logger.d(
+          '⚠️ [ChatController] Message already exists, skipping duplicate.',
+        );
+      }
+
+      if (!exists &&
+          (newMessage.from == friendId || newMessage.from == myUserId)) {
+        logger.i('✅ [ChatController] Adding message to list');
         messages.insert(0, newMessage);
+      } else if (!exists) {
+        logger.w(
+          '⚠️ [ChatController] Message ignored (from ${newMessage.from} != $friendId or $myUserId)',
+        );
       }
     } catch (e) {
-      logger.e('❌ Error al parsear mensaje', error: e);
+      logger.e('❌ [ChatController] Error al parsear mensaje', error: e);
     }
   }
 

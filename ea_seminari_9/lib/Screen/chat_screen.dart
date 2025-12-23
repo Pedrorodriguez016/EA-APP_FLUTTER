@@ -107,7 +107,22 @@ class ChatScreen extends GetView<ChatController> {
                     hintStyle: TextStyle(color: context.theme.hintColor),
                     border: InputBorder.none,
                   ),
-                  onSubmitted: (_) => controller.sendMessage(),
+                  onSubmitted: (_) {
+                    final text = controller.textController.text.trim();
+                    if (text.isNotEmpty) {
+                      // Optimistic Update
+                      final myMsg = ChatMessage(
+                        id: DateTime.now().millisecondsSinceEpoch.toString(),
+                        from: controller.myUserId,
+                        to: controller.friendId,
+                        text: text,
+                        createdAt: DateTime.now(),
+                        isMine: true,
+                      );
+                      controller.messages.insert(0, myMsg);
+                      controller.sendMessage();
+                    }
+                  },
                 ),
               ),
             ),
@@ -121,7 +136,21 @@ class ChatScreen extends GetView<ChatController> {
                   color: context.theme.colorScheme.onPrimary,
                   size: 20,
                 ),
-                onPressed: () => controller.sendMessage(),
+                onPressed: () {
+                  final text = controller.textController.text.trim();
+                  if (text.isNotEmpty) {
+                    final myMsg = ChatMessage(
+                      id: DateTime.now().millisecondsSinceEpoch.toString(),
+                      from: controller.myUserId,
+                      to: controller.friendId,
+                      text: text,
+                      createdAt: DateTime.now(),
+                      isMine: true,
+                    );
+                    controller.messages.insert(0, myMsg);
+                    controller.sendMessage();
+                  }
+                },
               ),
             ),
           ],
@@ -145,11 +174,13 @@ class _ChatBubble extends StatelessWidget {
     // tanto en modo claro como oscuro
     const myBubbleColor = Color(0xFF7C3AED);
     final otherBubbleColor = context.isDarkMode
-        ? Colors.grey.shade800
-        : Colors.grey.shade200;
+        ? Color(0xFF424242) // Grey 800 fixed
+        : Color(0xFFEEEEEE); // Grey 200 fixed
 
     const myTextColor = Colors.white;
-    final otherTextColor = context.textTheme.bodyLarge?.color;
+    // Forzamos el color del texto recibido para asegurar que coincida con el fondo
+    // (Fondo oscuro -> Texto blanco, Fondo claro -> Texto negro)
+    final otherTextColor = context.isDarkMode ? Colors.white : Colors.black;
 
     return Align(
       alignment: message.isMine ? Alignment.centerRight : Alignment.centerLeft,

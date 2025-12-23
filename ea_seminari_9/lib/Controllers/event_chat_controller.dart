@@ -47,13 +47,31 @@ class EventChatController extends GetxController {
   }
 
   void _handleNewMessage(dynamic data) {
+    logger.d(
+      '📥 [EventChatController] _handleNewMessage called with data: $data',
+    );
     try {
       final newMessage = EventChatMessage.fromJson(data, myUserId);
-      if (newMessage.eventId == eventId) {
+      final exists = messages.any(
+        (msg) =>
+            msg.id == newMessage.id ||
+            (msg.isMine &&
+                msg.text == newMessage.text &&
+                msg.createdAt.difference(newMessage.createdAt).inSeconds.abs() <
+                    2),
+      );
+
+      if (!exists && newMessage.eventId == eventId) {
+        logger.i('✅ [EventChatController] Adding message to list');
         messages.insert(0, newMessage);
+      } else if (exists) {
+        logger.d('⚠️ [EventChatController] Message duplicate skipped');
       }
     } catch (e) {
-      logger.e('❌ Error parseando mensaje de evento', error: e);
+      logger.e(
+        '❌ [EventChatController] Error parseando mensaje de evento',
+        error: e,
+      );
     }
   }
 

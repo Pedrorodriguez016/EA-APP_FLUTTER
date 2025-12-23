@@ -84,7 +84,23 @@ class EventChatScreen extends GetView<EventChatController> {
                     hintStyle: TextStyle(color: context.theme.hintColor),
                     border: InputBorder.none,
                   ),
-                  onSubmitted: (_) => controller.sendMessage(),
+                  onSubmitted: (_) {
+                    final text = controller.textController.text.trim();
+                    if (text.isNotEmpty) {
+                      // Optimistic Update
+                      final myMsg = EventChatMessage(
+                        id: DateTime.now().millisecondsSinceEpoch.toString(),
+                        eventId: controller.eventId,
+                        userId: controller.myUserId,
+                        username: controller.myUsername,
+                        text: text,
+                        createdAt: DateTime.now(),
+                        isMine: true,
+                      );
+                      controller.messages.insert(0, myMsg);
+                      controller.sendMessage();
+                    }
+                  },
                 ),
               ),
             ),
@@ -97,7 +113,22 @@ class EventChatScreen extends GetView<EventChatController> {
                   color: context.theme.colorScheme.onPrimary,
                   size: 20,
                 ),
-                onPressed: () => controller.sendMessage(),
+                onPressed: () {
+                  final text = controller.textController.text.trim();
+                  if (text.isNotEmpty) {
+                    final myMsg = EventChatMessage(
+                      id: DateTime.now().millisecondsSinceEpoch.toString(),
+                      eventId: controller.eventId,
+                      userId: controller.myUserId,
+                      username: controller.myUsername,
+                      text: text,
+                      createdAt: DateTime.now(),
+                      isMine: true,
+                    );
+                    controller.messages.insert(0, myMsg);
+                    controller.sendMessage();
+                  }
+                },
               ),
             ),
           ],
@@ -118,12 +149,14 @@ class _EventChatBubble extends StatelessWidget {
 
     // Color fijo para mis mensajes (Morado marca) para asegurar contraste con blanco
     const myBubbleColor = Color(0xFF7C3AED);
+    // Fixed grey colors for better visibility
     final otherBubbleColor = context.isDarkMode
-        ? Colors.grey.shade800
-        : Colors.grey.shade200;
+        ? Color(0xFF424242) // Solid Dark Grey
+        : Color(0xFFEEEEEE); // Solid Light Grey
 
     const myTextColor = Colors.white;
-    final otherTextColor = context.textTheme.bodyLarge?.color;
+    // Forzamos el color del texto recibido
+    final otherTextColor = context.isDarkMode ? Colors.white : Colors.black;
 
     return Align(
       alignment: message.isMine ? Alignment.centerRight : Alignment.centerLeft,

@@ -14,7 +14,7 @@ class SocketService extends GetxService {
       _url,
       IO.OptionBuilder()
           .setTransports(['websocket'])
-          .disableAutoConnect()
+          .enableAutoConnect() // Changed from disable to enable for better stability
           .build(),
     );
   }
@@ -47,13 +47,18 @@ class SocketService extends GetxService {
   }
 
   void sendChatMessage(String from, String to, String text) {
-    logger.d('📤 Enviando mensaje de $from a $to: $text');
+    logger.d(
+      '📤 [SocketService] Enviando mensaje privado de $from a $to: $text',
+    );
     _socket.emit('chat:message', {'from': from, 'to': to, 'text': text});
   }
 
   // El controlador pasará una función aquí para saber qué hacer cuando llegue un mensaje
   void listenToChatMessages(Function(dynamic) onMessageReceived) {
-    _socket.on('chat:message', onMessageReceived);
+    _socket.on('chat:message', (data) {
+      logger.d('🔍 [SocketService] RAW chat:message received: $data');
+      onMessageReceived(data);
+    });
   }
 
   void stopListeningToChatMessages() {
@@ -62,7 +67,15 @@ class SocketService extends GetxService {
 
   // EVENT CHAT
   void joinEventChatRoom(String eventId) {
-    logger.i('🏟️ Uniendose a sala de chat de evento: $eventId');
+    if (!_socket.connected) {
+      logger.w(
+        '⚠️ [SocketService] Socket desconectado al intentar unirse a sala. Reconectando...',
+      );
+      _socket.connect();
+    }
+    logger.i(
+      '🏟️ [SocketService] Uniendose a sala de chat de evento: $eventId',
+    );
     _socket.emit('eventChat:join', {'eventId': eventId});
   }
 
@@ -72,7 +85,9 @@ class SocketService extends GetxService {
     String username,
     String text,
   ) {
-    logger.d('📤 Enviando mensaje al evento $eventId de $username: $text');
+    logger.d(
+      '📤 [SocketService] Enviando mensaje al evento $eventId de $username: $text',
+    );
     _socket.emit('eventChat:message', {
       'eventId': eventId,
       'userId': userId,
@@ -82,7 +97,10 @@ class SocketService extends GetxService {
   }
 
   void listenToEventChatMessages(Function(dynamic) onMessageReceived) {
-    _socket.on('eventChat:message', onMessageReceived);
+    _socket.on('eventChat:message', (data) {
+      logger.d('🔍 [SocketService] RAW eventChat:message received: $data');
+      onMessageReceived(data);
+    });
   }
 
   void stopListeningToEventChatMessages() {
