@@ -47,6 +47,15 @@ class HomeScreen extends GetView<UserController> {
         ),
       ),
       bottomNavigationBar: CustomNavBar(currentIndex: 0),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Get.toNamed('/chatbot'),
+        backgroundColor: context.theme.colorScheme.primary,
+        heroTag: 'chatbotFab',
+        child: Icon(
+          Icons.smart_toy_rounded,
+          color: context.theme.colorScheme.onPrimary,
+        ),
+      ),
     );
   }
 

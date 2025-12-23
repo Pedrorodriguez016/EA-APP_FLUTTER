@@ -125,7 +125,10 @@
       "load_error_msg": "Impossible de charger les événements. Vérifiez votre connexion ou le serveur.",
       "login_to_participate": "Vous devez vous connecter pour participer",
       "load_my_events": "Impossible de charger vos événements"
-    }
+    },
+    "chat_btn": "Entrer dans le chat",
+    "chat_subtitle": "Chat de l'événement",
+    "chat_hint": "Écrivez quelque chose dans l'événement..."
   },
   "users": {
     "list_title": "Utilisateurs",
@@ -152,7 +155,13 @@
     "default_title": "Chat",
     "errors": {
       "load_contacts": "Impossible de charger les contacts"
-    }
+    },
+    "events_section": "Groupes d'Événements",
+    "friends_section": "Amis",
+    "event_group_subtitle": "Chat de groupe de l'événement",
+    "filter_all": "Tous",
+    "filter_friends": "Amis",
+    "filter_events": "Événements"
   },
   "settings": {
     "title": "Paramètres",

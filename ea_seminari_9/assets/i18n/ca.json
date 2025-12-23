@@ -125,7 +125,10 @@
       "load_error_msg": "No s'han pogut carregar els esdeveniments. Revisa la connexió o el servidor.",
       "login_to_participate": "Has d'iniciar sessió per participar",
       "load_my_events": "No s'han pogut carregar els teus esdeveniments"
-    }
+    },
+    "chat_btn": "Entrar al xat",
+    "chat_subtitle": "Xat de l'esdeveniment",
+    "chat_hint": "Escriu alguna cosa a l'esdeveniment..."
   },
   "users": {
     "list_title": "Usuaris",
@@ -152,7 +155,13 @@
     "default_title": "Xat",
     "errors": {
       "load_contacts": "No s'han pogut carregar els contactes"
-    }
+    },
+    "events_section": "Grups d'Esdeveniments",
+    "friends_section": "Amics",
+    "event_group_subtitle": "Xat grupal de l'esdeveniment",
+    "filter_all": "Tots",
+    "filter_friends": "Amics",
+    "filter_events": "Esdeveniments"
   },
   "settings": {
     "title": "Ajustos",

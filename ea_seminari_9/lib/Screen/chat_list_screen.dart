@@ -4,10 +4,12 @@ import 'package:get/get.dart';
 import '../Controllers/chat_list_controller.dart';
 import '../Widgets/navigation_bar.dart';
 import '../Models/user.dart';
+import '../Models/eventos.dart';
 
 class ChatListScreen extends GetView<ChatListController> {
   const ChatListScreen({Key? key}) : super(key: key);
 
+  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +26,7 @@ class ChatListScreen extends GetView<ChatListController> {
         actions: [
           IconButton(
             icon: Icon(Icons.refresh, color: context.theme.iconTheme.color),
-            onPressed: controller.loadFriends,
+            onPressed: controller.loadData,
           ),
         ],
       ),
@@ -33,21 +35,203 @@ class ChatListScreen extends GetView<ChatListController> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (controller.friendsList.isEmpty) {
+        if (controller.friendsList.isEmpty && controller.eventsList.isEmpty) {
           return _buildEmptyState(context);
         }
 
-        return ListView.separated(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          itemCount: controller.friendsList.length,
-          separatorBuilder: (context, index) => const Divider(height: 1),
-          itemBuilder: (context, index) {
-            final friend = controller.friendsList[index];
-            return _buildFriendTile(context, friend, controller);
-          },
+        return Column(
+          children: [
+            _buildFilterBar(context),
+            Divider(height: 1, color: context.theme.dividerColor),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                children: [
+                  if (controller.selectedFilter.value == ChatFilter.all ||
+                      controller.selectedFilter.value == ChatFilter.events)
+                    if (controller.eventsList.isNotEmpty) ...[
+                      _buildSectionHeader(
+                        context,
+                        translate('chat.events_section'),
+                      ),
+                      ...controller.eventsList
+                          .map(
+                            (event) =>
+                                _buildEventTile(context, event, controller),
+                          )
+                          .toList(),
+                      const SizedBox(height: 20),
+                    ],
+                  if (controller.selectedFilter.value == ChatFilter.all ||
+                      controller.selectedFilter.value == ChatFilter.friends)
+                    if (controller.friendsList.isNotEmpty) ...[
+                      _buildSectionHeader(
+                        context,
+                        translate('chat.friends_section'),
+                      ),
+                      ...controller.friendsList
+                          .map(
+                            (friend) =>
+                                _buildFriendTile(context, friend, controller),
+                          )
+                          .toList(),
+                    ],
+                ],
+              ),
+            ),
+          ],
         );
       }),
       bottomNavigationBar: CustomNavBar(currentIndex: 2),
+    );
+  }
+
+  Widget _buildFilterBar(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Obx(() {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            _buildFilterButton(
+              context: context,
+              label: translate('chat.filter_all'),
+              filter: ChatFilter.all,
+              isSelected: controller.selectedFilter.value == ChatFilter.all,
+            ),
+            const SizedBox(width: 8),
+            _buildFilterButton(
+              context: context,
+              label: translate('chat.filter_friends'),
+              filter: ChatFilter.friends,
+              icon: Icons.person_outline,
+              isSelected: controller.selectedFilter.value == ChatFilter.friends,
+            ),
+            const SizedBox(width: 8),
+            _buildFilterButton(
+              context: context,
+              label: translate('chat.filter_events'),
+              filter: ChatFilter.events,
+              icon: Icons.event_outlined,
+              isSelected: controller.selectedFilter.value == ChatFilter.events,
+            ),
+          ],
+        );
+      }),
+    );
+  }
+
+  Widget _buildFilterButton({
+    required BuildContext context,
+    required String label,
+    required ChatFilter filter,
+    IconData? icon,
+    required bool isSelected,
+  }) {
+    final Color primaryColor = context.theme.colorScheme.primary;
+    final Color activeColor = primaryColor;
+    final Color inactiveColor = context.theme.dividerColor.withValues(
+      alpha: 0.1,
+    );
+
+    return InkWell(
+      onTap: () {
+        controller.setFilter(filter);
+      },
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? activeColor : inactiveColor,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: primaryColor.withValues(alpha: 0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : [],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(
+                icon,
+                size: 18,
+                color: isSelected
+                    ? Colors.white
+                    : context.theme.iconTheme.color,
+              ),
+              const SizedBox(width: 6),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected
+                    ? Colors.white
+                    : context.theme.textTheme.bodyMedium?.color,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(BuildContext context, String title) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Text(
+        title.toUpperCase(),
+        style: TextStyle(
+          color: context.theme.hintColor,
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEventTile(
+    BuildContext context,
+    Evento event,
+    ChatListController controller,
+  ) {
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      leading: Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          color: context.theme.colorScheme.primary.withValues(alpha: 0.1),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(Icons.event, color: context.theme.colorScheme.primary),
+      ),
+      title: Text(
+        event.name,
+        style: context.textTheme.bodyLarge?.copyWith(
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+        ),
+      ),
+      subtitle: Text(
+        translate('chat.event_group_subtitle'),
+        style: TextStyle(color: context.theme.hintColor, fontSize: 14),
+      ),
+      trailing: Icon(
+        Icons.arrow_forward_ios,
+        size: 16,
+        color: context.theme.dividerColor,
+      ),
+      onTap: () => controller.goToEventChat(event),
     );
   }
 
@@ -98,7 +282,7 @@ class ChatListScreen extends GetView<ChatListController> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.people_outline,
+            Icons.chat_bubble_outline,
             size: 80,
             color: context.theme.disabledColor,
           ),

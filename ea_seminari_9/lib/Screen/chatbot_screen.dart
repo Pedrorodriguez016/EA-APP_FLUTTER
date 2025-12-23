@@ -6,12 +6,21 @@ class ChatBotScreen extends GetView<ChatBotController> {
   const ChatBotScreen({Key? key}) : super(key: key);
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text("Asistente Virtual"),
+        title: Text(
+          "Asistente Virtual",
+          style: context.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: context.theme.scaffoldBackgroundColor,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: context.theme.iconTheme.color),
           onPressed: () => Get.back(),
         ),
       ),
@@ -27,22 +36,34 @@ class ChatBotScreen extends GetView<ChatBotController> {
                     (controller.isLoading.value ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index == controller.messages.length) {
-                    return _buildLoadingBubble();
+                    return _buildLoadingBubble(context);
                   }
                   final msg = controller.messages[index];
-                  return _buildMessageBubble(msg);
+                  return _buildMessageBubble(context, msg);
                 },
               );
             }),
           ),
-          _buildInputArea(),
+          _buildInputArea(context),
         ],
       ),
     );
   }
 
-  Widget _buildMessageBubble(BotMessage msg) {
+  Widget _buildMessageBubble(BuildContext context, BotMessage msg) {
     final isUser = msg.isUser;
+    // Forzamos color de marca (0xFF7C3AED) y texto blanco para el usuario
+    // para garantizar visibilidad en Dark Mode.
+    const userBubbleColor = Color(0xFF7C3AED);
+    final botBubbleColor = context.isDarkMode
+        ? Colors.grey.shade800
+        : Colors.grey.shade200;
+
+    final bubbleColor = isUser ? userBubbleColor : botBubbleColor;
+    final textColor = isUser
+        ? Colors.white
+        : context.textTheme.bodyLarge?.color;
+
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Column(
@@ -55,7 +76,7 @@ class ChatBotScreen extends GetView<ChatBotController> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             constraints: const BoxConstraints(maxWidth: 280),
             decoration: BoxDecoration(
-              color: isUser ? const Color(0xFF667EEA) : Colors.grey.shade200,
+              color: bubbleColor,
               borderRadius: BorderRadius.only(
                 topLeft: const Radius.circular(16),
                 topRight: const Radius.circular(16),
@@ -65,10 +86,7 @@ class ChatBotScreen extends GetView<ChatBotController> {
             ),
             child: Text(
               msg.text,
-              style: TextStyle(
-                color: isUser ? Colors.white : Colors.black87,
-                fontSize: 15,
-              ),
+              style: TextStyle(color: textColor, fontSize: 15),
             ),
           ),
           if (msg.relatedEvents != null && msg.relatedEvents!.isNotEmpty)
@@ -82,16 +100,20 @@ class ChatBotScreen extends GetView<ChatBotController> {
                   final String name = event['name'] ?? 'Evento';
                   final String id = event['_id'] ?? event['id'] ?? '';
                   return ActionChip(
-                    avatar: const Icon(
+                    avatar: Icon(
                       Icons.event,
                       size: 16,
-                      color: Colors.white,
+                      color: context.theme.colorScheme.onPrimary,
                     ),
                     label: Text(
                       name,
-                      style: const TextStyle(color: Colors.white, fontSize: 12),
+                      style: TextStyle(
+                        color: context.theme.colorScheme.onPrimary,
+                        fontSize: 12,
+                      ),
                     ),
-                    backgroundColor: const Color(0xFF667EEA),
+                    backgroundColor: context.theme.colorScheme.primary,
+                    side: BorderSide.none,
                     onPressed: () {
                       if (id.isNotEmpty) {
                         Get.toNamed('/evento/$id');
@@ -106,24 +128,29 @@ class ChatBotScreen extends GetView<ChatBotController> {
     );
   }
 
-  Widget _buildLoadingBubble() {
+  Widget _buildLoadingBubble(BuildContext context) {
     return Align(
       alignment: Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.grey.shade200,
+          color: context.isDarkMode
+              ? Colors.grey.shade800
+              : Colors.grey.shade200,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: const SizedBox(
+        child: SizedBox(
           width: 40,
           height: 20,
           child: Center(
             child: SizedBox(
               width: 16,
               height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: context.theme.primaryColor,
+              ),
             ),
           ),
         ),
@@ -131,14 +158,14 @@ class ChatBotScreen extends GetView<ChatBotController> {
     );
   }
 
-  Widget _buildInputArea() {
+  Widget _buildInputArea(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.theme.cardColor,
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: context.theme.shadowColor.withValues(alpha: 0.1),
             blurRadius: 5,
             offset: const Offset(0, -2),
           ),
@@ -149,10 +176,14 @@ class ChatBotScreen extends GetView<ChatBotController> {
           Expanded(
             child: TextField(
               controller: controller.textController,
+              style: context.textTheme.bodyLarge,
               decoration: InputDecoration(
                 hintText: "Escribe tu consulta...",
+                hintStyle: TextStyle(color: context.theme.hintColor),
                 filled: true,
-                fillColor: Colors.grey.shade100,
+                fillColor: context.isDarkMode
+                    ? Colors.grey.shade800
+                    : Colors.grey.shade100,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
                   borderSide: BorderSide.none,
@@ -167,12 +198,12 @@ class ChatBotScreen extends GetView<ChatBotController> {
           ),
           const SizedBox(width: 8),
           CircleAvatar(
-            backgroundColor: const Color(0xFF667EEA),
+            backgroundColor: context.theme.colorScheme.primary,
             radius: 24,
             child: IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.send_rounded,
-                color: Colors.white,
+                color: context.theme.colorScheme.onPrimary,
                 size: 20,
               ),
               onPressed: () => controller.sendQuery(),

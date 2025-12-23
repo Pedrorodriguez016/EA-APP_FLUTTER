@@ -1,60 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_translate/flutter_translate.dart';
 import 'package:get/get.dart';
-import '../Controllers/chat_controller.dart';
-import '../Models/chat.dart';
+import 'package:flutter_translate/flutter_translate.dart';
+import '../Controllers/event_chat_controller.dart';
+import '../Models/event_chat.dart';
 
-class ChatScreen extends GetView<ChatController> {
-  const ChatScreen({Key? key}) : super(key: key);
+class EventChatScreen extends GetView<EventChatController> {
+  const EventChatScreen({Key? key}) : super(key: key);
 
+  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // CAMBIO: Fondo dinámico
       backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        // CAMBIO: Fondo y elevación adaptativos
         backgroundColor: context.theme.scaffoldBackgroundColor,
         elevation: 1,
         shadowColor: context.theme.shadowColor.withValues(alpha: 0.2),
         leading: IconButton(
-          // CAMBIO: Icono dinámico
           icon: Icon(Icons.arrow_back, color: context.theme.iconTheme.color),
           onPressed: () => Get.back(),
         ),
-        title: Row(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
-              // CAMBIO: Color primario del tema
-              backgroundColor: context.theme.colorScheme.primary,
-              child: Text(
-                controller.friendName.isNotEmpty
-                    ? controller.friendName.substring(0, 2).toUpperCase()
-                    : "?",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: context.theme.colorScheme.onPrimary,
-                ),
+            Text(
+              controller.eventName,
+              style: context.textTheme.titleMedium?.copyWith(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(width: 10),
-            GestureDetector(
-              onTap: () => Get.toNamed('/user/${controller.friendId}'),
-              child: Text(
-                controller.friendName,
-                // CAMBIO: Texto título dinámico
-                style: context.textTheme.titleMedium?.copyWith(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+            Text(
+              translate('events.chat_subtitle'),
+              style: TextStyle(color: context.theme.hintColor, fontSize: 12),
             ),
           ],
         ),
       ),
       body: Column(
         children: [
-          // LISTA DE MENSAJES
           Expanded(
             child: Obx(
               () => ListView.builder(
@@ -63,15 +47,12 @@ class ChatScreen extends GetView<ChatController> {
                 itemCount: controller.messages.length,
                 physics: const BouncingScrollPhysics(),
                 itemBuilder: (context, index) {
-                  return _ChatBubble(message: controller.messages[index]);
+                  return _EventChatBubble(message: controller.messages[index]);
                 },
               ),
             ),
           ),
-
           Divider(height: 1, color: context.theme.dividerColor),
-
-          // INPUT AREA
           _buildInputArea(context),
         ],
       ),
@@ -80,7 +61,6 @@ class ChatScreen extends GetView<ChatController> {
 
   Widget _buildInputArea(BuildContext context) {
     return Container(
-      // CAMBIO: Fondo de la barra de input (blanco en light, gris oscuro en dark)
       color: context.theme.cardColor,
       padding: const EdgeInsets.all(8),
       child: SafeArea(
@@ -90,7 +70,6 @@ class ChatScreen extends GetView<ChatController> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  // CAMBIO: Fondo del input text field
                   color: context.isDarkMode
                       ? Colors.grey.shade800
                       : Colors.grey.shade100,
@@ -99,11 +78,9 @@ class ChatScreen extends GetView<ChatController> {
                 child: TextField(
                   controller: controller.textController,
                   focusNode: controller.focusNode,
-                  // CAMBIO: Color del texto input
                   style: context.textTheme.bodyLarge,
                   decoration: InputDecoration(
-                    hintText: translate("chat.input_hint"),
-                    // CAMBIO: Color del hint
+                    hintText: translate('events.chat_hint'),
                     hintStyle: TextStyle(color: context.theme.hintColor),
                     border: InputBorder.none,
                   ),
@@ -113,7 +90,6 @@ class ChatScreen extends GetView<ChatController> {
             ),
             const SizedBox(width: 8),
             CircleAvatar(
-              // CAMBIO: Botón enviar con color primario
               backgroundColor: context.theme.colorScheme.primary,
               child: IconButton(
                 icon: Icon(
@@ -131,18 +107,16 @@ class ChatScreen extends GetView<ChatController> {
   }
 }
 
-class _ChatBubble extends StatelessWidget {
-  final ChatMessage message;
-  const _ChatBubble({required this.message});
+class _EventChatBubble extends StatelessWidget {
+  final EventChatMessage message;
+  const _EventChatBubble({required this.message});
 
   @override
   Widget build(BuildContext context) {
     final time =
         "${message.createdAt.hour.toString().padLeft(2, '0')}:${message.createdAt.minute.toString().padLeft(2, '0')}";
 
-    // CAMBIO: Colores dinámicos para las burbujas
-    // Usamos el color primario "Light" (morado oscuro 0xFF7C3AED) para mantener contraste con texto blanco
-    // tanto en modo claro como oscuro
+    // Color fijo para mis mensajes (Morado marca) para asegurar contraste con blanco
     const myBubbleColor = Color(0xFF7C3AED);
     final otherBubbleColor = context.isDarkMode
         ? Colors.grey.shade800
@@ -171,25 +145,33 @@ class _ChatBubble extends StatelessWidget {
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment: message.isMine
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
           children: [
-            // El mensaje de texto
-            Flexible(
-              child: Text(
-                message.text,
-                style: TextStyle(
-                  // CAMBIO: Texto legible según el fondo
-                  color: message.isMine ? myTextColor : otherTextColor,
-                  fontSize: 16,
+            if (!message.isMine)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text(
+                  message.username,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    color: myBubbleColor,
+                  ),
                 ),
               ),
+            Text(
+              message.text,
+              style: TextStyle(
+                color: message.isMine ? myTextColor : otherTextColor,
+                fontSize: 15,
+              ),
             ),
-            const SizedBox(height: 4),
-            // La hora
+            const SizedBox(height: 2),
             Text(
               time,
               style: TextStyle(
-                // CAMBIO: Color de hora más sutil
                 color: message.isMine
                     ? myTextColor.withValues(alpha: 0.7)
                     : context.theme.hintColor,

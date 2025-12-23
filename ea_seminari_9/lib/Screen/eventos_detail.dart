@@ -214,6 +214,36 @@ class EventosDetailScreen extends GetView<EventoController> {
               ),
             ),
           ),
+          const SizedBox(height: 16),
+          // Botón de Chat (Solo si es participante)
+          if (isParticipant)
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  Get.toNamed(
+                    '/event-chat',
+                    arguments: {'eventId': evento.id, 'eventName': evento.name},
+                  );
+                },
+                icon: const Icon(Icons.chat_bubble_outline),
+                label: Text(
+                  translate('events.chat_btn') ?? 'Chat del evento',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFF667EEA),
+                  side: const BorderSide(color: Color(0xFF667EEA), width: 2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
           const SizedBox(height: 20),
         ],
       ),

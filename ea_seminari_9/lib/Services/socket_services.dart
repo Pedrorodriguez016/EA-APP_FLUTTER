@@ -5,20 +5,24 @@ import '../utils/logger.dart';
 
 class SocketService extends GetxService {
   late IO.Socket _socket;
-  final String _url = '${dotenv.env['BASE_URL']}';
+  String get _url => dotenv.env['BASE_URL'] ?? 'http://localhost:3000';
 
-  void connectWithUserId(String userId) {
-    logger.i('🔌 Iniciando conexión Socket con usuario: $userId');
-    // Configuración del cliente
+  @override
+  void onInit() {
+    super.onInit();
     _socket = IO.io(
       _url,
       IO.OptionBuilder()
-          .setTransports(['websocket']) // forzar WebSockets
-          .disableAutoConnect() // conectamos manualmente
+          .setTransports(['websocket'])
+          .disableAutoConnect()
           .build(),
     );
+  }
 
-    _socket.connect();
+  void connectWithUserId(String userId) {
+    if (!_socket.connected) {
+      _socket.connect();
+    }
 
     _socket.onConnect((_) {
       logger.i('✅ Conectado al Socket Server');
@@ -54,6 +58,35 @@ class SocketService extends GetxService {
 
   void stopListeningToChatMessages() {
     _socket.off('chat:message');
+  }
+
+  // EVENT CHAT
+  void joinEventChatRoom(String eventId) {
+    logger.i('🏟️ Uniendose a sala de chat de evento: $eventId');
+    _socket.emit('eventChat:join', {'eventId': eventId});
+  }
+
+  void sendEventChatMessage(
+    String eventId,
+    String userId,
+    String username,
+    String text,
+  ) {
+    logger.d('📤 Enviando mensaje al evento $eventId de $username: $text');
+    _socket.emit('eventChat:message', {
+      'eventId': eventId,
+      'userId': userId,
+      'username': username,
+      'text': text,
+    });
+  }
+
+  void listenToEventChatMessages(Function(dynamic) onMessageReceived) {
+    _socket.on('eventChat:message', onMessageReceived);
+  }
+
+  void stopListeningToEventChatMessages() {
+    _socket.off('eventChat:message');
   }
 
   void disconnect() {
