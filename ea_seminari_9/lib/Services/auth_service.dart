@@ -58,7 +58,6 @@ class AuthService {
       throw e;
     }
   }
-
   // Google Login: Envía el idToken al backend para validación
   Future<Map<String, dynamic>> loginWithGoogle(String idToken) async {
     try {

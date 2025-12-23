@@ -1,37 +1,45 @@
-import 'package:ea_seminari_9/Controllers/user_controller.dart';
+import 'package:ea_seminari_9/Widgets/logout_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_translate/flutter_translate.dart'; // Importar
-import '../Models/user.dart';
+import 'package:flutter_translate/flutter_translate.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:flutter_map/flutter_map.dart';
+import '../Controllers/user_controller.dart';
 import '../Controllers/auth_controller.dart';
+import '../Controllers/eventos_controller.dart';
+import '../Services/eventos_services.dart';
 import '../Widgets/navigation_bar.dart';
-import '../Widgets/logout_button.dart';
 import '../Widgets/user_card.dart';
 import '../Widgets/solicitudes.dart';
 import '../Widgets/mapa.dart';
-import '../Controllers/eventos_controller.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:flutter_map/flutter_map.dart';
+import '../utils/app_theme.dart';
 
 class HomeScreen extends GetView<UserController> {
   HomeScreen({Key? key}) : super(key: key);
 
   final AuthController authController = Get.find<AuthController>();
-  final EventoController eventoController = Get.find<EventoController>();
-
+  final EventoController eventoController = Get.put(
+    EventoController(EventosServices()),
+  );
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (controller.friendsList.isEmpty) {
+        controller.fetchFriends();
+        controller.fetchRequest();
+      }
+    });
+
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      appBar: _buildAppBar(),
+      appBar: _buildAppBar(context),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            _buildWelcomeCard(authController),
+            _buildWelcomeCard(authController, context),
             const SizedBox(height: 24),
-            _buildEventsCard(),
+            _buildEventsCard(context),
             const SizedBox(height: 24),
             _buildFriendsCard(context),
             const SizedBox(height: 24),
@@ -39,30 +47,27 @@ class HomeScreen extends GetView<UserController> {
         ),
       ),
       bottomNavigationBar: CustomNavBar(currentIndex: 0),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Get.toNamed('/chatbot'),
-        backgroundColor: const Color(0xFF667EEA),
-        child: const Icon(Icons.smart_toy, color: Colors.white),
-      ),
-
     );
   }
 
-  AppBar _buildAppBar() {
+  AppBar _buildAppBar(BuildContext context) {
     return AppBar(
-      title: Text(translate('home.title')), // 'Inicio'
-      backgroundColor: Colors.white,
-      elevation: 0,
+      title: Text(translate('home.title')),
       leading: const LogoutButton(),
       actions: [
         IconButton(
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: context.theme.colorScheme.onSurface.withValues(
+                alpha: 0.05,
+              ),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.notifications_outlined, color: Colors.grey),
+            child: Icon(
+              Icons.notifications_outlined,
+              color: context.theme.colorScheme.onSurface,
+            ),
           ),
           onPressed: () {},
         ),
@@ -70,53 +75,69 @@ class HomeScreen extends GetView<UserController> {
     );
   }
 
-  Widget _buildWelcomeCard(AuthController auth) {
+  Widget _buildWelcomeCard(AuthController auth, BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
+        gradient: AppGradients.primaryBtn,
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF667EEA).withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: context.theme.colorScheme.primary.withValues(alpha: 0.4),
+            blurRadius: 25,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            translate('home.welcome_card.greeting'), // '¡Hola!'
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                translate('home.welcome_card.greeting'),
+                style: context.textTheme.headlineSmall?.copyWith(
+                  color: Colors.white.withValues(alpha: 0.9),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.celebration_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            auth.currentUser.value?.username ?? 'Usuario',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 32,
-              fontWeight: FontWeight.w800,
+          const SizedBox(height: 12),
+          Obx(
+            () => Text(
+              auth.currentUser.value?.username ?? translate('common.user'),
+              style: context.textTheme.headlineMedium?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+                fontSize: 32,
+                letterSpacing: -0.5,
+                height: 1.1,
+              ),
             ),
           ),
           const SizedBox(height: 16),
           Text(
-            translate(
-              'home.welcome_card.subtitle',
-            ), // 'Bienvenido a tu aplicación...'
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
-              fontSize: 16,
+            translate('home.welcome_card.subtitle'),
+            style: context.textTheme.bodyMedium?.copyWith(
+              color: Colors.white.withValues(alpha: 0.8),
+              fontSize: 15,
+              height: 1.4,
             ),
           ),
         ],
@@ -124,142 +145,205 @@ class HomeScreen extends GetView<UserController> {
     );
   }
 
-  Widget _buildEventsCard() {
-    return Card(
-      elevation: 2,
-      shadowColor: Colors.black.withOpacity(0.1),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+  Widget _buildEventsCard(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: context.theme.cardTheme.color,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: context.theme.colorScheme.outline.withValues(alpha: 0.1),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              translate('home.events_section.title'), // 'Eventos'
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton.icon(
-                  onPressed: () => Get.toNamed('/crear_evento'),
-                  icon: const Icon(Icons.add_circle),
-                  label: Text(
-                    translate('home.events_section.create_btn'),
-                  ), // 'Crear evento'
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF667EEA),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                Text(
+                  translate('home.events_section.title'),
+                  style: context.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 22,
                   ),
                 ),
-                TextButton.icon(
+                IconButton(
                   onPressed: () => Get.toNamed('/eventos'),
-                  icon: const Icon(Icons.search),
-                  label: Text(
-                    translate('home.events_section.explore_btn'),
-                  ), // 'Explorar eventos'
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.indigo.shade50,
-                    foregroundColor: Colors.indigo.shade800,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                TextButton.icon(
-                  onPressed: () => Get.toNamed('/eventos?mine=true'),
-                  icon: const Icon(Icons.calendar_today),
-                  label: Text(
-                    translate('home.events_section.my_events_btn'),
-                  ), // 'Mis eventos'
-                  style: TextButton.styleFrom(
-                    backgroundColor: Colors.indigo.shade50,
-                    foregroundColor: Colors.indigo.shade800,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                  icon: Icon(
+                    Icons.arrow_forward_rounded,
+                    color: context.theme.colorScheme.primary,
                   ),
                 ),
               ],
             ),
-            SizedBox(
-              height: 200,
-              child: Obx(() {
-                final eventos = eventoController.mapEventosList;
-                final myMarkers = eventos
-                    .where((e) => e.lat != null && e.lng != null)
-                    .map((evento) {
-                      return Marker(
-                        point: LatLng(
-                          evento.lat!.toDouble(),
-                          evento.lng!.toDouble(),
-                        ),
-                        width: 45,
-                        height: 45,
-                        child: GestureDetector(
-                          onTap: () {
-                            Get.toNamed('/evento/${evento.id}');
-                          },
-                          child: const Icon(
-                            Icons.location_on,
-                            color: Color(0xFF667EEA),
-                            size: 45,
-                            shadows: [
-                              Shadow(
-                                blurRadius: 10,
-                                color: Colors.black26,
-                                offset: Offset(2, 2),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    })
-                    .toList();
-                return CustomMap(
-                  height: 200,
-                  center: const LatLng(41.3851, 2.1734),
-                  zoom: 12,
-                  enableExpansion: true,
-                  markers: myMarkers,
-
-                  // Lógica de recarga al mover el mapa
-                  onPositionChanged: (MapPosition position, bool hasGesture) {
-                    final bounds = position.bounds;
-                    if (bounds != null) {
-                      eventoController.fetchMapEvents(
-                        bounds.north,
-                        bounds.south,
-                        bounds.east,
-                        bounds.west,
-                      );
-                    }
-                  },
-                );
-              }),
+            const SizedBox(height: 20),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _buildActionButton(
+                    context,
+                    Icons.add_circle_rounded,
+                    translate('home.events_section.create_btn'),
+                    () => Get.toNamed('/crear_evento'),
+                    isPrimary: true,
+                  ),
+                  const SizedBox(width: 12),
+                  _buildActionButton(
+                    context,
+                    Icons.explore_rounded,
+                    translate('home.events_section.explore_btn'),
+                    () => Get.toNamed('/eventos'),
+                  ),
+                  const SizedBox(width: 12),
+                  _buildActionButton(
+                    context,
+                    Icons.calendar_month_rounded,
+                    translate('home.events_section.my_events_btn'),
+                    () => Get.toNamed('/eventos?mine=true'),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
+            Container(
+              height: 220,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Obx(() {
+                  final eventos = eventoController.mapEventosList;
+                  final myMarkers = eventos
+                      .where((e) => e.lat != null && e.lng != null)
+                      .map((evento) {
+                        return Marker(
+                          point: LatLng(
+                            evento.lat!.toDouble(),
+                            evento.lng!.toDouble(),
+                          ),
+                          width: 50,
+                          height: 50,
+                          child: GestureDetector(
+                            onTap: () => Get.toNamed('/evento/${evento.id}'),
+                            child: Icon(
+                              Icons.location_on_rounded,
+                              color: context.theme.colorScheme.primary,
+                              size: 50,
+                              shadows: [
+                                Shadow(
+                                  blurRadius: 12,
+                                  color: context.theme.shadowColor.withValues(
+                                    alpha: 0.6,
+                                  ),
+                                  offset: const Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      })
+                      .toList();
+
+                  return CustomMap(
+                    height: 220,
+                    center: const LatLng(41.3851, 2.1734),
+                    zoom: 12,
+                    enableExpansion: true,
+                    markers: myMarkers,
+                    onPositionChanged: (MapPosition position, bool hasGesture) {
+                      final bounds = position.bounds;
+                      if (bounds != null) {
+                        eventoController.fetchMapEvents(
+                          bounds.north,
+                          bounds.south,
+                          bounds.east,
+                          bounds.west,
+                        );
+                      }
+                    },
+                  );
+                }),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton(
+    BuildContext context,
+    IconData icon,
+    String label,
+    VoidCallback onTap, {
+    bool isPrimary = false,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isPrimary
+              ? context.theme.colorScheme.primary
+              : context.theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: isPrimary
+              ? null
+              : Border.all(
+                  color: context.theme.colorScheme.outline.withValues(
+                    alpha: 0.2,
+                  ),
+                ),
+          boxShadow: isPrimary
+              ? [
+                  BoxShadow(
+                    color: context.theme.colorScheme.primary.withValues(
+                      alpha: 0.3,
+                    ),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 20,
+              color: isPrimary
+                  ? Colors.white
+                  : context.theme.colorScheme.onSurface,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: isPrimary
+                    ? Colors.white
+                    : context.theme.colorScheme.onSurface,
+              ),
+            ),
           ],
         ),
       ),
@@ -267,16 +351,23 @@ class HomeScreen extends GetView<UserController> {
   }
 
   Widget _buildFriendsCard(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.fetchFriends();
-      controller.fetchRequest();
-    });
-    return Card(
-      elevation: 2,
-      shadowColor: Colors.black.withOpacity(0.1),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    return Container(
+      decoration: BoxDecoration(
+        color: context.theme.cardTheme.color,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: context.theme.colorScheme.outline.withValues(alpha: 0.1),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -284,93 +375,69 @@ class HomeScreen extends GetView<UserController> {
             Row(
               children: [
                 Text(
-                  translate('home.friends_section.title'), // 'Amigos'
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                  translate('home.friends_section.title'),
+                  style: context.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 22,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
+                    horizontal: 10,
+                    vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
+                    color: context.theme.colorScheme.primary.withValues(
+                      alpha: 0.1,
+                    ),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Obx(
                     () => Text(
                       controller.friendsList.length.toString(),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.black54,
+                        color: context.theme.colorScheme.primary,
+                        fontSize: 14,
                       ),
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(width: 16),
+            const SizedBox(height: 20),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  TextButton.icon(
-                    onPressed: () {
-                      final List<User> users = controller.friendsRequests;
+                  _buildActionButton(
+                    context,
+                    Icons.group_add_rounded,
+                    translate('home.friends_section.requests_btn'),
+                    () {
                       FriendRequestsDialog.show(
                         context,
-                        requests: users,
+                        requests: controller.friendsRequests,
                         onAccept: (user) =>
                             controller.acceptFriendRequest(user),
                         onReject: (user) =>
                             controller.rejectFriendRequest(user),
                       );
                     },
-                    icon: const Icon(Icons.group_add, size: 20),
-                    label: Text(
-                      translate('home.friends_section.requests_btn'),
-                    ), // 'Solicitudes'
-                    style: TextButton.styleFrom(
-                      backgroundColor: Colors.indigo.shade50,
-                      foregroundColor: Colors.indigo.shade800,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
+                    isPrimary: true,
                   ),
                   const SizedBox(width: 12),
-                  ElevatedButton.icon(
-                    onPressed: () => Get.toNamed('/users'),
-                    icon: const Icon(Icons.search, size: 20),
-                    label: Text(
-                      translate('home.friends_section.search_btn'),
-                    ), // 'Buscar amigos'
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey.shade200,
-                      foregroundColor: Colors.black87,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
+                  _buildActionButton(
+                    context,
+                    Icons.search_rounded,
+                    translate('home.friends_section.search_btn'),
+                    () => Get.toNamed('/users'),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 20),
-
             Obx(() {
               if (controller.isLoading.value) {
                 return const Center(
@@ -383,31 +450,31 @@ class HomeScreen extends GetView<UserController> {
 
               if (controller.friendsList.isEmpty) {
                 return Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        translate(
-                          'home.friends_section.empty_msg',
-                        ), // 'Aún no tienes amigos...'
-                        style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontStyle: FontStyle.italic,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 12.0),
+                    child: Text(
+                      translate('home.friends_section.empty_msg'),
+                      style: context.textTheme.bodySmall?.copyWith(
+                        fontStyle: FontStyle.italic,
+                        fontSize: 14,
+                        color: context.theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
                         ),
-                        textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 12),
-                    ],
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 );
               }
               return ListView.builder(
                 shrinkWrap: true,
-                primary: false,
+                physics: const NeverScrollableScrollPhysics(),
                 itemCount: controller.friendsList.length,
                 itemBuilder: (context, index) {
-                  final user = controller.friendsList[index];
-                  return UserCard(user: user);
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: UserCard(user: controller.friendsList[index]),
+                  );
                 },
               );
             }),

@@ -2,8 +2,8 @@ import 'package:ea_seminari_9/Bindings/auth_bindings.dart';
 import 'package:ea_seminari_9/Bindings/chat_list_binding.dart';
 import 'package:ea_seminari_9/Screen/chat_list_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import '/Bindings/chat_binding.dart';
-import '/Screen/chat_screen.dart';
+import 'Bindings/chat_binding.dart';
+import 'Screen/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -14,33 +14,32 @@ import 'Screen/register_screen.dart';
 import 'Screen/home.dart';
 import 'Screen/user_list.dart';
 import 'Screen/eventos_detail.dart';
-
 import 'Screen/user_detail.dart';
 import 'Screen/eventos_list.dart';
 import 'Screen/settings_screen.dart';
 import 'Bindings/user_bindings.dart';
-import '../Screen/perfil_screen.dart';
+import 'Screen/perfil_screen.dart';
 import 'Screen/crear_evento_screen.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'utils/logger.dart';
 import 'Screen/chatbot_screen.dart';
 import 'Bindings/chatbot_binding.dart';
+import 'utils/app_theme.dart';
 
 void main() async {
   logger.i('🚀 Iniciando aplicación...');
   WidgetsFlutterBinding.ensureInitialized();
   var delegate = await LocalizationDelegate.create(
-    fallbackLocale: 'es', // Idioma por defecto si falla
-    supportedLocales: ['es', 'en', 'ca', 'fr'], // Idiomas soportados
-    basePath: 'assets/i18n/', // Ruta donde guardaste los JSON
+    fallbackLocale: 'es',
+    supportedLocales: ['es', 'en', 'ca', 'fr'],
+    basePath: 'assets/i18n/',
   );
   await initializeDateFormatting('es', null);
   timeago.setLocaleMessages('es', timeago.EsMessages());
   await dotenv.load(fileName: ".env");
   logger.i('✅ Configuración completada, inicializando servicios');
 
-  // Inicializar StorageService antes de crear controllers que lo requieran
   await Get.putAsync<StorageService>(() async => await StorageService().init());
 
   logger.i('✅ Servicios inicializados, iniciando aplicación');
@@ -53,6 +52,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var localizationDelegate = LocalizedApp.of(context).delegate;
+    final storage = Get.find<StorageService>();
+    final ThemeMode initialThemeMode = storage.getThemeMode();
 
     return GetMaterialApp(
       title: 'Eventer',
@@ -65,25 +66,9 @@ class MyApp extends StatelessWidget {
       ],
       supportedLocales: localizationDelegate.supportedLocales,
       locale: localizationDelegate.currentLocale,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF667EEA),
-          brightness: Brightness.light,
-        ),
-        fontFamily: 'Inter',
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black87,
-          elevation: 0,
-          centerTitle: true,
-          titleTextStyle: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Colors.black87,
-          ),
-        ),
-      ),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: initialThemeMode,
       initialRoute: '/login',
       getPages: [
         GetPage(
@@ -124,6 +109,7 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: '/evento/:id',
           page: () => EventosDetailScreen(eventoId: Get.parameters['id']!),
+          binding: UserBinding(),
         ),
         GetPage(
           name: '/profile',

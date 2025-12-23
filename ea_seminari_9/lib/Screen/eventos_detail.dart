@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import '../Models/eventos.dart';
 import '../Controllers/eventos_controller.dart';
 import 'package:get/get.dart';
-import 'package:flutter_translate/flutter_translate.dart'; // Importar
+import 'package:flutter_translate/flutter_translate.dart';
 import '../Controllers/auth_controller.dart';
-import 'package:intl/intl.dart'; // Añadido para el formato fijo
-import 'package:timeago/timeago.dart'
-    as timeago; // Añadido para el tiempo relativo
+import 'package:intl/intl.dart';
+import 'package:timeago/timeago.dart' as timeago;
 import '../utils/logger.dart';
+import '../utils/app_theme.dart';
 
 class EventosDetailScreen extends GetView<EventoController> {
   final String eventoId;
@@ -20,7 +20,6 @@ class EventosDetailScreen extends GetView<EventoController> {
     if (cleanScheduleString.isEmpty) {
       return translate('events.date_unavailable');
     }
-
     try {
       final DateTime? scheduleDate = DateTime.tryParse(cleanScheduleString);
 
@@ -28,27 +27,19 @@ class EventosDetailScreen extends GetView<EventoController> {
         return translate('events.format_error');
       }
 
-      // 1. Formato de Fecha: Ejemplo "13 de noviembre de 2025"
-      // Usamos las comillas simples ('de') para proteger el texto literal.
       final String formattedDate = DateFormat(
         'd \'de\' MMMM \'de\' yyyy',
         'es',
       ).format(scheduleDate);
-
-      // 2. Formato de Hora: Ejemplo "23:48" (Formato 24h)
       final String formattedTime = DateFormat(
         'HH:mm',
         'es',
       ).format(scheduleDate);
-
-      // 3. Tiempo Relativo: Ejemplo "(hace 17 días)"
       final String relativeTime = timeago.format(
         scheduleDate,
         locale: 'es',
         allowFromNow: true,
       );
-
-      // 4. Combinamos todo: "13 de noviembre de 2025 a las 23:48 (hace 17 días)"
       final String fixedTime = '$formattedDate a las $formattedTime';
 
       return '$fixedTime ($relativeTime)';
@@ -67,12 +58,24 @@ class EventosDetailScreen extends GetView<EventoController> {
     });
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(translate('events.detail_title')), // 'Detalles del Evento'
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        title: Text(
+          translate('events.detail_title'),
+          style: context.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_rounded,
+            color: context.theme.iconTheme.color,
+          ),
+          onPressed: () => Get.back(),
+        ),
       ),
 
       body: Obx(() {
@@ -83,7 +86,10 @@ class EventosDetailScreen extends GetView<EventoController> {
               children: [
                 const CircularProgressIndicator(),
                 const SizedBox(height: 16),
-                Text(translate('common.loading')), // 'Cargando...'
+                Text(
+                  translate('common.loading'),
+                  style: context.textTheme.bodyMedium,
+                ),
               ],
             ),
           );
@@ -94,27 +100,34 @@ class EventosDetailScreen extends GetView<EventoController> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.event_busy, size: 64, color: Colors.grey),
+                Icon(
+                  Icons.event_busy_rounded,
+                  size: 64,
+                  color: context.theme.disabledColor.withValues(alpha: 0.5),
+                ),
                 const SizedBox(height: 16),
                 Text(
-                  translate('events.not_found'), // 'Evento no encontrado'
-                  style: const TextStyle(fontSize: 18, color: Colors.grey),
+                  translate('events.not_found'),
+                  style: context.textTheme.titleMedium?.copyWith(
+                    color: context.theme.hintColor,
+                  ),
                 ),
               ],
             ),
           );
         }
         final evento = controller.selectedEvento.value!;
-        return _buildEventoDetail(evento);
+        return _buildEventoDetail(context, evento);
       }),
     );
   }
 
-  Widget _buildEventoDetail(Evento evento) {
+  Widget _buildEventoDetail(BuildContext context, Evento evento) {
     final currentUserId = Get.find<AuthController>().currentUser.value?.id;
     final isParticipant = evento.participantes.contains(currentUserId);
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -123,43 +136,71 @@ class EventosDetailScreen extends GetView<EventoController> {
             child: Container(
               width: 100,
               height: 100,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
-                ),
+              decoration: BoxDecoration(
+                gradient: AppGradients.primaryBtn,
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: context.theme.colorScheme.primary.withValues(
+                      alpha: 0.3,
+                    ),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
               ),
-              child: const Icon(Icons.event, color: Colors.white, size: 48),
+              child: const Icon(
+                Icons.event_note_rounded,
+                color: Colors.white,
+                size: 50,
+              ),
             ),
           ),
           const SizedBox(height: 32),
 
-          // Nombre del evento
-          Text(
-            evento.name,
-            style: const TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w800,
-              color: Colors.black87,
+          Center(
+            child: Text(
+              evento.name,
+              textAlign: TextAlign.center,
+              style: context.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.5,
+              ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
 
-          // Información del evento
-          _buildInfoCard(evento),
-          const SizedBox(height: 20),
-          SizedBox(
+          _buildInfoCard(context, evento),
+
+          const SizedBox(height: 32),
+
+          Container(
             width: double.infinity,
-            height: 50,
+            height: 56,
+            decoration: BoxDecoration(
+              gradient: isParticipant ? null : AppGradients.primaryBtn,
+              color: isParticipant ? Colors.redAccent : null,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: isParticipant
+                      ? Colors.redAccent.withValues(alpha: 0.4)
+                      : context.theme.colorScheme.primary.withValues(
+                          alpha: 0.4,
+                        ),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
             child: ElevatedButton(
               onPressed: () => controller.toggleParticipation(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: isParticipant
-                    ? Colors.redAccent
-                    : const Color(0xFF667EEA),
+                backgroundColor: Colors.transparent,
                 foregroundColor: Colors.white,
+                shadowColor: Colors.transparent,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                 ),
               ),
               child: Text(
@@ -167,7 +208,7 @@ class EventosDetailScreen extends GetView<EventoController> {
                     ? translate('events.leave_btn')
                     : translate('events.join_btn'),
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -179,67 +220,88 @@ class EventosDetailScreen extends GetView<EventoController> {
     );
   }
 
-  Widget _buildInfoCard(Evento evento) {
+  Widget _buildInfoCard(BuildContext context, Evento evento) {
     final String formattedSchedule = _formatSchedule(evento.schedule);
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: context.theme.cardColor,
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 10,
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 20,
             offset: const Offset(0, 4),
           ),
         ],
-        border: Border.all(color: Colors.grey.shade100),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            translate('events.info_card_title'), // 'Información del Evento'
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: Colors.black87,
-            ),
+          Row(
+            children: [
+              Icon(
+                Icons.info_outline_rounded,
+                color: context.theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                translate('events.info_card_title'),
+                style: context.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 20,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
 
           _buildDetailRow(
-            Icons.schedule,
+            context,
+            Icons.calendar_today_rounded,
             translate('events.schedule'),
             formattedSchedule,
           ),
 
-          const SizedBox(height: 12),
-          _buildDetailRow(Icons.location_on, translate('events.field_address') + ':', evento.address),
-          const SizedBox(height: 12),
+          const SizedBox(height: 20),
           _buildDetailRow(
-            Icons.people,
-            translate('events.participants'),
-            '${evento.participantes.length}',
+            context,
+            Icons.location_on_rounded,
+            translate('events.field_address'),
+            evento.address,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 20),
           _buildDetailRow(
-            Icons.category,
-            translate('events.field_category') + ':',
-            evento.categoria,
+            context,
+            Icons.people_alt_rounded,
+            translate('events.participants'),
+            '${evento.participantes.length} personas',
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDetailRow(IconData icon, String label, String value) {
+  Widget _buildDetailRow(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+  ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: const Color(0xFF667EEA), size: 20),
-        const SizedBox(width: 12),
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: context.theme.colorScheme.primary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, color: context.theme.colorScheme.primary, size: 22),
+        ),
+        const SizedBox(width: 16),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,18 +309,18 @@ class EventosDetailScreen extends GetView<EventoController> {
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey.shade600,
-                  fontWeight: FontWeight.w500,
+                  fontSize: 13,
+                  color: context.theme.hintColor,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 value,
-                style: const TextStyle(
-                  fontSize: 16,
+                style: context.textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  height: 1.3,
                 ),
               ),
             ],

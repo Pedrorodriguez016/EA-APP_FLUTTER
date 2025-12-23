@@ -7,9 +7,9 @@ class ChatBinding extends Bindings {
   @override
   void dependencies() {
     Get.lazyPut<SocketService>(() => SocketService());
-    Get.lazyPut<ChatController>(() => ChatController(
-      Get.find<SocketService>(),
-      Get.find<AuthController>()
-    ));
+    Get.lazyPut<ChatController>(
+      () =>
+          ChatController(Get.find<SocketService>(), Get.find<AuthController>()),
+    );
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_translate/flutter_translate.dart'; // Importar
+import 'package:flutter_translate/flutter_translate.dart';
 import '../Models/user.dart';
 import '../Controllers/user_controller.dart';
 
@@ -14,12 +14,22 @@ class UserDetailScreen extends GetView<UserController> {
       controller.fetchUserById(userId);
     });
     return Scaffold(
-      backgroundColor: Colors.white,
+      // CAMBIO: Fondo dinámico
+      backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(translate('users.detail_title')), // 'Detalles del Usuario'
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        title: Text(
+          translate('users.detail_title'),
+          // CAMBIO: Estilo dinámico
+          style: context.textTheme.titleLarge,
+        ),
+        // CAMBIO: AppBar integrado con el fondo
+        backgroundColor: context.theme.scaffoldBackgroundColor,
         elevation: 0,
+        // CAMBIO: Icono de retroceso dinámico
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: context.theme.iconTheme.color),
+          onPressed: () => Get.back(),
+        ),
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
@@ -29,7 +39,10 @@ class UserDetailScreen extends GetView<UserController> {
               children: [
                 const CircularProgressIndicator(),
                 const SizedBox(height: 16),
-                Text(translate('common.loading')), // 'Cargando...'
+                Text(
+                  translate('common.loading'),
+                  style: context.textTheme.bodyMedium,
+                ),
               ],
             ),
           );
@@ -39,50 +52,64 @@ class UserDetailScreen extends GetView<UserController> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.error_outline, size: 64, color: Colors.red),
-                SizedBox(height: 16),
-                Text(translate('users.load_error')),
+                Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: context.theme.colorScheme.error,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  translate('users.load_error'),
+                  style: context.textTheme.bodyLarge,
+                ),
               ],
             ),
           );
         }
         final user = controller.selectedUser.value!;
-        return _buildUserDetail(user);
+        return _buildUserDetail(context, user);
       }),
     );
   }
 
-  Widget _buildUserDetail(User user) {
+  Widget _buildUserDetail(BuildContext context, User user) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         children: [
-          _buildUserHeader(user),
+          _buildUserHeader(context, user),
           const SizedBox(height: 32),
-          _buildUserInfoCard(user),
+          _buildUserInfoCard(context, user),
         ],
       ),
     );
   }
 
-  Widget _buildUserHeader(User user) {
+  Widget _buildUserHeader(BuildContext context, User user) {
     return Column(
       children: [
         Container(
           width: 120,
           height: 120,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+            gradient: LinearGradient(
+              // CAMBIO: Gradiente usando colores del tema
+              colors: [
+                context.theme.colorScheme.primary,
+                context.theme.colorScheme.secondary,
+              ],
             ),
             shape: BoxShape.circle,
           ),
           child: Center(
             child: Text(
-              user.username[0].toUpperCase(),
-              style: const TextStyle(
+              user.username.isNotEmpty ? user.username[0].toUpperCase() : '?',
+              style: TextStyle(
                 fontSize: 48,
-                color: Colors.white,
+                color: context
+                    .theme
+                    .colorScheme
+                    .onPrimary, // Texto blanco sobre primario
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -91,73 +118,97 @@ class UserDetailScreen extends GetView<UserController> {
         const SizedBox(height: 20),
         Text(
           user.username,
-          style: const TextStyle(
-            fontSize: 28,
+          // CAMBIO: Estilo de texto dinámico
+          style: context.textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.w800,
-            color: Colors.black87,
+            fontSize: 28,
           ),
         ),
         const SizedBox(height: 8),
         Text(
           user.gmail,
-          style: TextStyle(
+          // CAMBIO: Color secundario (hint)
+          style: context.textTheme.bodyMedium?.copyWith(
             fontSize: 16,
-            color: Colors.grey.shade600,
+            color: context.theme.hintColor,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildUserInfoCard(User user) {
+  Widget _buildUserInfoCard(BuildContext context, User user) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        // CAMBIO: Color de tarjeta y sombras dinámicas
+        color: context.theme.cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            // FIXED: withOpacity -> withValues
+            color: context.theme.shadowColor.withValues(alpha: 0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
-        border: Border.all(color: Colors.grey.shade100),
+        border: Border.all(color: context.theme.dividerColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            translate('users.info_card_title'), // 'Información Personal'
-            style: const TextStyle(
-              fontSize: 18,
+            translate('users.info_card_title'),
+            // CAMBIO: Título de sección dinámico
+            style: context.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w700,
-              color: Colors.black87,
+              fontSize: 18,
             ),
           ),
           const SizedBox(height: 20),
-          _buildInfoRow(Icons.person, '${translate("auth.fields.username")}:', user.username),
+          _buildInfoRow(
+            context,
+            Icons.person,
+            '${translate("auth.fields.username")}:',
+            user.username,
+          ),
           const SizedBox(height: 16),
-          _buildInfoRow(Icons.email, '${translate("auth.fields.email")}:', user.gmail),
+          _buildInfoRow(
+            context,
+            Icons.email,
+            '${translate("auth.fields.email")}:',
+            user.gmail,
+          ),
           const SizedBox(height: 16),
-          _buildInfoRow(Icons.cake, '${translate("auth.fields.birthday")}:', user.birthday),
+          _buildInfoRow(
+            context,
+            Icons.cake,
+            '${translate("auth.fields.birthday")}:',
+            user.birthday,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
+  Widget _buildInfoRow(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value,
+  ) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: const Color(0xFF667EEA).withOpacity(0.1),
+            // FIXED: withOpacity -> withValues, usando color primario
+            color: context.theme.colorScheme.primary.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: const Color(0xFF667EEA), size: 20),
+          child: Icon(icon, color: context.theme.colorScheme.primary, size: 20),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -168,17 +219,18 @@ class UserDetailScreen extends GetView<UserController> {
                 label,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey.shade600,
+                  // CAMBIO: Color secundario
+                  color: context.theme.hintColor,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
                 value,
-                style: const TextStyle(
-                  fontSize: 16,
+                // CAMBIO: Texto principal dinámico
+                style: context.textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  fontSize: 16,
                 ),
               ),
             ],

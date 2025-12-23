@@ -1,50 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class StandardAppBar extends StatelessWidget implements PreferredSizeWidget {
-  
-  final String title; 
-  final VoidCallback? onSearchPressed; 
+  final String title;
+  final VoidCallback? onSearchPressed;
 
-  const StandardAppBar({
-    Key? key,
-    required this.title,
-    this.onSearchPressed,
-  }) : super(key: key);
+  const StandardAppBar({Key? key, required this.title, this.onSearchPressed})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       title: Text(
         title,
-        style: const TextStyle(
-          color: Colors.black87,
-          fontWeight: FontWeight.w600,
+        style: context.theme.textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.w800,
+          fontSize: 20,
         ),
       ),
-      backgroundColor: Colors.white,
+      centerTitle: true,
+      backgroundColor: context.theme.scaffoldBackgroundColor,
       elevation: 0,
+      iconTheme: context.theme.iconTheme,
 
-      iconTheme: const IconThemeData(color: Colors.black87), 
-      
       actions: [
-        // Solo mostramos el botón de búsqueda si se pasa una función
         if (onSearchPressed != null)
-          IconButton(
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                shape: BoxShape.circle,
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            child: IconButton(
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: context.theme.colorScheme.onSurface.withValues(
+                    alpha: 0.05,
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.search_rounded,
+                  color: context.theme.colorScheme.onSurface,
+                ),
               ),
-              child: const Icon(Icons.search, color: Colors.grey),
+              onPressed: onSearchPressed,
             ),
-            onPressed: onSearchPressed,
           ),
       ],
     );
   }
-  
+
   // Esto es necesario para que funcione como un AppBar
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight); 
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

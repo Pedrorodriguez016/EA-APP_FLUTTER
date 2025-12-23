@@ -25,7 +25,7 @@ class ChatListController extends GetxController {
       isLoading(true);
       final myId = _authController.currentUser.value?.id;
       logger.i('👥 Cargando lista de amigos');
-      
+
       if (myId != null) {
         List<User> friends = await _userServices.fetchFriends(myId);
         friendsList.assignAll(friends);
@@ -35,7 +35,10 @@ class ChatListController extends GetxController {
       }
     } catch (e) {
       logger.e('❌ Error cargando chats', error: e);
-      Get.snackbar(translate('common.error'), translate('chat.errors.load_contacts'));
+      Get.snackbar(
+        translate('common.error'),
+        translate('chat.errors.load_contacts'),
+      );
     } finally {
       isLoading(false);
     }
@@ -45,10 +48,7 @@ class ChatListController extends GetxController {
     logger.i('💬 Abriendo chat con: ${friend.username}');
     Get.toNamed(
       '/chat',
-      arguments: {
-        'friendId': friend.id,
-        'friendName': friend.username,
-      },
+      arguments: {'friendId': friend.id, 'friendName': friend.username},
     );
   }
 }

@@ -26,9 +26,7 @@ class AuthController extends GetxController {
   String? token;
   String? refreshToken;
 
-  // GoogleSignIn 7.0+ uses a singleton instance and requires initialization.
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
-
   @override
   void onInit() {
     super.onInit();
@@ -37,7 +35,6 @@ class AuthController extends GetxController {
       _checkAutoLogin();
     });
   }
-
   Future<void> _initGoogleSignIn() async {
     try {
       // Inicializar el plugin con el serverClientId proporcionado
@@ -59,7 +56,6 @@ class AuthController extends GetxController {
       logger.e('Error al inicializar Google Sign-In', error: e);
     }
   }
-
   Future<void> _checkAutoLogin() async {
     User? savedUser = _storageService.getUser();
     if (savedUser != null) {
@@ -135,8 +131,6 @@ class AuthController extends GetxController {
   Future<void> signInWithGoogle() async {
     try {
       isLoginLoading.value = true;
-
-      // En v7.2.0, authenticate() es el método para iniciar el flujo
       if (_googleSignIn.supportsAuthenticate()) {
         await _googleSignIn.authenticate();
       } else {
@@ -203,7 +197,6 @@ class AuthController extends GetxController {
       isLoginLoading.value = false;
     }
   }
-
   void logout() {
     isLoggedIn.value = false;
     currentUser.value = null;

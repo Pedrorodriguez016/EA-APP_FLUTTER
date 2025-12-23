@@ -14,6 +14,5 @@ class UserBinding extends Bindings {
       UserController(Get.find<UserServices>(), Get.find<SocketService>()),
     );
     Get.put<EventoController>(EventoController(EventosServices()));
-
   }
 }

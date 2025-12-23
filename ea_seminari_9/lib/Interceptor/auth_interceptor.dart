@@ -7,10 +7,13 @@ import '../utils/logger.dart';
 class AuthInterceptor extends Interceptor {
   AuthController get _auth => Get.find<AuthController>();
 
-  final Dio _tokenDio = Dio(BaseOptions(baseUrl: '${dotenv.env['BASE_URL']}/api',
-    connectTimeout:const Duration(seconds: 5,),
-    receiveTimeout: const Duration(seconds: 5,))
-    );
+  final Dio _tokenDio = Dio(
+    BaseOptions(
+      baseUrl: '${dotenv.env['BASE_URL']}/api',
+      connectTimeout: const Duration(seconds: 5),
+      receiveTimeout: const Duration(seconds: 5),
+    ),
+  );
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
@@ -19,8 +22,10 @@ class AuthInterceptor extends Interceptor {
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
     }
-    
-    logger.d('📤 Enviando request a: ${options.path} - Método: ${options.method}');
+
+    logger.d(
+      '📤 Enviando request a: ${options.path} - Método: ${options.method}',
+    );
     super.onRequest(options, handler);
   }
 
@@ -28,22 +33,22 @@ class AuthInterceptor extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
       logger.w('⚠️ Token expirado (401). Intentando refrescar...');
-      
+
       final refreshToken = _auth.refreshToken;
       final userId = _auth.currentUser.value?.id;
 
       if (refreshToken != null && userId != null) {
         try {
           logger.d('🔄 Refrescando token para usuario: $userId');
-          final response = await _tokenDio.post('/user/refresh', data: {
-            'refreshToken': refreshToken,
-            'userId': userId,
-          });
+          final response = await _tokenDio.post(
+            '/user/refresh',
+            data: {'refreshToken': refreshToken, 'userId': userId},
+          );
 
           if (response.statusCode == 200) {
             final newAccessToken = response.data['token'] as String?;
             final newRefreshToken = response.data['refreshToken'] as String?;
-            
+
             _auth.token = newAccessToken;
             if (newRefreshToken != null) {
               _auth.refreshToken = newRefreshToken;
@@ -55,9 +60,9 @@ class AuthInterceptor extends Interceptor {
             opts.headers['Authorization'] = 'Bearer $newAccessToken';
 
             // Clonamos la petición original y la reenviamos usando la instancia de Dio original (err.requestOptions.extra)
-            final clonedRequest = await Dio().fetch(opts); 
+            final clonedRequest = await Dio().fetch(opts);
             logger.d('🔄 Reintentando request: ${opts.path}');
-            
+
             // Resolvemos la promesa original con el resultado del reintento
             return handler.resolve(clonedRequest);
           }
@@ -74,8 +79,11 @@ class AuthInterceptor extends Interceptor {
         Get.offAllNamed('/login');
       }
     }
-    
-    logger.e('🚨 Error en request: ${err.requestOptions.path} - ${err.response?.statusCode} ${err.message}', error: err);
+
+    logger.e(
+      '🚨 Error en request: ${err.requestOptions.path} - ${err.response?.statusCode} ${err.message}',
+      error: err,
+    );
     // Si no fue 401 o falló el refresh, devolvemos el error original
     super.onError(err, handler);
   }
