@@ -8,11 +8,13 @@ class AuthService {
   late final Dio _client;
 
   AuthService() {
-    _client = Dio(BaseOptions(
-      baseUrl: '${dotenv.env['BASE_URL']}/api',
-      connectTimeout: const Duration(seconds: 5),
-      receiveTimeout: const Duration(seconds: 5),
-    ));
+    _client = Dio(
+      BaseOptions(
+        baseUrl: '${dotenv.env['BASE_URL']}/api',
+        connectTimeout: const Duration(seconds: 5),
+        receiveTimeout: const Duration(seconds: 5),
+      ),
+    );
     // Agregamos el interceptor para manejar tokens automáticamente
     _client.interceptors.add(AuthInterceptor());
   }
@@ -21,10 +23,10 @@ class AuthService {
   Future<Map<String, dynamic>> login(String username, String password) async {
     try {
       logger.d('📡 POST /user/auth/login - username: $username');
-      final response = await _client.post('/user/auth/login', data: {
-        'username': username,
-        'password': password,
-      });
+      final response = await _client.post(
+        '/user/auth/login',
+        data: {'username': username, 'password': password},
+      );
       logger.i('✅ Login HTTP OK para usuario: $username');
       return response.data;
     } catch (e) {
@@ -37,16 +39,38 @@ class AuthService {
   Future<dynamic> register(User newUser) async {
     try {
       logger.d('📡 POST /user - registrando usuario: ${newUser.username}');
-      final response = await _client.post('/user', data: {
-        "username": newUser.username,
-        "gmail": newUser.gmail,
-        "birthday": newUser.birthday,
-        "password": newUser.password,
-      });
+      final response = await _client.post(
+        '/user',
+        data: {
+          "username": newUser.username,
+          "gmail": newUser.gmail,
+          "birthday": newUser.birthday,
+          "password": newUser.password,
+        },
+      );
       logger.i('✅ Registro HTTP OK para usuario: ${newUser.username}');
       return response.data;
     } catch (e) {
-      logger.e('❌ Error en registro HTTP para usuario: ${newUser.username}', error: e);
+      logger.e(
+        '❌ Error en registro HTTP para usuario: ${newUser.username}',
+        error: e,
+      );
+      throw e;
+    }
+  }
+
+  // Google Login: Envía el idToken al backend para validación
+  Future<Map<String, dynamic>> loginWithGoogle(String idToken) async {
+    try {
+      logger.d('📡 POST /user/auth/google - Enviando idToken');
+      final response = await _client.post(
+        '/user/auth/google',
+        data: {'credential': idToken},
+      );
+      logger.i('✅ Google Login HTTP OK');
+      return response.data;
+    } catch (e) {
+      logger.e('❌ Error en Google login HTTP', error: e);
       throw e;
     }
   }
