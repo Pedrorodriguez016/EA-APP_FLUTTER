@@ -107,6 +107,17 @@ class SocketService extends GetxService {
     _socket.off('eventChat:message');
   }
 
+  void listenToChatErrors(Function(dynamic) onErrorReceived) {
+    _socket.on('chat:error', (data) {
+      logger.w('⚠️ [SocketService] Chat Error received: $data');
+      onErrorReceived(data);
+    });
+  }
+
+  void stopListeningToChatErrors() {
+    _socket.off('chat:error');
+  }
+
   void disconnect() {
     try {
       if (_socket.connected) {

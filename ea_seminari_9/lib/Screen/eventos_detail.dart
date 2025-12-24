@@ -229,7 +229,7 @@ class EventosDetailScreen extends GetView<EventoController> {
                 },
                 icon: const Icon(Icons.chat_bubble_outline),
                 label: Text(
-                  translate('events.chat_btn') ?? 'Chat del evento',
+                  translate('events.chat_btn'),
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

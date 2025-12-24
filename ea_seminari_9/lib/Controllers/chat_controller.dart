@@ -46,6 +46,26 @@ class ChatController extends GetxController {
 
     _socketService.joinChatRoom(myUserId, friendId);
     _socketService.listenToChatMessages(_handleNewMessage);
+    _socketService.listenToChatErrors(_handleChatError);
+  }
+
+  void _handleChatError(dynamic data) {
+    logger.e('🛑 Error en chat: ${data['message']}');
+    Get.snackbar(
+      'Error',
+      data['message'] ?? 'No se pudo enviar el mensaje',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+      margin: const EdgeInsets.all(10),
+      borderRadius: 10,
+      duration: const Duration(seconds: 4),
+    );
+
+    // Remove the optimistic message if it exists (assuming it's the last added one)
+    if (messages.isNotEmpty && messages.first.isMine) {
+      messages.removeAt(0);
+    }
   }
 
   void _handleNewMessage(dynamic data) {
@@ -104,6 +124,7 @@ class ChatController extends GetxController {
   void onClose() {
     logger.i('🚪 Cerrando ChatController');
     _socketService.stopListeningToChatMessages();
+    _socketService.stopListeningToChatErrors();
 
     textController.dispose();
     scrollController.dispose();
