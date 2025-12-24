@@ -230,7 +230,7 @@ class CrearEventoScreen extends GetView<EventoController> {
             final dt = controller.selectedSchedule.value!;
             final String minute = dt.minute.toString().padLeft(2, '0');
             buttonText =
-                "${dt.day}/${dt.month}/${dt.year} - ${dt.hour}:$minute";
+                '${dt.day}/${dt.month}/${dt.year} - ${dt.hour}:$minute';
           }
           final Color activeColor = context.theme.colorScheme.primary;
           final Color inactiveColor = context.theme.hintColor;

@@ -42,10 +42,10 @@ class AuthService {
       final response = await _client.post(
         '/user',
         data: {
-          "username": newUser.username,
-          "gmail": newUser.gmail,
-          "birthday": newUser.birthday,
-          "password": newUser.password,
+          'username': newUser.username,
+          'gmail': newUser.gmail,
+          'birthday': newUser.birthday,
+          'password': newUser.password,
         },
       );
       logger.i('✅ Registro HTTP OK para usuario: ${newUser.username}');

@@ -134,7 +134,7 @@ class AuthController extends GetxController {
       if (_googleSignIn.supportsAuthenticate()) {
         await _googleSignIn.authenticate();
       } else {
-        throw Exception("Este dispositivo no soporta autenticación de Google");
+        throw Exception('Este dispositivo no soporta autenticación de Google');
       }
     } catch (e) {
       logger.e('Error al iniciar flujo de Google', error: e);
@@ -157,7 +157,7 @@ class AuthController extends GetxController {
       final String? idToken = googleAuth.idToken;
 
       if (idToken == null) {
-        throw Exception("No se pudo obtener el ID Token de Google");
+        throw Exception('No se pudo obtener el ID Token de Google');
       }
 
       final data = await _authService.loginWithGoogle(idToken);

@@ -409,7 +409,7 @@ class EventoController extends GetxController {
       }
     } catch (e) {
       Get.snackbar(
-        "Error",
+        'Error',
         e.toString(),
         backgroundColor: Colors.red,
         colorText: Colors.white,

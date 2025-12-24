@@ -288,7 +288,7 @@ class ChatListScreen extends GetView<ChatListController> {
           ),
           const SizedBox(height: 16),
           Text(
-            translate("chat.empty_list"),
+            translate('chat.empty_list'),
             style: context.textTheme.bodyMedium?.copyWith(
               color: context.theme.hintColor,
               fontSize: 16,

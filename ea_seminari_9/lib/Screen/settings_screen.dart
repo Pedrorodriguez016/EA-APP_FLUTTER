@@ -5,6 +5,7 @@ import '../Controllers/user_controller.dart';
 import '../Widgets/navigation_bar.dart';
 import '../Widgets/user_info.dart';
 import '../Services/storage_service.dart';
+import '../utils/logger.dart';
 
 class SettingsScreen extends GetView<UserController> {
   SettingsScreen({super.key});
@@ -132,7 +133,7 @@ class SettingsScreen extends GetView<UserController> {
           try {
             Get.find<StorageService>().saveTheme(val);
           } catch (e) {
-            print("StorageService error: $e");
+            logger.e('StorageService error: $e');
           }
         },
       ),

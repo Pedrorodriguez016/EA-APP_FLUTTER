@@ -30,7 +30,7 @@ class ChatScreen extends GetView<ChatController> {
               child: Text(
                 controller.friendName.isNotEmpty
                     ? controller.friendName.substring(0, 2).toUpperCase()
-                    : "?",
+                    : '?',
                 style: TextStyle(
                   fontSize: 14,
                   color: context.theme.colorScheme.onPrimary,
@@ -102,7 +102,7 @@ class ChatScreen extends GetView<ChatController> {
                   // CAMBIO: Color del texto input
                   style: context.textTheme.bodyLarge,
                   decoration: InputDecoration(
-                    hintText: translate("chat.input_hint"),
+                    hintText: translate('chat.input_hint'),
                     // CAMBIO: Color del hint
                     hintStyle: TextStyle(color: context.theme.hintColor),
                     border: InputBorder.none,

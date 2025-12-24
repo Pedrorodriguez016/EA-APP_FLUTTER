@@ -31,10 +31,10 @@ class ChatBotService {
       String responseText;
       if (count == 0) {
         responseText =
-            "No he encontrado eventos que coincidan con tu búsqueda.";
+            'No he encontrado eventos que coincidan con tu búsqueda.';
       } else {
         final names = events.map((e) => "- ${e['name']}").join('\n');
-        responseText = "He encontrado $count eventos:\n$names";
+        responseText = 'He encontrado $count eventos:\n$names';
       }
 
       return {'text': responseText, 'events': events};

@@ -12,7 +12,7 @@ class ChatBotScreen extends GetView<ChatBotController> {
       backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          "Asistente Virtual",
+          'Asistente Virtual',
           style: context.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -178,7 +178,7 @@ class ChatBotScreen extends GetView<ChatBotController> {
               controller: controller.textController,
               style: context.textTheme.bodyLarge,
               decoration: InputDecoration(
-                hintText: "Escribe tu consulta...",
+                hintText: 'Escribe tu consulta...',
                 hintStyle: TextStyle(color: context.theme.hintColor),
                 filled: true,
                 fillColor: context.isDarkMode

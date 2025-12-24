@@ -39,7 +39,7 @@ void main() async {
   );
   await initializeDateFormatting('es', null);
   timeago.setLocaleMessages('es', timeago.EsMessages());
-  await dotenv.load(fileName: ".env");
+  await dotenv.load(fileName: '.env');
   logger.i('✅ Configuración completada, inicializando servicios');
 
   await Get.putAsync<StorageService>(() async => await StorageService().init());

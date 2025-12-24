@@ -14,7 +14,7 @@ class BotMessage {
     required this.isUser,
     DateTime? timestamp,
     this.relatedEvents,
-  }) : this.timestamp = timestamp ?? DateTime.now();
+  }) : timestamp = timestamp ?? DateTime.now();
 }
 
 class ChatBotController extends GetxController {
@@ -33,7 +33,7 @@ class ChatBotController extends GetxController {
     // Mensaje de bienvenida
     messages.add(
       BotMessage(
-        text: "Hola! Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?",
+        text: 'Hola! Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
         isUser: false,
       ),
     );
@@ -70,7 +70,7 @@ class ChatBotController extends GetxController {
     } catch (e) {
       messages.add(
         BotMessage(
-          text: "Lo siento, hubo un error al procesar tu solicitud.",
+          text: 'Lo siento, hubo un error al procesar tu solicitud.',
           isUser: false,
         ),
       );
