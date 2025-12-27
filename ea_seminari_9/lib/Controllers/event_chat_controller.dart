@@ -72,20 +72,25 @@ class EventChatController extends GetxController {
     );
     try {
       final newMessage = EventChatMessage.fromJson(data, myUserId);
-      final exists = messages.any(
+      final index = messages.indexWhere(
         (msg) =>
             msg.id == newMessage.id ||
             (msg.isMine &&
                 msg.text == newMessage.text &&
                 msg.createdAt.difference(newMessage.createdAt).inSeconds.abs() <
-                    2),
+                    60),
       );
 
-      if (!exists && newMessage.eventId == eventId) {
+      if (index != -1) {
+        // El mensaje ya existe (probablemente el optimista).
+        // Actualizamos sus datos con los reales del servidor (ID real, fecha exacta)
+        logger.d(
+          '🔄 [EventChatController] Actualizando mensaje optimista con datos reales',
+        );
+        messages[index] = newMessage;
+      } else if (newMessage.eventId == eventId) {
         logger.i('✅ [EventChatController] Adding message to list');
         messages.insert(0, newMessage);
-      } else if (exists) {
-        logger.d('⚠️ [EventChatController] Message duplicate skipped');
       }
     } catch (e) {
       logger.e(
@@ -98,6 +103,18 @@ class EventChatController extends GetxController {
   void sendMessage() {
     String text = textController.text.trim();
     if (text.isEmpty) return;
+
+    // 1. Inserción Optimista
+    final tempMsg = EventChatMessage(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      eventId: eventId,
+      userId: myUserId,
+      username: myUsername,
+      text: text,
+      createdAt: DateTime.now(),
+      isMine: true,
+    );
+    messages.insert(0, tempMsg);
 
     textController.clear();
     focusNode.requestFocus();

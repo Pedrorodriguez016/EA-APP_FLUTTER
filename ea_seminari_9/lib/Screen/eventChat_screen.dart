@@ -85,21 +85,7 @@ class EventChatScreen extends GetView<EventChatController> {
                     border: InputBorder.none,
                   ),
                   onSubmitted: (_) {
-                    final text = controller.textController.text.trim();
-                    if (text.isNotEmpty) {
-                      // Optimistic Update
-                      final myMsg = EventChatMessage(
-                        id: DateTime.now().millisecondsSinceEpoch.toString(),
-                        eventId: controller.eventId,
-                        userId: controller.myUserId,
-                        username: controller.myUsername,
-                        text: text,
-                        createdAt: DateTime.now(),
-                        isMine: true,
-                      );
-                      controller.messages.insert(0, myMsg);
-                      controller.sendMessage();
-                    }
+                    controller.sendMessage();
                   },
                 ),
               ),
@@ -114,20 +100,7 @@ class EventChatScreen extends GetView<EventChatController> {
                   size: 20,
                 ),
                 onPressed: () {
-                  final text = controller.textController.text.trim();
-                  if (text.isNotEmpty) {
-                    final myMsg = EventChatMessage(
-                      id: DateTime.now().millisecondsSinceEpoch.toString(),
-                      eventId: controller.eventId,
-                      userId: controller.myUserId,
-                      username: controller.myUsername,
-                      text: text,
-                      createdAt: DateTime.now(),
-                      isMine: true,
-                    );
-                    controller.messages.insert(0, myMsg);
-                    controller.sendMessage();
-                  }
+                  controller.sendMessage();
                 },
               ),
             ),
