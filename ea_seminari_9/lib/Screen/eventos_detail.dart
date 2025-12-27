@@ -2,64 +2,71 @@ import 'package:flutter/material.dart';
 import '../Models/eventos.dart';
 import '../Controllers/eventos_controller.dart';
 import '../Controllers/auth_controller.dart';
-import 'package:get/get.dart'; 
+import 'package:get/get.dart';
 import 'package:intl/intl.dart'; // Añadido para el formato fijo
-import 'package:timeago/timeago.dart' as timeago; // Añadido para el tiempo relativo
-
+import 'package:timeago/timeago.dart'
+    as timeago; // Añadido para el tiempo relativo
+import '../Controllers/valoracion_controller.dart';
+import '../Widgets/valoracion_list.dart';
 
 class EventosDetailScreen extends GetView<EventoController> {
   final String eventoId;
 
   const EventosDetailScreen({super.key, required this.eventoId});
 
+  String _formatSchedule(String scheduleString) {
+    final String cleanScheduleString = scheduleString.trim();
 
-String _formatSchedule(String scheduleString) {
-    
-    final String cleanScheduleString = scheduleString.trim(); 
-    
     if (cleanScheduleString.isEmpty) {
       return 'Fecha no disponible';
     }
-    
+
     try {
-      final DateTime? scheduleDate = DateTime.tryParse(cleanScheduleString); 
-      
+      final DateTime? scheduleDate = DateTime.tryParse(cleanScheduleString);
+
       if (scheduleDate == null) {
-          return 'Error de formato'; 
+        return 'Error de formato';
       }
-      
+
       // 1. Formato de Fecha: Ejemplo "13 de noviembre de 2025"
       // Usamos las comillas simples ('de') para proteger el texto literal.
-      final String formattedDate = DateFormat('d \'de\' MMMM \'de\' yyyy', 'es').format(scheduleDate);
+      final String formattedDate = DateFormat(
+        'd \'de\' MMMM \'de\' yyyy',
+        'es',
+      ).format(scheduleDate);
 
       // 2. Formato de Hora: Ejemplo "23:48" (Formato 24h)
-      final String formattedTime = DateFormat('HH:mm', 'es').format(scheduleDate);
-      
+      final String formattedTime = DateFormat(
+        'HH:mm',
+        'es',
+      ).format(scheduleDate);
+
       // 3. Tiempo Relativo: Ejemplo "(hace 17 días)"
       final String relativeTime = timeago.format(
-        scheduleDate, 
-        locale: 'es', 
-        allowFromNow: true, 
+        scheduleDate,
+        locale: 'es',
+        allowFromNow: true,
       );
-      
+
       // 4. Combinamos todo: "13 de noviembre de 2025 a las 23:48 (hace 17 días)"
       final String fixedTime = '$formattedDate a las $formattedTime';
-      
+
       return '$fixedTime ($relativeTime)';
-      
     } catch (e) {
       print('Fallo al formatear la fecha en detalles: $e');
-      return 'Error de formato'; 
+      return 'Error de formato';
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
+    final valoracionController = Get.put(ValoracionController());
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (controller.selectedEvento.value?.id != eventoId) {
         controller.fetchEventoById(eventoId);
       }
+      valoracionController.loadRatings(eventoId);
     });
 
     return Scaffold(
@@ -72,7 +79,6 @@ String _formatSchedule(String scheduleString) {
       ),
 
       body: Obx(() {
-
         if (controller.isLoading.value) {
           return const Center(
             child: Column(
@@ -102,11 +108,12 @@ String _formatSchedule(String scheduleString) {
           );
         }
         final evento = controller.selectedEvento.value!;
-        return _buildEventoDetail(evento);
+        return _buildEventoDetail(context, evento);
       }),
     );
   }
-  Widget _buildEventoDetail(Evento evento) {
+
+  Widget _buildEventoDetail(BuildContext context, Evento evento) {
     final currentUserId = Get.find<AuthController>().currentUser.value?.id;
     final isParticipant = evento.participantes.contains(currentUserId);
     return SingleChildScrollView(
@@ -150,22 +157,27 @@ String _formatSchedule(String scheduleString) {
             child: ElevatedButton(
               onPressed: () => controller.toggleParticipation(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: isParticipant ? Colors.redAccent : const Color(0xFF667EEA),
+                backgroundColor: isParticipant
+                    ? Colors.redAccent
+                    : const Color(0xFF667EEA),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
               child: Text(
-                isParticipant 
-                  ? "Salir del evento"  // Añadir a JSON: 'events.leave_btn'
-                  : "Unirme al evento", // Añadir a JSON: 'events.join_btn'
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                isParticipant
+                    ? "Salir del evento" // Añadir a JSON: 'events.leave_btn'
+                    : "Unirme al evento", // Añadir a JSON: 'events.join_btn'
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
           const SizedBox(height: 20),
-
+          ValoracionList(eventId: eventoId),
         ],
       ),
     );
@@ -200,7 +212,7 @@ String _formatSchedule(String scheduleString) {
             ),
           ),
           const SizedBox(height: 16),
-           _buildDetailRow(Icons.schedule, 'Horario:', formattedSchedule),
+          _buildDetailRow(Icons.schedule, 'Horario:', formattedSchedule),
           const SizedBox(height: 12),
           _buildDetailRow(Icons.location_on, 'Dirección:', evento.address),
           const SizedBox(height: 12),
@@ -208,13 +220,11 @@ String _formatSchedule(String scheduleString) {
             Icons.people,
             'Participantes:',
             '${evento.participantes.length} personas',
-          ), 
+          ),
         ],
       ),
     );
   }
-
-  
 
   Widget _buildDetailRow(IconData icon, String label, String value) {
     return Row(

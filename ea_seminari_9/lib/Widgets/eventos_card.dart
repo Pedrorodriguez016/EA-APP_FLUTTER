@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../Models/eventos.dart';
 import 'package:get/get.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:intl/intl.dart'; 
+import 'package:intl/intl.dart';
 
 class EventosCard extends StatelessWidget {
   final Evento evento;
@@ -16,23 +16,26 @@ class EventosCard extends StatelessWidget {
     }
     try {
       final DateTime scheduleDate = DateTime.parse(scheduleString);
-      
+
       // Formato Fijo (ej: "23 Nov. 2025 a las 23:48")
-      final String fixedTime = DateFormat('d MMM. yyyy HH:mm', 'es').format(scheduleDate);
-      
+      final String fixedTime = DateFormat(
+        'd MMM. yyyy HH:mm',
+        'es',
+      ).format(scheduleDate);
+
       // Formato Relativo (ej: "en 2 días")
       final String relativeTime = timeago.format(
-        scheduleDate, 
-        locale: 'es', 
-        allowFromNow: true, 
+        scheduleDate,
+        locale: 'es',
+        allowFromNow: true,
       );
-      
+
       // Combinamos ambos formatos
       return '$fixedTime ($relativeTime)';
     } catch (e) {
       // Este catch debería ser rarísimo ahora que usamos la clave correcta
       print('Fallo al parsear la fecha: $scheduleString, Error: $e');
-      return 'Error de formato'; 
+      return 'Error de formato';
     }
   }
 
@@ -85,7 +88,7 @@ class EventosCard extends StatelessWidget {
                           fontSize: 14,
                           color: Colors.grey.shade600,
                         ),
-                      ),  
+                      ),
 
                       const SizedBox(height: 4),
                       Text(
@@ -101,7 +104,10 @@ class EventosCard extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.deepPurple.shade50,
                     borderRadius: BorderRadius.circular(12),
