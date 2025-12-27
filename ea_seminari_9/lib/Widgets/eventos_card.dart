@@ -18,11 +18,13 @@ class EventosCard extends StatelessWidget {
     try {
       final DateTime scheduleDate = DateTime.parse(scheduleString);
 
+      // Formato Fijo (ej: "23 Nov. 2025 a las 23:48")
       final String fixedTime = DateFormat(
         'd MMM. yyyy HH:mm',
         'es',
       ).format(scheduleDate);
 
+      // Formato Relativo (ej: "en 2 días")
       final String relativeTime = timeago.format(
         scheduleDate,
         locale: 'es',
@@ -90,12 +92,29 @@ class EventosCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        evento.name,
-                        style: context.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 16,
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              evento.name,
+                              style: context.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                fontSize: 16,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (evento.isPrivate)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 6),
+                              child: Icon(
+                                Icons.lock_outline,
+                                size: 16,
+                                color: context.theme.hintColor,
+                              ),
+                            ),
+                        ],
                       ),
                       const SizedBox(height: 4),
 

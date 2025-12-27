@@ -7,6 +7,10 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'auth_controller.dart';
 import '../utils/logger.dart';
+import 'package:latlong2/latlong.dart';
+import 'auth_controller.dart';
+import 'package:ea_seminari_9/Models/user.dart';
+import 'package:ea_seminari_9/Services/user_services.dart';
 
 // Definimos los tipos de filtro posibles
 enum EventFilter { all, myEvents }
@@ -36,6 +40,11 @@ class EventoController extends GetxController {
   late TextEditingController direccionController;
   var selectedSchedule = Rxn<DateTime>();
   var selectedCategoria = Rxn<String>(); // Añadido para categoría
+  var isPrivate = false.obs;
+  var friendsList = <User>[].obs;
+  var selectedInvitedUsers = <String>[].obs;
+  var isLoadingFriends = false.obs;
+  final UserServices _userServices = UserServices();
 
   EventoController(this._eventosServices);
   final ScrollController scrollController = ScrollController();
@@ -57,6 +66,20 @@ class EventoController extends GetxController {
         refreshEventos();
       }
     });
+
+    fetchEventos(1);
+    selectedSchedule.value = null;
+    super.onInit();
+    scrollController.addListener(_scrollListener);
+  }
+
+  @override
+  void onClose() {
+    tituloController.dispose();
+    direccionController.dispose();
+    _debounce?.cancel();
+    scrollController.removeListener(_scrollListener);
+    super.onClose();
   }
 
   void _scrollListener() {
@@ -145,8 +168,6 @@ class EventoController extends GetxController {
     }
   }
 
-  // --- [Resto de las funciones sin cambios, solo para completar el archivo] ---
-
   void loadMoreEvents() {
     if (currentPage.value < totalPages.value) {
       fetchEventos(currentPage.value + 1);
@@ -158,6 +179,8 @@ class EventoController extends GetxController {
     direccionController.clear();
     selectedSchedule.value = null;
     selectedCategoria.value = null;
+    isPrivate.value = false;
+    selectedInvitedUsers.clear();
   }
 
   Future<void> pickSchedule(BuildContext context) async {
@@ -321,6 +344,8 @@ class EventoController extends GetxController {
         'address': direccion,
         'schedule': selectedSchedule.value!.toIso8601String(),
         'categoria': selectedCategoria.value!, // Enviar categoría seleccionada
+        'isPrivate': isPrivate.value,
+        'invitados': selectedInvitedUsers.toList(),
       };
 
       await _eventosServices.createEvento(nuevoEventoData);
@@ -354,14 +379,6 @@ class EventoController extends GetxController {
       final bounds = camera.visibleBounds;
       fetchMapEvents(bounds.north, bounds.south, bounds.east, bounds.west);
     });
-  }
-
-  @override
-  void onClose() {
-    tituloController.dispose();
-    direccionController.dispose();
-    _debounce?.cancel();
-    super.onClose();
   }
 
   Future<void> toggleParticipation() async {
@@ -429,6 +446,73 @@ class EventoController extends GetxController {
       Get.snackbar(
         translate('common.error'),
         translate('events.errors.load_my_events'),
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  void fetchFriends() async {
+    final userId = _authController.currentUser.value?.id;
+    if (userId == null) return;
+
+    try {
+      isLoadingFriends(true);
+      final friends = await _userServices.fetchFriends(userId);
+      friendsList.assignAll(friends);
+    } catch (e) {
+      print("Error fetching friends: $e");
+    } finally {
+      isLoadingFriends(false);
+    }
+  }
+
+  void toggleUserSelection(String userId) {
+    if (selectedInvitedUsers.contains(userId)) {
+      selectedInvitedUsers.remove(userId);
+    } else {
+      selectedInvitedUsers.add(userId);
+    }
+  }
+
+  Future<void> respondToInvitation(bool accept) async {
+    final event = selectedEvento.value;
+    if (event == null) return;
+
+    try {
+      isLoading(true);
+      Evento updatedEvento;
+
+      if (accept) {
+        updatedEvento = await _eventosServices.acceptInvitation(event.id);
+        Get.snackbar(
+          "Éxito",
+          "Invitación aceptada",
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      } else {
+        updatedEvento = await _eventosServices.rejectInvitation(event.id);
+        Get.snackbar(
+          "Información",
+          "Invitación rechazada",
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+        );
+      }
+
+      selectedEvento.value = updatedEvento;
+
+      final index = eventosList.indexWhere((e) => e.id == updatedEvento.id);
+      if (index != -1) {
+        eventosList[index] = updatedEvento;
+      }
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
       );
     } finally {
       isLoading(false);

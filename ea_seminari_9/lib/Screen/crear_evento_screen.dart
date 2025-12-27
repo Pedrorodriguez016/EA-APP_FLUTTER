@@ -39,26 +39,9 @@ class CrearEventoScreen extends GetView<EventoController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              translate('events.field_title'),
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            // MODIFICADO: Usa el controller de GetX
-            TextField(controller: controller.tituloController),
-            const SizedBox(height: 16),
-            Text(
-              translate('events.field_address'),
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            // MODIFICADO: Usa el controller de GetX
-            TextField(controller: controller.direccionController, maxLines: 3),
-            const SizedBox(height: 16),
-
             // --- SELECTOR DE CATEGORÍA ---
-            Text(
-              translate('events.field_category'),
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+            _buildSectionTitle(context, translate('events.field_category')),
+            const SizedBox(height: 12),
             Obx(
               () => DropdownButtonFormField<String>(
                 value: controller.selectedCategoria.value,
@@ -84,11 +67,13 @@ class CrearEventoScreen extends GetView<EventoController> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-            // --- FIN SELECTOR ---
+            const SizedBox(height: 24),
 
             // --- NUEVO WIDGET: Selector de Fecha ---
             _buildDatePicker(context),
+            const SizedBox(height: 24),
+
+            // --- TITLE ---
             _buildSectionTitle(context, translate('events.field_title')),
             const SizedBox(height: 12),
             _buildTextField(
@@ -96,10 +81,9 @@ class CrearEventoScreen extends GetView<EventoController> {
               controller.tituloController,
               icon: Icons.title_rounded,
             ),
-
-            // --- FIN NUEVO WIDGET ---
             const SizedBox(height: 24),
 
+            // --- ADDRESS ---
             _buildSectionTitle(context, translate('events.field_address')),
             const SizedBox(height: 12),
             _buildTextField(
@@ -108,10 +92,84 @@ class CrearEventoScreen extends GetView<EventoController> {
               maxLines: 3,
               icon: Icons.location_on_rounded,
             ),
-
             const SizedBox(height: 24),
 
-            _buildDatePicker(context),
+            // --- SWITCH PRIVACIDAD ---
+            Obx(
+              () => SwitchListTile(
+                title: const Text(
+                  'Evento Privado',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: const Text(
+                  'Solo los invitados podrán ver y unirse a este evento',
+                ),
+                value: controller.isPrivate.value,
+                onChanged: (bool val) {
+                  controller.isPrivate.value = val;
+                  if (val) {
+                    controller.fetchFriends();
+                  }
+                },
+              ),
+            ),
+
+            // --- LISTA DE PROBABLES INVITADOS ---
+            Obx(() {
+              if (!controller.isPrivate.value) return const SizedBox.shrink();
+
+              if (controller.isLoadingFriends.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (controller.friendsList.isEmpty) {
+                return const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    'No tienes amigos para invitar aún.',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                );
+              }
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      'Invitar amigos:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Container(
+                    height: 200, // Altura fija para la lista
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: controller.friendsList.length,
+                      itemBuilder: (context, index) {
+                        final friend = controller.friendsList[index];
+                        return Obx(() {
+                          final isSelected = controller.selectedInvitedUsers
+                              .contains(friend.id);
+                          return CheckboxListTile(
+                            title: Text(friend.username),
+                            subtitle: Text(friend.gmail),
+                            value: isSelected,
+                            onChanged: (_) =>
+                                controller.toggleUserSelection(friend.id),
+                          );
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              );
+            }),
 
             const SizedBox(height: 40),
 

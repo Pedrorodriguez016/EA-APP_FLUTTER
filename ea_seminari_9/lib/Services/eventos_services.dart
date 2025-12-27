@@ -58,11 +58,13 @@ class EventosServices {
   }) async {
     try {
       logger.d('📄 Obteniendo eventos - Página: $page, Límite: $limit');
+
       final response = await _client.get(
         '/',
         queryParameters: {
           'page': page,
           'limit': limit,
+          if (q.isNotEmpty) 'q': q,
           if (creatorId != null && creatorId.isNotEmpty) 'creatorId': creatorId,
         },
       );
@@ -88,6 +90,7 @@ class EventosServices {
       logger.d('📄 Obteniendo evento con ID: $id');
       final response = await _client.get('/$id');
       logger.i('✅ Evento obtenido: ${response.data['title'] ?? id}');
+
       return Evento.fromJson(response.data);
     } catch (e) {
       logger.e('❌ Error al cargar evento', error: e);
@@ -122,6 +125,7 @@ class EventosServices {
         return null;
       }
       logger.e('❌ Error al buscar evento', error: e);
+
       throw Exception('Error al buscar usuario por username: ${e.message}');
     } catch (e) {
       logger.e('❌ Error desconocido al buscar evento', error: e);
@@ -152,6 +156,26 @@ class EventosServices {
     } catch (e) {
       logger.e('❌ Error al salir del evento', error: e);
       throw Exception('Error al salir del evento: $e');
+    }
+  }
+
+  Future<Evento> acceptInvitation(String eventId) async {
+    try {
+      final response = await _client.post('/$eventId/accept-invitation');
+      return Evento.fromJson(response.data['evento']);
+    } catch (e) {
+      print('Error in acceptInvitation: $e');
+      throw Exception('Error al aceptar invitación: $e');
+    }
+  }
+
+  Future<Evento> rejectInvitation(String eventId) async {
+    try {
+      final response = await _client.post('/$eventId/reject-invitation');
+      return Evento.fromJson(response.data['evento']);
+    } catch (e) {
+      print('Error in rejectInvitation: $e');
+      throw Exception('Error al rechazar invitación: $e');
     }
   }
 

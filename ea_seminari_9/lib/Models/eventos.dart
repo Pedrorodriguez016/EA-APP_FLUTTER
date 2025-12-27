@@ -31,6 +31,9 @@ class Evento {
   final int? capacidadMaxima;
   final List<String> participantes;
   final String categoria;
+  final bool isPrivate;
+  final List<String> invitados;
+  final List<String> invitacionesPendientes;
 
   Evento({
     required this.id,
@@ -42,6 +45,9 @@ class Evento {
     this.lng,
     required this.participantes,
     required this.categoria,
+    this.isPrivate = false,
+    this.invitados = const [],
+    this.invitacionesPendientes = const [],
   });
 
   factory Evento.fromJson(Map<String, dynamic> json) {
@@ -57,6 +63,13 @@ class Evento {
         json['participantes'] ?? [],
       ).map((p) => p.toString()).toList(),
       categoria: json['categoria'] as String? ?? 'Otros',
+      isPrivate: json['isPrivate'] as bool? ?? false,
+      invitados: List<dynamic>.from(
+        json['invitados'] ?? [],
+      ).map((i) => i.toString()).toList(),
+      invitacionesPendientes: List<dynamic>.from(
+        json['invitacionesPendientes'] ?? [],
+      ).map((i) => i.toString()).toList(),
     );
   }
   Map<String, dynamic> toJson() {
@@ -66,6 +79,9 @@ class Evento {
       'address': address,
       'participantes': participantes,
       'categoria': categoria,
+      'isPrivate': isPrivate,
+      'invitados': invitados,
+      'invitacionesPendientes': invitacionesPendientes,
     };
   }
 }

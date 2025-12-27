@@ -8,6 +8,8 @@ import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import '../utils/logger.dart';
 import '../utils/app_theme.dart';
+import '../Controllers/valoracion_controller.dart';
+import '../Widgets/valoracion_list.dart';
 
 class EventosDetailScreen extends GetView<EventoController> {
   final String eventoId;
@@ -20,6 +22,7 @@ class EventosDetailScreen extends GetView<EventoController> {
     if (cleanScheduleString.isEmpty) {
       return translate('events.date_unavailable');
     }
+
     try {
       final DateTime? scheduleDate = DateTime.tryParse(cleanScheduleString);
 
@@ -31,30 +34,36 @@ class EventosDetailScreen extends GetView<EventoController> {
         'd \'de\' MMMM \'de\' yyyy',
         'es',
       ).format(scheduleDate);
+
       final String formattedTime = DateFormat(
         'HH:mm',
         'es',
       ).format(scheduleDate);
+
       final String relativeTime = timeago.format(
         scheduleDate,
         locale: 'es',
         allowFromNow: true,
       );
+
       final String fixedTime = '$formattedDate a las $formattedTime';
 
       return '$fixedTime ($relativeTime)';
     } catch (e) {
       logger.w('⚠️ Fallo al formatear la fecha en detalles: $e');
-      return 'Error de formato';
+      return translate('events.format_error');
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final valoracionController = Get.put(ValoracionController());
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (controller.selectedEvento.value?.id != eventoId) {
         controller.fetchEventoById(eventoId);
       }
+      valoracionController.loadRatings(eventoId);
     });
 
     return Scaffold(
@@ -126,6 +135,12 @@ class EventosDetailScreen extends GetView<EventoController> {
     final currentUserId = Get.find<AuthController>().currentUser.value?.id;
     final isParticipant = evento.participantes.contains(currentUserId);
 
+    // Logic for private events invitiation status
+    final bool isInvitedButPending = evento.invitacionesPendientes.contains(
+      currentUserId,
+    );
+    final bool isPrivateAndNotParticipant = evento.isPrivate && !isParticipant;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -174,46 +189,148 @@ class EventosDetailScreen extends GetView<EventoController> {
 
           const SizedBox(height: 32),
 
-          Container(
-            width: double.infinity,
-            height: 56,
-            decoration: BoxDecoration(
-              gradient: isParticipant ? null : AppGradients.primaryBtn,
-              color: isParticipant ? Colors.redAccent : null,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: isParticipant
-                      ? Colors.redAccent.withValues(alpha: 0.4)
-                      : context.theme.colorScheme.primary.withValues(
-                          alpha: 0.4,
+          // ACTIONS SECTION
+          if (isPrivateAndNotParticipant) ...[
+            if (isInvitedButPending) ...[
+              // Case: Pending Invitation
+              SizedBox(
+                width: double.infinity,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () =>
+                            controller.respondToInvitation(false), // Reject
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          elevation: 0,
                         ),
-                  blurRadius: 15,
-                  offset: const Offset(0, 8),
+                        child: Text(
+                          translate('events.reject_btn'),
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: AppGradients.primaryBtn,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: context.theme.colorScheme.primary
+                                  .withValues(alpha: 0.4),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: ElevatedButton(
+                          onPressed: () =>
+                              controller.respondToInvitation(true), // Accept
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor: Colors.white,
+                            shadowColor: Colors.transparent,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: Text(
+                            translate('events.accept_btn'),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: ElevatedButton(
-              onPressed: () => controller.toggleParticipation(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.transparent,
-                foregroundColor: Colors.white,
-                shadowColor: Colors.transparent,
-                shape: RoundedRectangleBorder(
+              ),
+            ] else ...[
+              // Case: Private Event & NO Invitation
+              Container(
+                width: double.infinity,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: context.theme.disabledColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: context.theme.disabledColor.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.lock_rounded,
+                        color: context.theme.disabledColor,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        translate('events.private_event_locked'),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: context.theme.disabledColor,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              child: Text(
-                isParticipant
-                    ? translate('events.leave_btn')
-                    : translate('events.join_btn'),
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+            ],
+          ] else ...[
+            // Case: Public Event OR Already Participant -> Join/Leave Button
+            Container(
+              width: double.infinity,
+              height: 56,
+              decoration: BoxDecoration(
+                gradient: isParticipant ? null : AppGradients.primaryBtn,
+                color: isParticipant ? Colors.redAccent : null,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: isParticipant
+                        ? Colors.redAccent.withValues(alpha: 0.4)
+                        : context.theme.colorScheme.primary.withValues(
+                            alpha: 0.4,
+                          ),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: ElevatedButton(
+                onPressed: () => controller.toggleParticipation(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: Colors.white,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: Text(
+                  isParticipant
+                      ? translate('events.leave_btn')
+                      : translate('events.join_btn'),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
+
           const SizedBox(height: 16),
           // Botón de Chat (Solo si es participante)
           if (isParticipant)
@@ -244,7 +361,10 @@ class EventosDetailScreen extends GetView<EventoController> {
                 ),
               ),
             ),
-          const SizedBox(height: 20),
+
+          const SizedBox(height: 32),
+          // Ratings Section
+          ValoracionList(eventId: eventoId),
         ],
       ),
     );

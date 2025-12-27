@@ -8,11 +8,14 @@ import '../Services/socket_services.dart';
 class UserBinding extends Bindings {
   @override
   void dependencies() {
-    Get.put<UserServices>(UserServices());
-    Get.put<SocketService>(SocketService());
-    Get.put<UserController>(
-      UserController(Get.find<UserServices>(), Get.find<SocketService>()),
+    Get.lazyPut<UserServices>(() => UserServices());
+    Get.lazyPut<SocketService>(() => SocketService());
+    Get.lazyPut<UserController>(
+      () => UserController(Get.find<UserServices>(), Get.find<SocketService>()),
     );
-    Get.put<EventoController>(EventoController(EventosServices()));
+    Get.lazyPut<EventoController>(
+      () => EventoController(EventosServices()),
+      fenix: true,
+    );
   }
 }
