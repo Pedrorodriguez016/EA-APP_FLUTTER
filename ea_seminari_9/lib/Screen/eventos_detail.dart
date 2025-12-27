@@ -151,31 +151,92 @@ class EventosDetailScreen extends GetView<EventoController> {
           // Información del evento
           _buildInfoCard(evento),
           const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            height: 50,
-            child: ElevatedButton(
-              onPressed: () => controller.toggleParticipation(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: isParticipant
-                    ? Colors.redAccent
-                    : const Color(0xFF667EEA),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+          // Botones de acción
+          if (evento.isPrivate && !isParticipant) ...[
+            if (evento.invitacionesPendientes.contains(currentUserId)) ...[
+              // Caso: Invitación pendiente
+              SizedBox(
+                width: double.infinity,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => controller.respondToInvitation(false),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text("Rechazar"),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () =>
+                            controller.respondToInvitation(true), // Aceptar
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text("Aceptar Invitación"),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              child: Text(
-                isParticipant
-                    ? "Salir del evento" // Añadir a JSON: 'events.leave_btn'
-                    : "Unirme al evento", // Añadir a JSON: 'events.join_btn'
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+            ] else ...[
+              // Caso: Privado y NO invitado
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton.icon(
+                  onPressed: null, // Deshabilitado
+                  icon: const Icon(Icons.lock),
+                  label: const Text("Evento Privado"),
+                  style: ElevatedButton.styleFrom(
+                    disabledBackgroundColor: Colors.grey.shade300,
+                    disabledForegroundColor: Colors.grey.shade600,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ] else ...[
+            // Caso: Público o ya participante (Salir)
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () => controller.toggleParticipation(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isParticipant
+                      ? Colors.redAccent
+                      : const Color(0xFF667EEA),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  isParticipant ? "Salir del evento" : "Unirme al evento",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
           const SizedBox(height: 20),
           ValoracionList(eventId: eventoId),
         ],

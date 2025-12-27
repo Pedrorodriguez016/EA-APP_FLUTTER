@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'auth_controller.dart'; 
+import 'auth_controller.dart';
+import 'package:ea_seminari_9/Models/user.dart';
+import 'package:ea_seminari_9/Services/user_services.dart';
 
 // Definimos los tipos de filtro posibles
 enum EventFilter { all, myEvents }
@@ -28,13 +30,18 @@ class EventoController extends GetxController {
   Timer? _debounce;
 
   // --- ESTADOS PARA FILTRADO ---
-  var currentFilter = EventFilter.all.obs; 
-  final AuthController _authController = Get.find<AuthController>(); 
+  var currentFilter = EventFilter.all.obs;
+  final AuthController _authController = Get.find<AuthController>();
 
   // --- Controllers para formulario ---
   final TextEditingController tituloController = TextEditingController();
   final TextEditingController direccionController = TextEditingController();
   var selectedSchedule = Rxn<DateTime>();
+  var isPrivate = false.obs;
+  var friendsList = <User>[].obs;
+  var selectedInvitedUsers = <String>[].obs;
+  var isLoadingFriends = false.obs;
+  final UserServices _userServices = UserServices();
 
   EventoController(this._eventosServices);
   final ScrollController scrollController = ScrollController();
@@ -43,39 +50,43 @@ class EventoController extends GetxController {
   void onInit() {
     // Escucha el estado del usuario para refrescar la lista si es necesario.
     ever(_authController.currentUser, (_) {
-      if (currentFilter.value == EventFilter.myEvents || _authController.currentUser.value == null) {
+      if (currentFilter.value == EventFilter.myEvents ||
+          _authController.currentUser.value == null) {
         refreshEventos();
       }
     });
-    
-    fetchEventos(1); 
-    selectedSchedule.value = null; 
+
+    fetchEventos(1);
+    selectedSchedule.value = null;
     super.onInit();
     scrollController.addListener(_scrollListener);
   }
-  
+
   @override
   void onClose() {
     tituloController.dispose();
     direccionController.dispose();
     _debounce?.cancel();
-    scrollController.removeListener(_scrollListener); 
+    scrollController.removeListener(_scrollListener);
     super.onClose();
   }
 
   void _scrollListener() {
-    if (scrollController.position.pixels >= scrollController.position.maxScrollExtent - 200) {
-      if (!isLoading.value && !isMoreLoading.value && currentPage.value < totalPages.value) {
+    if (scrollController.position.pixels >=
+        scrollController.position.maxScrollExtent - 200) {
+      if (!isLoading.value &&
+          !isMoreLoading.value &&
+          currentPage.value < totalPages.value) {
         loadMoreEvents();
       }
     }
   }
 
- void setFilter(EventFilter filter) {
+  void setFilter(EventFilter filter) {
     if (currentFilter.value != filter) {
       currentFilter.value = filter;
       searchEditingController.clear();
-      
+
       if (filter == EventFilter.myEvents) {
         eventosList.clear();
         fetchMisEventosEspecificos();
@@ -86,44 +97,47 @@ class EventoController extends GetxController {
     }
   }
 
-
   void fetchEventos(int page) async {
-    
     String? creatorId;
     if (currentFilter.value == EventFilter.myEvents) {
-      creatorId = _authController.currentUser.value?.id; 
-      
+      creatorId = _authController.currentUser.value?.id;
+
       if (creatorId == null) {
         isLoading.value = false;
         isMoreLoading.value = false;
-        eventosList.clear(); 
-        
+        eventosList.clear();
+
         // Esto evita que intente cargar eventos si el usuario no está logueado
-        Get.snackbar('Acceso Restringido', 'Debes iniciar sesión para ver tus eventos.',
-            snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red);
+        Get.snackbar(
+          'Acceso Restringido',
+          'Debes iniciar sesión para ver tus eventos.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+        );
         return;
       }
     }
 
     // --- LÍNEA DE DEPURACIÓN CLAVE ---
     // Mira esta línea en la consola para saber si tienes el ID del usuario.
-    print("DEBUG FILTRO: Filtro actual: ${currentFilter.value.name}, creatorId enviado: $creatorId");
+    print(
+      "DEBUG FILTRO: Filtro actual: ${currentFilter.value.name}, creatorId enviado: $creatorId",
+    );
     // ----------------------------------
 
-    if (page == 1) {  
+    if (page == 1) {
       isLoading.value = true;
     } else {
       isMoreLoading.value = true;
     }
-    
 
     try {
       final data = await _eventosServices.fetchEvents(
         page: page,
         limit: limit,
-        creatorId: creatorId, 
+        creatorId: creatorId,
       );
-        
+
       final List<Evento> newEventos = data['eventos'];
       if (page == 1) {
         eventosList.assignAll(newEventos);
@@ -136,28 +150,33 @@ class EventoController extends GetxController {
     } catch (e) {
       print("Error al cargar eventos: $e");
       if (page == 1) eventosList.clear();
-      
-      Get.snackbar('Error de Carga', 'No se pudieron cargar los eventos. Revise su conexión o el servidor.',
-          snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.red);
 
+      Get.snackbar(
+        'Error de Carga',
+        'No se pudieron cargar los eventos. Revise su conexión o el servidor.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+      );
     } finally {
       isLoading.value = false;
       isMoreLoading.value = false;
     }
   }
-  
+
   // --- [Resto de las funciones sin cambios, solo para completar el archivo] ---
 
-  void loadMoreEvents() { 
+  void loadMoreEvents() {
     if (currentPage.value < totalPages.value) {
-       fetchEventos(currentPage.value + 1); 
+      fetchEventos(currentPage.value + 1);
     }
   }
-  
+
   void limpiarFormularioCrear() {
     tituloController.clear();
     direccionController.clear();
     selectedSchedule.value = null;
+    isPrivate.value = false;
+    selectedInvitedUsers.clear();
   }
 
   Future<void> pickSchedule(BuildContext context) async {
@@ -168,14 +187,16 @@ class EventoController extends GetxController {
       lastDate: DateTime(2101),
     );
 
-    if (date == null) return; 
+    if (date == null) return;
 
     final TimeOfDay? time = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.fromDateTime(selectedSchedule.value ?? DateTime.now()),
+      initialTime: TimeOfDay.fromDateTime(
+        selectedSchedule.value ?? DateTime.now(),
+      ),
     );
 
-    if (time == null) return; 
+    if (time == null) return;
 
     final DateTime combinedDateTime = DateTime(
       date.year,
@@ -188,53 +209,59 @@ class EventoController extends GetxController {
     selectedSchedule.value = combinedDateTime;
   }
 
-  void fetchMapEvents(double north, double south, double east, double west) async {
+  void fetchMapEvents(
+    double north,
+    double south,
+    double east,
+    double west,
+  ) async {
     try {
       var nuevosEventos = await _eventosServices.fetchEventsByBounds(
-        north: north, 
-        south: south, 
-        east: east, 
-        west: west
+        north: north,
+        south: south,
+        east: east,
+        west: west,
       );
-      
+
       mapEventosList.assignAll(nuevosEventos);
-      
     } catch (e) {
       print("Error cargando mapa: $e");
     }
   }
-  
+
   Future<void> searchEventos(String query) async {
     if (searchEditingController.text.isEmpty) {
       refreshEventos();
       return;
     }
-    
+
     try {
       isLoading(true);
-    
-      final Evento? evento = await _eventosServices.getEventoByName(searchEditingController.text); 
-      
+
+      final Evento? evento = await _eventosServices.getEventoByName(
+        searchEditingController.text,
+      );
+
       if (evento != null) {
         eventosList.assignAll([evento]);
       } else {
         eventosList.clear();
         Get.snackbar(
-          'Búsqueda', 
+          'Búsqueda',
           'No se encontró ningún evento con ese nombre',
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.orange,
           colorText: Colors.white,
-          duration: const Duration(seconds: 2)
+          duration: const Duration(seconds: 2),
         );
       }
     } catch (e) {
       Get.snackbar(
-        'Error', 
+        'Error',
         'Ocurrió un error al buscar: $e',
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
-        colorText: Colors.white
+        colorText: Colors.white,
       );
     } finally {
       isLoading(false);
@@ -243,7 +270,7 @@ class EventoController extends GetxController {
 
   void refreshEventos() {
     searchEditingController.clear();
-    fetchEventos(1); 
+    fetchEventos(1);
     Get.snackbar(
       'Actualizado',
       'Lista de Eventos actualizada',
@@ -267,24 +294,30 @@ class EventoController extends GetxController {
       isLoading(false);
     }
   }
-  
+
   Future<void> crearEvento() async {
     final String titulo = tituloController.text;
     final String direccion = direccionController.text;
 
     if (titulo.isEmpty) {
-      Get.snackbar('Campo requerido', 'Por favor, introduce un título.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.orange,
-          colorText: Colors.white);
+      Get.snackbar(
+        'Campo requerido',
+        'Por favor, introduce un título.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+      );
       return;
     }
-    
+
     if (selectedSchedule.value == null) {
-      Get.snackbar('Campo requerido', 'Por favor, selecciona una fecha y hora.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.orange,
-          colorText: Colors.white);
+      Get.snackbar(
+        'Campo requerido',
+        'Por favor, selecciona una fecha y hora.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+      );
       return;
     }
 
@@ -293,6 +326,8 @@ class EventoController extends GetxController {
         'name': titulo,
         'address': direccion,
         'schedule': selectedSchedule.value!.toIso8601String(),
+        'isPrivate': isPrivate.value,
+        'invitados': selectedInvitedUsers.toList(),
       };
 
       await _eventosServices.createEvento(nuevoEventoData);
@@ -307,10 +342,8 @@ class EventoController extends GetxController {
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
-    
-      refreshEventos();
-      
 
+      refreshEventos();
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -321,20 +354,14 @@ class EventoController extends GetxController {
       );
     }
   }
-  
+
   void onMapPositionChanged(MapCamera camera, bool hasGesture) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
 
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      
       final bounds = camera.visibleBounds;
-      
-      fetchMapEvents(
-        bounds.north, 
-        bounds.south, 
-        bounds.east, 
-        bounds.west
-      );
+
+      fetchMapEvents(bounds.north, bounds.south, bounds.east, bounds.west);
     });
   }
 
@@ -350,38 +377,37 @@ class EventoController extends GetxController {
     final isParticipant = event.participantes.contains(user.id);
 
     try {
-      isLoading(true); 
-      
+      isLoading(true);
+
       Evento updatedEvento;
 
       if (isParticipant) {
         updatedEvento = await _eventosServices.leaveEvent(event.id);
         Get.snackbar(
-          "Existo!", 
-          "Has salido del evento", 
-          backgroundColor: Colors.orange, 
-          colorText: Colors.white
+          "Existo!",
+          "Has salido del evento",
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
         );
       } else {
         updatedEvento = await _eventosServices.joinEvent(event.id);
         Get.snackbar(
-          "Exito!", 
-          "Te has unido al evento", 
-          backgroundColor: Colors.green, 
-          colorText: Colors.white
+          "Exito!",
+          "Te has unido al evento",
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
         );
       }
 
       selectedEvento.value = updatedEvento;
-      
+
       final index = eventosList.indexWhere((e) => e.id == updatedEvento.id);
       if (index != -1) {
         eventosList[index] = updatedEvento;
       }
-
     } catch (e) {
       Get.snackbar(
-       "Error",
+        "Error",
         e.toString(),
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -391,7 +417,7 @@ class EventoController extends GetxController {
     }
   }
 
-void fetchMisEventosEspecificos() async {
+  void fetchMisEventosEspecificos() async {
     try {
       isLoading(true);
       final resultado = await _eventosServices.getMisEventos();
@@ -404,4 +430,70 @@ void fetchMisEventosEspecificos() async {
     }
   }
 
+  void fetchFriends() async {
+    final userId = _authController.currentUser.value?.id;
+    if (userId == null) return;
+
+    try {
+      isLoadingFriends(true);
+      final friends = await _userServices.fetchFriends(userId);
+      friendsList.assignAll(friends);
+    } catch (e) {
+      print("Error fetching friends: $e");
+    } finally {
+      isLoadingFriends(false);
+    }
+  }
+
+  void toggleUserSelection(String userId) {
+    if (selectedInvitedUsers.contains(userId)) {
+      selectedInvitedUsers.remove(userId);
+    } else {
+      selectedInvitedUsers.add(userId);
+    }
+  }
+
+  Future<void> respondToInvitation(bool accept) async {
+    final event = selectedEvento.value;
+    if (event == null) return;
+
+    try {
+      isLoading(true);
+      Evento updatedEvento;
+
+      if (accept) {
+        updatedEvento = await _eventosServices.acceptInvitation(event.id);
+        Get.snackbar(
+          "Éxito",
+          "Invitación aceptada",
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      } else {
+        updatedEvento = await _eventosServices.rejectInvitation(event.id);
+        Get.snackbar(
+          "Información",
+          "Invitación rechazada",
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+        );
+      }
+
+      selectedEvento.value = updatedEvento;
+
+      final index = eventosList.indexWhere((e) => e.id == updatedEvento.id);
+      if (index != -1) {
+        eventosList[index] = updatedEvento;
+      }
+    } catch (e) {
+      Get.snackbar(
+        "Error",
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
 }

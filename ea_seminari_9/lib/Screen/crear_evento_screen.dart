@@ -26,21 +26,102 @@ class CrearEventoScreen extends GetView<EventoController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Título del evento',
-                style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text(
+              'Título del evento',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             // MODIFICADO: Usa el controller de GetX
             TextField(controller: controller.tituloController),
             const SizedBox(height: 16),
-            const Text('Direccion',
-                style: TextStyle(fontWeight: FontWeight.bold)),
+            const Text(
+              'Direccion',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
             // MODIFICADO: Usa el controller de GetX
-            TextField(
-                controller: controller.direccionController, maxLines: 3),
+            TextField(controller: controller.direccionController, maxLines: 3),
             const SizedBox(height: 16),
 
-            // --- NUEVO WIDGET: Selector de Fecha ---
             _buildDatePicker(context),
+
             // --- FIN NUEVO WIDGET ---
+            const SizedBox(height: 16),
+
+            // --- SWITCH PRIVACIDAD ---
+            Obx(
+              () => SwitchListTile(
+                title: const Text(
+                  'Evento Privado',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                subtitle: const Text(
+                  'Solo los invitados podrán ver y unirse a este evento',
+                ),
+                value: controller.isPrivate.value,
+                onChanged: (bool val) {
+                  controller.isPrivate.value = val;
+                  if (val) {
+                    controller.fetchFriends();
+                  }
+                },
+              ),
+            ),
+
+            // --- LISTA DE PROBABLES INVITADOS ---
+            Obx(() {
+              if (!controller.isPrivate.value) return const SizedBox.shrink();
+
+              if (controller.isLoadingFriends.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (controller.friendsList.isEmpty) {
+                return const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    'No tienes amigos para invitar aún.',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                );
+              }
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      'Invitar amigos:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Container(
+                    height: 200, // Altura fija para la lista
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: controller.friendsList.length,
+                      itemBuilder: (context, index) {
+                        final friend = controller.friendsList[index];
+                        return Obx(() {
+                          final isSelected = controller.selectedInvitedUsers
+                              .contains(friend.id);
+                          return CheckboxListTile(
+                            title: Text(friend.username),
+                            subtitle: Text(friend.gmail),
+                            value: isSelected,
+                            onChanged: (_) =>
+                                controller.toggleUserSelection(friend.id),
+                          );
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              );
+            }),
 
             const SizedBox(height: 24),
             Center(
@@ -48,8 +129,10 @@ class CrearEventoScreen extends GetView<EventoController> {
                 icon: const Icon(Icons.save),
                 label: const Text('Guardar evento'),
                 style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
                 ),
                 onPressed: () {
                   // MODIFICADO: Llama al controller sin parámetros
@@ -68,20 +151,23 @@ class CrearEventoScreen extends GetView<EventoController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Fecha y hora del evento',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        const Text(
+          'Fecha y hora del evento',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 8),
         // Obx re-dibuja este widget cuando 'selectedSchedule' cambia
         Obx(() {
           final bool isDateSelected = controller.selectedSchedule.value != null;
-          
+
           // Formatea la fecha para mostrarla
           String buttonText = 'Seleccionar fecha y hora';
           if (isDateSelected) {
             final dt = controller.selectedSchedule.value!;
             // Formato simple: 13/11/2025 - 23:50
             final String minute = dt.minute.toString().padLeft(2, '0');
-            buttonText = "${dt.day}/${dt.month}/${dt.year} - ${dt.hour}:$minute";
+            buttonText =
+                "${dt.day}/${dt.month}/${dt.year} - ${dt.hour}:$minute";
           }
 
           return OutlinedButton.icon(
@@ -90,7 +176,9 @@ class CrearEventoScreen extends GetView<EventoController> {
             style: OutlinedButton.styleFrom(
               minimumSize: const Size(double.infinity, 48), // Ancho completo
               alignment: Alignment.centerLeft,
-              foregroundColor: isDateSelected ? Colors.black87 : Colors.grey.shade700,
+              foregroundColor: isDateSelected
+                  ? Colors.black87
+                  : Colors.grey.shade700,
               side: BorderSide(
                 color: isDateSelected ? Colors.blue : Colors.grey.shade400,
               ),
