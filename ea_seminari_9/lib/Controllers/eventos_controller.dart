@@ -51,26 +51,23 @@ class EventoController extends GetxController {
 
   @override
   void onInit() {
+    super.onInit();
     tituloController = TextEditingController();
     direccionController = TextEditingController();
 
-    fetchEventos(1);
+    // Inicializar datos
     selectedSchedule.value = null;
-    super.onInit();
+    fetchEventos(1);
+
+    // Agregar listener una sola vez
     scrollController.addListener(_scrollListener);
 
     // Escucha el estado del usuario para refrescar la lista si es necesario.
-    ever(_authController.currentUser, (_) {
-      if (currentFilter.value == EventFilter.myEvents ||
-          _authController.currentUser.value == null) {
+    ever(_authController.currentUser, (user) {
+      if (user != null) {
         refreshEventos();
       }
     });
-
-    fetchEventos(1);
-    selectedSchedule.value = null;
-    super.onInit();
-    scrollController.addListener(_scrollListener);
   }
 
   @override

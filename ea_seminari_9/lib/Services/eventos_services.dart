@@ -1,12 +1,16 @@
+import 'package:ea_seminari_9/Models/user.dart';
 import '../Models/eventos.dart';
 import 'package:dio/dio.dart';
 import '../Interceptor/auth_interceptor.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../utils/logger.dart';
+import 'package:get/get.dart';
+import '../Services/storage_service.dart';
 
 class EventosServices {
   final String baseUrl = '${dotenv.env['BASE_URL']}/api/event';
   late final Dio _client;
+  final User currentUser = Get.find<StorageService>().getUser()!;
 
   EventosServices() {
     _client = Dio(BaseOptions(baseUrl: baseUrl));
@@ -60,24 +64,28 @@ class EventosServices {
       logger.d('📄 Obteniendo eventos - Página: $page, Límite: $limit');
 
       final response = await _client.get(
-        '/',
+        '/visible',
         queryParameters: {
           'page': page,
           'limit': limit,
           if (q.isNotEmpty) 'q': q,
-          if (creatorId != null && creatorId.isNotEmpty) 'creatorId': creatorId,
         },
       );
 
       final responseData = response.data;
-      final List<dynamic> eventosList = responseData['data'];
+
+      // Intentar obtener la lista de eventos buscando en 'data' o 'docs'
+      final List<dynamic> eventosList =
+          responseData['data'] ?? responseData['docs'] ?? [];
+
+      logger.i('✅ Respuesta recibida. Claves: ${responseData.keys.join(", ")}');
       logger.i('✅ Eventos obtenidos: ${eventosList.length}');
 
       return {
         'eventos': eventosList.map((json) => Evento.fromJson(json)).toList(),
-        'totalPages': responseData['totalPages'] ?? 1,
-        'currentPage': responseData['page'] ?? 1,
-        'total': responseData['totalItems'] ?? 0,
+        'totalPages': responseData['totalPages'] ?? responseData['pages'] ?? 1,
+        'currentPage': responseData['page'] ?? responseData['currentPage'] ?? 1,
+        'total': responseData['totalItems'] ?? responseData['totalDocs'] ?? 0,
       };
     } catch (e) {
       logger.e('❌ Error al cargar eventos', error: e);
