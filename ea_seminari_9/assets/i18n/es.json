@@ -127,7 +127,18 @@
     },
     "chat_btn": "Chat del evento",
     "chat_subtitle": "Conversación grupal",
-    "chat_hint": "Escribe un mensaje..."
+    "chat_hint": "Escribe un mensaje...",
+    "reviews_title": "Valoraciones",
+    "write_review": "Escribir reseña",
+    "review_dialog_title": "Tu Opinión",
+    "review_comment_hint": "Escribe un comentario...",
+    "review_send_btn": "Enviar Valoración",
+    "review_empty_msg": "Sé el primero en valorar este evento"
+  },
+  "calendar": {
+    "title": "Calendario de Eventos",
+    "no_events_day": "No hay eventos para este día",
+    "events_found": "eventos encontrados"
   },
   "users": {
     "list_title": "Usuarios",

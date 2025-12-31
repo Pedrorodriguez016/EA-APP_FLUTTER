@@ -28,6 +28,7 @@ import 'utils/logger.dart';
 import 'Screen/chatbot_screen.dart';
 import 'Bindings/chatbot_binding.dart';
 import 'utils/app_theme.dart';
+import 'Screen/calendar_screen.dart';
 
 void main() async {
   logger.i('🚀 Iniciando aplicación...');
@@ -142,6 +143,11 @@ class MyApp extends StatelessWidget {
           name: '/event-chat',
           page: () => const EventChatScreen(),
           binding: EventChatBinding(),
+        ),
+        GetPage(
+          name: '/calendar',
+          page: () => const CalendarScreen(),
+          binding: UserBinding(),
         ),
       ],
       defaultTransition: Transition.cupertino,

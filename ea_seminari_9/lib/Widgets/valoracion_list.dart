@@ -17,7 +17,7 @@ class ValoracionList extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: context.theme.cardColor,
         borderRadius: BorderRadius.circular(24),
@@ -33,24 +33,55 @@ class ValoracionList extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Valoraciones', // Could be translate('events.reviews_title')
-                style: context.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 20,
+              Expanded(
+                child: Text(
+                  translate('events.reviews_title'),
+                  style: context.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 20,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              TextButton.icon(
+              const SizedBox(width: 8),
+              TextButton(
                 onPressed: () => Get.dialog(ValoracionDialog(eventId: eventId)),
-                icon: Icon(Icons.edit, size: 18, color: context.theme.colorScheme.primary),
-                label: Text(
-                  'Escribir reseña', // Could be translate('events.write_review')
-                  style: TextStyle(
-                     color: context.theme.colorScheme.primary,
-                     fontWeight: FontWeight.bold,
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
                   ),
+                  backgroundColor: context.theme.colorScheme.primary.withValues(
+                    alpha: 0.1,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.add_comment_rounded,
+                      size: 16,
+                      color: context.theme.colorScheme.primary,
+                    ),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        translate('events.write_review'),
+                        style: TextStyle(
+                          color: context.theme.colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -62,18 +93,31 @@ class ValoracionList extends StatelessWidget {
             }
             if (valoracionController.valoraciones.isEmpty) {
               return Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: context.theme.colorScheme.surface, 
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: context.theme.dividerColor),
+                  color: context.theme.colorScheme.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: context.theme.dividerColor.withValues(alpha: 0.5),
+                  ),
                 ),
                 child: Center(
-                  child: Text(
-                    'Sé el primero en valorar este evento',
-                    style: context.textTheme.bodyMedium?.copyWith(
-                      color: context.theme.hintColor,
-                    ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.rate_review_outlined,
+                        color: context.theme.disabledColor,
+                        size: 32,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        translate('events.review_empty_msg'),
+                        textAlign: TextAlign.center,
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          color: context.theme.hintColor,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               );
@@ -83,13 +127,16 @@ class ValoracionList extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: valoracionController.valoraciones.length,
-              separatorBuilder: (_, __) => Divider(color: context.theme.dividerColor.withValues(alpha: 0.5)),
+              separatorBuilder: (_, __) => Divider(
+                color: context.theme.dividerColor.withValues(alpha: 0.5),
+              ),
               itemBuilder: (context, index) {
                 final val = valoracionController.valoraciones[index];
                 final isMe =
                     val.id == valoracionController.myValoracion.value?.id;
 
-                final avatarInitial = (val.usuarioNombre ?? 'A')[0].toUpperCase();
+                final avatarInitial = (val.usuarioNombre ?? 'A')[0]
+                    .toUpperCase();
 
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -97,87 +144,100 @@ class ValoracionList extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       CircleAvatar(
-                         backgroundColor: context.theme.colorScheme.primary.withValues(alpha: 0.2),
-                         child: Text(
-                           avatarInitial,
-                           style: TextStyle(
-                             color: context.theme.colorScheme.primary,
-                             fontWeight: FontWeight.bold,
-                           ),
-                         ),
+                        backgroundColor: context.theme.colorScheme.primary
+                            .withValues(alpha: 0.2),
+                        child: Text(
+                          avatarInitial,
+                          style: TextStyle(
+                            color: context.theme.colorScheme.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                             Row(
-                               children: [
-                                 Expanded(
+                            Row(
+                              children: [
+                                Expanded(
                                   child: Text(
-                                      val.usuarioNombre ?? 'Anonimo',
-                                      overflow: TextOverflow.ellipsis,
-                                      style: context.textTheme.bodyLarge?.copyWith(
+                                    val.usuarioNombre ?? 'Anonimo',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: context.textTheme.bodyLarge
+                                        ?.copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                if (isMe) ...[
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green.withValues(
+                                        alpha: 0.1,
+                                      ),
+                                      borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(
+                                        color: Colors.green.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Tú',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.green,
                                         fontWeight: FontWeight.bold,
                                       ),
+                                    ),
                                   ),
-                                 ),
-                                 if (isMe) ...[
-                                   const SizedBox(width: 8),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 2,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.green.withValues(alpha: 0.1),
-                                        borderRadius: BorderRadius.circular(4),
-                                        border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
-                                      ),
-                                      child: const Text(
-                                        'Tú',
-                                        style: TextStyle(fontSize: 10, color: Colors.green, fontWeight: FontWeight.bold),
-                                      ),
+                                ],
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                _buildStarDisplay(
+                                  val.puntuacion.toDouble(),
+                                  context,
+                                ),
+                                const Spacer(),
+                                if (isMe)
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.delete_outline,
+                                      size: 20,
+                                      color: Colors.redAccent,
                                     ),
-                                 ]
-                               ],
-                             ),
-                             const SizedBox(height: 4),
-                             Row(
-                               children: [
-                                  _buildStarDisplay(val.puntuacion.toDouble(), context),
-                                  const Spacer(),
-                                  if (isMe)
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.delete_outline,
-                                        size: 20,
-                                        color: Colors.redAccent,
-                                      ),
-                                      padding: EdgeInsets.zero,
-                                      constraints: const BoxConstraints(),
-                                      onPressed: () =>
-                                          valoracionController.deleteRating(eventId),
-                                    ),
-                               ],
-                             ),
-                             if (val.comentario.isNotEmpty) ...[
-                               const SizedBox(height: 6),
-                               Text(
-                                 val.comentario,
-                                 style: context.textTheme.bodyMedium,
-                               ),
-                             ],
-                             const SizedBox(height: 4),
-                             Text(
-                               DateFormat('dd MMM yyyy').format(val.createdAt),
-                               style: context.textTheme.bodySmall?.copyWith(
-                                 fontSize: 12,
-                               ),
-                             ),
+                                    padding: EdgeInsets.zero,
+                                    constraints: const BoxConstraints(),
+                                    onPressed: () => valoracionController
+                                        .deleteRating(eventId),
+                                  ),
+                              ],
+                            ),
+                            if (val.comentario.isNotEmpty) ...[
+                              const SizedBox(height: 6),
+                              Text(
+                                val.comentario,
+                                style: context.textTheme.bodyMedium,
+                              ),
+                            ],
+                            const SizedBox(height: 4),
+                            Text(
+                              DateFormat('dd MMM yyyy').format(val.createdAt),
+                              style: context.textTheme.bodySmall?.copyWith(
+                                fontSize: 12,
+                              ),
+                            ),
                           ],
                         ),
-                      )
+                      ),
                     ],
                   ),
                 );

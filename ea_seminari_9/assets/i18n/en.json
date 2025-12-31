@@ -128,7 +128,18 @@
     },
     "chat_btn": "Enter chat",
     "chat_subtitle": "Event chat",
-    "chat_hint": "Write something in the event..."
+    "chat_hint": "Write something in the event...",
+    "reviews_title": "Ratings",
+    "write_review": "Write review",
+    "review_dialog_title": "Your Opinion",
+    "review_comment_hint": "Write a comment...",
+    "review_send_btn": "Submit Review",
+    "review_empty_msg": "Be the first to review this event"
+  },
+  "calendar": {
+    "title": "Events Calendar",
+    "no_events_day": "No events for this day",
+    "events_found": "events found"
   },
   "users": {
     "list_title": "Users",

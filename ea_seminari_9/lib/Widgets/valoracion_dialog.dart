@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../Controllers/valoracion_controller.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import '../utils/app_theme.dart';
 
 class ValoracionDialog extends StatelessWidget {
@@ -21,7 +22,7 @@ class ValoracionDialog extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Tu Opinión',
+              translate('events.review_dialog_title'),
               style: context.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
@@ -56,7 +57,7 @@ class ValoracionDialog extends StatelessWidget {
               maxLines: 3,
               style: context.textTheme.bodyMedium,
               decoration: InputDecoration(
-                hintText: 'Escribe un comentario...',
+                hintText: translate('events.review_comment_hint'),
                 hintStyle: context.theme.inputDecorationTheme.hintStyle,
                 border: context.theme.inputDecorationTheme.border,
                 enabledBorder: context.theme.inputDecorationTheme.enabledBorder,
@@ -107,8 +108,8 @@ class ValoracionDialog extends StatelessWidget {
                               color: Colors.white,
                             ),
                           )
-                        : const Text(
-                            'Enviar Valoración',
+                        : Text(
+                            translate('events.review_send_btn'),
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,

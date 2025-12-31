@@ -132,7 +132,7 @@ class CustomNavBar extends StatelessWidget {
         Get.offNamed('/home');
         break;
       case 1:
-        Get.offNamed('/eventos');
+        Get.offNamed('/calendar');
         break;
       case 2:
         Get.offNamed('/chat-list');

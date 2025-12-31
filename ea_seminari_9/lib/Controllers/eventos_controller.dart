@@ -7,8 +7,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'auth_controller.dart';
 import '../utils/logger.dart';
-import 'package:latlong2/latlong.dart';
-import 'auth_controller.dart';
 import 'package:ea_seminari_9/Models/user.dart';
 import 'package:ea_seminari_9/Services/user_services.dart';
 
@@ -22,6 +20,9 @@ class EventoController extends GetxController {
   var mapEventosList = <Evento>[].obs;
   var misEventosCreados = <Evento>[].obs;
   var misEventosInscritos = <Evento>[].obs;
+  var calendarEvents = <Evento>[].obs;
+  var selectedDayEvents = <Evento>[].obs;
+  var isCalendarView = false.obs;
   var currentPage = 1.obs;
   var totalPages = 1.obs;
   var totalEventos = 0.obs;
@@ -287,6 +288,7 @@ class EventoController extends GetxController {
       isLoading(true);
       var evento = await _eventosServices.fetchEventById(id);
       selectedEvento.value = evento;
+      _updateEventInLists(evento);
     } catch (e) {
       Get.snackbar(
         translate('common.error'),
@@ -390,7 +392,10 @@ class EventoController extends GetxController {
       return;
     }
 
-    final isParticipant = event.participantes.contains(user.id);
+    final bool isParticipant = event.participantes.any((p) {
+      if (user.id.isEmpty) return false;
+      return p.trim() == user.id.trim();
+    });
 
     try {
       isLoading(true);
@@ -417,10 +422,8 @@ class EventoController extends GetxController {
 
       selectedEvento.value = updatedEvento;
 
-      final index = eventosList.indexWhere((e) => e.id == updatedEvento.id);
-      if (index != -1) {
-        eventosList[index] = updatedEvento;
-      }
+      // Sincronizar en todas las listas reactivas
+      _updateEventInLists(updatedEvento);
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -430,6 +433,32 @@ class EventoController extends GetxController {
       );
     } finally {
       isLoading(false);
+    }
+  }
+
+  void _updateEventInLists(Evento updatedEvento) {
+    final updatedId = updatedEvento.id.trim();
+    logger.d(
+      '🔄 Actualizando evento en listas: $updatedId (Participantes: ${updatedEvento.participantes.length})',
+    );
+
+    void updateSpecificList(RxList<Evento> list, String listName) {
+      final index = list.indexWhere((e) => e.id.trim() == updatedId);
+      if (index != -1) {
+        list[index] = updatedEvento;
+        list.refresh();
+        logger.d('✅ Evento actualizado en $listName en el índice $index');
+      }
+    }
+
+    updateSpecificList(eventosList, 'eventosList');
+    updateSpecificList(calendarEvents, 'calendarEvents');
+    updateSpecificList(selectedDayEvents, 'selectedDayEvents');
+    updateSpecificList(mapEventosList, 'mapEventosList');
+
+    if (selectedEvento.value?.id.trim() == updatedId) {
+      selectedEvento.value = updatedEvento;
+      logger.d('✅ selectedEvento actualizado');
     }
   }
 
@@ -499,11 +528,7 @@ class EventoController extends GetxController {
       }
 
       selectedEvento.value = updatedEvento;
-
-      final index = eventosList.indexWhere((e) => e.id == updatedEvento.id);
-      if (index != -1) {
-        eventosList[index] = updatedEvento;
-      }
+      _updateEventInLists(updatedEvento);
     } catch (e) {
       Get.snackbar(
         "Error",
@@ -512,7 +537,19 @@ class EventoController extends GetxController {
         colorText: Colors.white,
       );
     } finally {
-      isLoading(false);
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchCalendarEvents(DateTime from, DateTime to) async {
+    try {
+      isLoading.value = true;
+      final events = await _eventosServices.getCalendarEvents(from, to);
+      calendarEvents.assignAll(events);
+    } catch (e) {
+      logger.e('❌ Error fetching calendar events', error: e);
+    } finally {
+      isLoading.value = false;
     }
   }
 }

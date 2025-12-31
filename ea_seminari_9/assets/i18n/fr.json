@@ -128,7 +128,18 @@
     },
     "chat_btn": "Entrer dans le chat",
     "chat_subtitle": "Chat de l'événement",
-    "chat_hint": "Écrivez quelque chose dans l'événement..."
+    "chat_hint": "Écrivez quelque chose dans l'événement...",
+    "reviews_title": "Évaluations",
+    "write_review": "Écrire un avis",
+    "review_dialog_title": "Votre Avis",
+    "review_comment_hint": "Écrire un commentaire...",
+    "review_send_btn": "Envoyer l'Avis",
+    "review_empty_msg": "Soyez le premier à évaluer cet événement"
+  },
+  "calendar": {
+    "title": "Calendrier des Événements",
+    "no_events_day": "Aucun événement pour ce jour",
+    "events_found": "événements trouvés"
   },
   "users": {
     "list_title": "Utilisateurs",

@@ -145,9 +145,13 @@ class EventosServices {
     try {
       logger.i('💪 Uniendose al evento: $eventId');
       final response = await _client.post('/$eventId/join');
-      logger.i('✅ Suscripción al evento exitosa');
+      final data = response.data;
 
-      return Evento.fromJson(response.data);
+      // El backend devuelve { message, evento, enListaEspera }
+      if (data is Map && data.containsKey('evento')) {
+        return Evento.fromJson(data['evento']);
+      }
+      return Evento.fromJson(data);
     } catch (e) {
       logger.e('❌ Error al unirse al evento', error: e);
       throw Exception('Error al unirse al evento: $e');
@@ -158,9 +162,13 @@ class EventosServices {
     try {
       logger.i('🚪 Saliendo del evento: $eventId');
       final response = await _client.post('/$eventId/leave');
-      logger.i('✅ Salida del evento exitosa');
+      final data = response.data;
 
-      return Evento.fromJson(response.data);
+      // El backend devuelve { message, evento }
+      if (data is Map && data.containsKey('evento')) {
+        return Evento.fromJson(data['evento']);
+      }
+      return Evento.fromJson(data);
     } catch (e) {
       logger.e('❌ Error al salir del evento', error: e);
       throw Exception('Error al salir del evento: $e');
@@ -170,7 +178,11 @@ class EventosServices {
   Future<Evento> acceptInvitation(String eventId) async {
     try {
       final response = await _client.post('/$eventId/accept-invitation');
-      return Evento.fromJson(response.data['evento']);
+      final data = response.data;
+      if (data is Map && data.containsKey('evento')) {
+        return Evento.fromJson(data['evento']);
+      }
+      return Evento.fromJson(data);
     } catch (e) {
       print('Error in acceptInvitation: $e');
       throw Exception('Error al aceptar invitación: $e');
@@ -180,7 +192,11 @@ class EventosServices {
   Future<Evento> rejectInvitation(String eventId) async {
     try {
       final response = await _client.post('/$eventId/reject-invitation');
-      return Evento.fromJson(response.data['evento']);
+      final data = response.data;
+      if (data is Map && data.containsKey('evento')) {
+        return Evento.fromJson(data['evento']);
+      }
+      return Evento.fromJson(data);
     } catch (e) {
       print('Error in rejectInvitation: $e');
       throw Exception('Error al rechazar invitación: $e');
@@ -208,6 +224,28 @@ class EventosServices {
     } catch (e) {
       logger.e('❌ Error al obtener mis eventos', error: e);
       throw Exception('Error al cargar mis eventos: $e');
+    }
+  }
+
+  Future<List<Evento>> getCalendarEvents(DateTime from, DateTime to) async {
+    try {
+      logger.d(
+        '📅 Obteniendo eventos de calendario: ${from.toIso8601String()} - ${to.toIso8601String()}',
+      );
+      final response = await _client.get(
+        '/calendar',
+        queryParameters: {
+          'dateFrom': from.toIso8601String(),
+          'dateTo': to.toIso8601String(),
+        },
+      );
+
+      final List<dynamic> data = response.data;
+      logger.i('✅ Eventos de calendario obtenidos: ${data.length}');
+      return data.map((json) => Evento.fromJson(json)).toList();
+    } catch (e) {
+      logger.e('❌ Error en getCalendarEvents', error: e);
+      return [];
     }
   }
 }
