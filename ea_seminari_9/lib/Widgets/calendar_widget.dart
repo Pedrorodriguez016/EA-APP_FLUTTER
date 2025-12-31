@@ -21,7 +21,6 @@ class CalendarWidget extends StatefulWidget {
 }
 
 class _CalendarWidgetState extends State<CalendarWidget> {
-  CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
 
@@ -35,7 +34,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),
@@ -43,11 +42,10 @@ class _CalendarWidgetState extends State<CalendarWidget> {
       ),
       margin: const EdgeInsets.all(16),
       child: Obx(() {
-        // Registro explícito para que GetX detecte la dependencia
-        controller.calendarEvents.length;
-        Get.find<AuthController>().currentUser.value;
-
         final allEvents = controller.calendarEvents;
+        final eventsKey = allEvents
+            .map((e) => '${e.id}:${e.participantes.length}')
+            .join('_');
 
         List<Evento> getEventsForDay(DateTime day) {
           return allEvents.where((event) {
@@ -61,34 +59,26 @@ class _CalendarWidgetState extends State<CalendarWidget> {
         }
 
         return TableCalendar<Evento>(
+          key: ValueKey(eventsKey),
           firstDay: DateTime.now().subtract(const Duration(days: 365)),
           lastDay: DateTime.now().add(const Duration(days: 365)),
           focusedDay: _focusedDay,
-          calendarFormat: _calendarFormat,
+          calendarFormat: CalendarFormat.month,
           locale: LocalizedApp.of(context).delegate.currentLocale.toString(),
           eventLoader: getEventsForDay,
           selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
           onDaySelected: (selectedDay, focusedDay) {
-            if (!isSameDay(_selectedDay, selectedDay)) {
-              setState(() {
-                _selectedDay = selectedDay;
-                _focusedDay = focusedDay;
-              });
-              widget.onDaySelected(selectedDay, getEventsForDay(selectedDay));
-            }
-          },
-          onFormatChanged: (format) {
-            if (_calendarFormat != format) {
-              setState(() {
-                _calendarFormat = format;
-              });
-            }
+            setState(() {
+              _selectedDay = selectedDay;
+              _focusedDay = focusedDay;
+            });
+            widget.onDaySelected(selectedDay, getEventsForDay(selectedDay));
           },
           onPageChanged: (focusedDay) {
-            _focusedDay = focusedDay;
-            if (widget.onPageChanged != null) {
-              widget.onPageChanged!(focusedDay);
-            }
+            setState(() {
+              _focusedDay = focusedDay;
+            });
+            widget.onPageChanged?.call(focusedDay);
           },
           calendarStyle: CalendarStyle(
             markerDecoration: BoxDecoration(

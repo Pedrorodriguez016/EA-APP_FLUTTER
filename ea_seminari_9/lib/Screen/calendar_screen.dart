@@ -8,24 +8,8 @@ import '../Widgets/eventos_card.dart';
 import '../Widgets/navigation_bar.dart';
 import '../Widgets/app_bar.dart';
 
-class CalendarScreen extends StatefulWidget {
+class CalendarScreen extends GetView<EventoController> {
   const CalendarScreen({super.key});
-
-  @override
-  State<CalendarScreen> createState() => _CalendarScreenState();
-}
-
-class _CalendarScreenState extends State<CalendarScreen> {
-  final EventoController controller = Get.find<EventoController>();
-  DateTime _focusedDay = DateTime.now();
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _fetchEventsForMonth(_focusedDay);
-    });
-  }
 
   void _fetchEventsForMonth(DateTime date) {
     final firstDay = DateTime(date.year, date.month, 1);
@@ -35,6 +19,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchEventsForMonth(DateTime.now());
+    });
+
     return Scaffold(
       backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: StandardAppBar(title: translate('calendar.title')),
@@ -46,12 +34,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 controller.selectedDayEvents.assignAll(events);
               },
               onPageChanged: (focusedDay) {
-                _focusedDay = focusedDay;
                 _fetchEventsForMonth(focusedDay);
               },
             ),
           ),
           Obx(() {
+            for (var e in controller.selectedDayEvents) {
+              e.participantes.length;
+            }
+
             if (controller.isLoading.value &&
                 controller.calendarEvents.isEmpty) {
               return const SliverFillRemaining(
@@ -87,13 +78,19 @@ class _CalendarScreenState extends State<CalendarScreen> {
               );
             }
 
+            final events = controller.selectedDayEvents;
+
             return SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
                   if (index.isOdd) return const SizedBox(height: 12);
                   final eventIndex = index ~/ 2;
-                  final event = controller.selectedDayEvents[eventIndex];
+                  if (eventIndex >= events.length) {
+                    return const SizedBox.shrink();
+                  }
+
+                  final event = events[eventIndex];
                   final currentUserId =
                       Get.find<AuthController>().currentUser.value?.id ?? '';
                   final bool isParticipant = event.participantes.any(
@@ -101,14 +98,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   );
 
                   return EventosCard(
-                    // La clave cambia si cambia el ID, si cambia el número de participantes o si cambia tu estado
                     key: ValueKey(
-                      'card_${event.id}_${event.participantes.length}_${isParticipant}',
+                      'card_${event.id}_${event.participantes.length}_$isParticipant',
                     ),
                     evento: event,
                     showParticipationStatus: true,
                   );
-                }, childCount: controller.selectedDayEvents.length * 2 - 1),
+                }, childCount: events.isEmpty ? 0 : events.length * 2 - 1),
               ),
             );
           }),
