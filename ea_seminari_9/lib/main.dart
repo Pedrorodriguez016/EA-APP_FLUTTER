@@ -1,5 +1,6 @@
 import 'package:ea_seminari_9/Bindings/auth_bindings.dart';
 import 'package:ea_seminari_9/Bindings/chat_list_binding.dart';
+import 'package:ea_seminari_9/Bindings/gamificacion_binding.dart';
 import 'package:ea_seminari_9/Screen/chat_list_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'Bindings/chat_binding.dart';
@@ -26,6 +27,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'utils/logger.dart';
 import 'Screen/chatbot_screen.dart';
+import 'Screen/gamificacion_screen.dart';
 import 'Bindings/chatbot_binding.dart';
 import 'utils/app_theme.dart';
 
@@ -142,6 +144,11 @@ class MyApp extends StatelessWidget {
           name: '/event-chat',
           page: () => const EventChatScreen(),
           binding: EventChatBinding(),
+        ),
+        GetPage(
+          name: '/gamificacion',
+          page: () => const GamificacionScreen(),
+          binding: GamificacionBinding(),
         ),
       ],
       defaultTransition: Transition.cupertino,

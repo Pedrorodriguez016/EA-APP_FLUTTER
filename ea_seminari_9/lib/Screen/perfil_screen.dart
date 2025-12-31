@@ -4,6 +4,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import '../Controllers/auth_controller.dart';
 import '../Controllers/user_controller.dart';
 import '../Widgets/logout_button.dart';
+import '../Widgets/gamificacion_card.dart';
 import '../utils/app_theme.dart';
 
 class ProfileScreen extends GetView<UserController> {
@@ -76,7 +77,12 @@ class ProfileScreen extends GetView<UserController> {
                 ),
               ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
+
+            // Card de gamificación
+            const GamificacionCard(),
+
+            const SizedBox(height: 24),
 
             _buildTextField(
               context,
