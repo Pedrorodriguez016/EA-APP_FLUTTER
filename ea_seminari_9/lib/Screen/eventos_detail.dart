@@ -115,131 +115,165 @@ class EventosDetailScreen extends GetView<EventoController> {
 
   Widget _buildEventoDetail(BuildContext context, Evento evento) {
     final currentUserId = Get.find<AuthController>().currentUser.value?.id;
-    final isParticipant = evento.participantes.contains(currentUserId);
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header con icono
-          Center(
-            child: Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+      child: Obx(() {
+        // Usar el evento reactivo del controller
+        final currentEvento = controller.selectedEvento.value ?? evento;
+        final isParticipant = currentEvento.participantes.contains(
+          currentUserId,
+        );
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header con icono
+            Center(
+              child: Container(
+                width: 100,
+                height: 100,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                  ),
+                  shape: BoxShape.circle,
                 ),
-                shape: BoxShape.circle,
+                child: const Icon(Icons.event, color: Colors.white, size: 48),
               ),
-              child: const Icon(Icons.event, color: Colors.white, size: 48),
             ),
-          ),
-          const SizedBox(height: 32),
+            const SizedBox(height: 32),
 
-          // Nombre del evento
-          Text(
-            evento.name,
-            style: const TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w800,
-              color: Colors.black87,
+            // Nombre del evento
+            Text(
+              currentEvento.name,
+              style: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.w800,
+                color: Colors.black87,
+              ),
             ),
-          ),
-          const SizedBox(height: 24),
+            const SizedBox(height: 24),
 
-          // Información del evento
-          _buildInfoCard(evento),
-          const SizedBox(height: 20),
-          // Botones de acción
-          if (evento.isPrivate && !isParticipant) ...[
-            if (evento.invitacionesPendientes.contains(currentUserId)) ...[
-              // Caso: Invitación pendiente
-              SizedBox(
-                width: double.infinity,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () => controller.respondToInvitation(false),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.redAccent,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+            // Información del evento
+            _buildInfoCard(currentEvento),
+            const SizedBox(height: 20),
+            // Botones de acción
+            if (currentEvento.isPrivate && !isParticipant) ...[
+              if (currentEvento.invitacionesPendientes.contains(
+                currentUserId,
+              )) ...[
+                // Caso: Invitación pendiente
+                SizedBox(
+                  width: double.infinity,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () =>
+                              controller.respondToInvitation(false),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
+                          child: const Text("Rechazar"),
                         ),
-                        child: const Text("Rechazar"),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () =>
+                              controller.respondToInvitation(true), // Aceptar
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text("Aceptar Invitación"),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ] else ...[
+                // Caso: Privado y NO invitado
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton.icon(
+                    onPressed: null, // Deshabilitado
+                    icon: const Icon(Icons.lock),
+                    label: const Text("Evento Privado"),
+                    style: ElevatedButton.styleFrom(
+                      disabledBackgroundColor: Colors.grey.shade300,
+                      disabledForegroundColor: Colors.grey.shade600,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () =>
-                            controller.respondToInvitation(true), // Aceptar
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text("Aceptar Invitación"),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ] else ...[
-              // Caso: Privado y NO invitado
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton.icon(
-                  onPressed: null, // Deshabilitado
-                  icon: const Icon(Icons.lock),
-                  label: const Text("Evento Privado"),
-                  style: ElevatedButton.styleFrom(
-                    disabledBackgroundColor: Colors.grey.shade300,
-                    disabledForegroundColor: Colors.grey.shade600,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ),
+              // Caso: Público o ya participante/en lista de espera
+              _buildActionButton(currentEvento, currentUserId),
             ],
-          ] else ...[
-            // Caso: Público o ya participante (Salir)
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () => controller.toggleParticipation(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isParticipant
-                      ? Colors.redAccent
-                      : const Color(0xFF667EEA),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: Text(
-                  isParticipant ? "Salir del evento" : "Unirme al evento",
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
+            const SizedBox(height: 20),
+            ValoracionList(eventId: eventoId),
           ],
-          const SizedBox(height: 20),
-          ValoracionList(eventId: eventoId),
-        ],
+        );
+      }),
+    );
+  }
+
+  Widget _buildActionButton(Evento evento, String? currentUserId) {
+    // Calcular estados reactivamente dentro del método
+    final isParticipant = evento.participantes.contains(currentUserId);
+    final isOnWaitlist = evento.listaEspera.contains(currentUserId);
+    final isFull =
+        evento.capacidadMaxima != null &&
+        evento.participantes.length >= evento.capacidadMaxima!;
+
+    String buttonText;
+    Color buttonColor;
+
+    if (isParticipant) {
+      buttonText = "Salir del evento";
+      buttonColor = Colors.redAccent;
+    } else if (isOnWaitlist) {
+      buttonText = "Salir de la lista de espera";
+      buttonColor = Colors.orange;
+    } else if (isFull) {
+      buttonText = "Entrar en lista de espera";
+      buttonColor = Colors.orange.shade600;
+    } else {
+      buttonText = "Unirme al evento";
+      buttonColor = const Color(0xFF667EEA);
+    }
+
+    return SizedBox(
+      width: double.infinity,
+      height: 50,
+      child: ElevatedButton(
+        onPressed: () => controller.toggleParticipation(),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: buttonColor,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: Text(
+          buttonText,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }
@@ -277,10 +311,66 @@ class EventosDetailScreen extends GetView<EventoController> {
           const SizedBox(height: 12),
           _buildDetailRow(Icons.location_on, 'Dirección:', evento.address),
           const SizedBox(height: 12),
-          _buildDetailRow(
-            Icons.people,
-            'Participantes:',
-            '${evento.participantes.length} personas',
+          // Capacidad con indicador visual
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(Icons.people, color: Color(0xFF667EEA), size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Participantes:',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Text(
+                          evento.capacidadMaxima != null
+                              ? '${evento.participantes.length}/${evento.capacidadMaxima}'
+                              : '${evento.participantes.length}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        if (evento.capacidadMaxima != null &&
+                            evento.participantes.length >=
+                                evento.capacidadMaxima!) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade50,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              'LLENO',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.red.shade700,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),

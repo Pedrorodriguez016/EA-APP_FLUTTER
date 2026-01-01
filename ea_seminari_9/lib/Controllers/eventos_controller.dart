@@ -36,6 +36,8 @@ class EventoController extends GetxController {
   // --- Controllers para formulario ---
   final TextEditingController tituloController = TextEditingController();
   final TextEditingController direccionController = TextEditingController();
+  final TextEditingController capacidadMaximaController =
+      TextEditingController();
   var selectedSchedule = Rxn<DateTime>();
   var isPrivate = false.obs;
   var friendsList = <User>[].obs;
@@ -66,6 +68,7 @@ class EventoController extends GetxController {
   void onClose() {
     tituloController.dispose();
     direccionController.dispose();
+    capacidadMaximaController.dispose();
     _debounce?.cancel();
     scrollController.removeListener(_scrollListener);
     super.onClose();
@@ -174,6 +177,7 @@ class EventoController extends GetxController {
   void limpiarFormularioCrear() {
     tituloController.clear();
     direccionController.clear();
+    capacidadMaximaController.clear();
     selectedSchedule.value = null;
     isPrivate.value = false;
     selectedInvitedUsers.clear();
@@ -321,6 +325,22 @@ class EventoController extends GetxController {
       return;
     }
 
+    // Validar capacidad máxima si el usuario ingresó algo
+    final capacidadText = capacidadMaximaController.text.trim();
+    if (capacidadText.isNotEmpty) {
+      final capacidad = int.tryParse(capacidadText);
+      if (capacidad == null || capacidad <= 0) {
+        Get.snackbar(
+          'Valor inválido',
+          'La capacidad máxima debe ser un número mayor a 0.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+        );
+        return;
+      }
+    }
+
     try {
       final Map<String, dynamic> nuevoEventoData = {
         'name': titulo,
@@ -329,6 +349,12 @@ class EventoController extends GetxController {
         'isPrivate': isPrivate.value,
         'invitados': selectedInvitedUsers.toList(),
       };
+
+      // Agregar capacidad máxima solo si el usuario ingresó un valor
+      if (capacidadText.isNotEmpty) {
+        nuevoEventoData['maxParticipantes'] = int.parse(capacidadText);
+      }
+      // Si no ingresó nada, el evento tendrá capacidad ilimitada
 
       await _eventosServices.createEvento(nuevoEventoData);
 
@@ -375,6 +401,7 @@ class EventoController extends GetxController {
     }
 
     final isParticipant = event.participantes.contains(user.id);
+    final isOnWaitlist = event.listaEspera.contains(user.id);
 
     try {
       isLoading(true);
@@ -384,22 +411,38 @@ class EventoController extends GetxController {
       if (isParticipant) {
         updatedEvento = await _eventosServices.leaveEvent(event.id);
         Get.snackbar(
-          "Existo!",
+          "Éxito!",
           "Has salido del evento",
           backgroundColor: Colors.orange,
           colorText: Colors.white,
         );
-      } else {
-        updatedEvento = await _eventosServices.joinEvent(event.id);
+      } else if (isOnWaitlist) {
+        // Usar leaveWaitlist específicamente para lista de espera
+        updatedEvento = await _eventosServices.leaveWaitlist(event.id);
         Get.snackbar(
-          "Exito!",
-          "Te has unido al evento",
-          backgroundColor: Colors.green,
+          "Éxito!",
+          "Has salido de la lista de espera",
+          backgroundColor: Colors.orange,
           colorText: Colors.white,
+        );
+      } else {
+        final response = await _eventosServices.joinEvent(event.id);
+        updatedEvento = response['evento'] as Evento;
+        final enListaEspera = response['enListaEspera'] as bool;
+        final mensaje = response['mensaje'] as String;
+
+        // Mostrar el mensaje del backend
+        Get.snackbar(
+          enListaEspera ? "En lista de espera" : "Éxito!",
+          mensaje,
+          backgroundColor: enListaEspera ? Colors.orange : Colors.green,
+          colorText: Colors.white,
+          duration: Duration(seconds: enListaEspera ? 4 : 3),
         );
       }
 
       selectedEvento.value = updatedEvento;
+      selectedEvento.refresh();
 
       final index = eventosList.indexWhere((e) => e.id == updatedEvento.id);
       if (index != -1) {

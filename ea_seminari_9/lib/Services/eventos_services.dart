@@ -121,11 +121,15 @@ class EventosServices {
     }
   }
 
-  Future<Evento> joinEvent(String eventId) async {
+  Future<Map<String, dynamic>> joinEvent(String eventId) async {
     try {
       final response = await _client.post('/$eventId/join');
 
-      return Evento.fromJson(response.data);
+      return {
+        'evento': Evento.fromJson(response.data['evento']),
+        'enListaEspera': response.data['enListaEspera'] ?? false,
+        'mensaje': response.data['mensaje'] ?? 'Te has unido al evento',
+      };
     } catch (e) {
       print('Error in joinEvent: $e');
       throw Exception('Error al unirse al evento: $e');
@@ -136,10 +140,35 @@ class EventosServices {
     try {
       final response = await _client.post('/$eventId/leave');
 
-      return Evento.fromJson(response.data);
+      return Evento.fromJson(response.data['evento'] ?? response.data);
     } catch (e) {
       print('Error in leaveEvent: $e');
       throw Exception('Error al salir del evento: $e');
+    }
+  }
+
+  Future<Evento> leaveWaitlist(String eventId) async {
+    try {
+      final response = await _client.delete('/$eventId/waitlist');
+
+      return Evento.fromJson(response.data['evento']);
+    } catch (e) {
+      print('Error in leaveWaitlist: $e');
+      throw Exception('Error al salir de la lista de espera: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> getWaitlistPosition(String eventId) async {
+    try {
+      final response = await _client.get('/$eventId/waitlist/position');
+
+      return {
+        'position': response.data['position'] ?? -1,
+        'enListaEspera': response.data['enListaEspera'] ?? false,
+      };
+    } catch (e) {
+      print('Error in getWaitlistPosition: $e');
+      throw Exception('Error al obtener posición en lista: $e');
     }
   }
 

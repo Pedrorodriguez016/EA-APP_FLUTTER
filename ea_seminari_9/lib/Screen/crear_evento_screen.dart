@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import '../Controllers/eventos_controller.dart';
 
@@ -122,6 +123,47 @@ class CrearEventoScreen extends GetView<EventoController> {
                 ],
               );
             }),
+
+            const SizedBox(height: 16),
+
+            // --- Campo de capacidad máxima (siempre visible, opcional) ---
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Capacidad máxima (opcional)',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                CupertinoTextField(
+                  controller: controller.capacidadMaximaController,
+                  keyboardType: TextInputType.number,
+                  placeholder: 'Dejar en blanco para capacidad ilimitada',
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: CupertinoColors.systemGrey4),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  prefix: const Padding(
+                    padding: EdgeInsets.only(left: 8),
+                    child: Icon(
+                      CupertinoIcons.person_2,
+                      color: CupertinoColors.systemGrey,
+                      size: 20,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Si no ingresas un número, el evento tendrá capacidad ilimitada',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade600,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
 
             const SizedBox(height: 24),
             Center(
