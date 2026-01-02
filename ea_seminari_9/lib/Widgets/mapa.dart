@@ -6,22 +6,21 @@ import 'package:get/get.dart';
 class CustomMap extends StatelessWidget {
   final LatLng center;
   final double zoom;
-  final double? height; 
-  final bool enableExpansion; 
-  final List<Marker> markers; 
-  
-  final void Function(MapPosition position, bool hasGesture)? onPositionChanged; 
+  final double? height;
+  final bool enableExpansion;
+  final List<Marker> markers;
+
+  final void Function(MapPosition position, bool hasGesture)? onPositionChanged;
 
   const CustomMap({
     Key? key,
     this.center = const LatLng(41.3851, 2.1734),
     this.zoom = 13.0,
-    this.height, 
-    this.enableExpansion = false, 
+    this.height,
+    this.enableExpansion = false,
     this.markers = const [],
-    this.onPositionChanged, 
+    this.onPositionChanged,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     final mapWidget = FlutterMap(
@@ -29,34 +28,30 @@ class CustomMap extends StatelessWidget {
         initialCenter: center,
         initialZoom: zoom,
         interactionOptions: const InteractionOptions(
-          flags: InteractiveFlag.all, 
+          flags: InteractiveFlag.all,
         ),
-        // 3. LO CONECTAMOS AL MAPA
-        onPositionChanged: (camera, hasGesture) {
+        // Usamos onMapEvent que se ejecuta también en la carga inicial
+        onMapEvent: (MapEvent event) {
           if (onPositionChanged != null) {
-            onPositionChanged!(camera, hasGesture);
+            // Obtener los bounds de la cámara actual
+            final bounds = event.camera.visibleBounds;
+            onPositionChanged!(
+              MapPosition(
+                bounds: bounds,
+                center: event.camera.center,
+                zoom: event.camera.zoom,
+              ),
+              event is MapEventMove || event is MapEventRotate,
+            );
           }
-        } 
+        },
       ),
       children: [
         TileLayer(
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
           userAgentPackageName: 'com.tu_app.eventos',
         ),
-        // Lógica de marcadores (la mantenemos igual)
-        if (markers.isNotEmpty)
-          MarkerLayer(markers: markers)
-        else
-          MarkerLayer(
-            markers: [
-              Marker(
-                point: center,
-                width: 40,
-                height: 40,
-                child: const Icon(Icons.location_on, color: Colors.red, size: 40),
-              ),
-            ],
-          ),
+        if (markers.isNotEmpty) MarkerLayer(markers: markers),
       ],
     );
 
@@ -133,7 +128,7 @@ class CustomMap extends StatelessWidget {
                 enableExpansion: false,
                 // 4. PASAMOS EL CALLBACK TAMBIÉN AL MAPA EXPANDIDO
                 // (Para que cargue eventos si te mueves en el mapa grande)
-                onPositionChanged: onPositionChanged, 
+                onPositionChanged: onPositionChanged,
               ),
             ),
           ],

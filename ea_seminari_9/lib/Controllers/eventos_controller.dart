@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart';
 
 class EventoController extends GetxController {
   // --- Variables de la lista (existentes) ---
@@ -25,7 +26,11 @@ class EventoController extends GetxController {
   final TextEditingController tituloController = TextEditingController();
   final TextEditingController direccionController = TextEditingController();
   var selectedSchedule = Rxn<DateTime>();
-  // --- FIN ARREGLO ---
+
+  var userLocation = Rxn<LatLng>();
+  var isLoadingLocation = false.obs;
+  // Barcelona como ubicación por defecto
+  final LatLng defaultLocation = const LatLng(41.3851, 2.1734);
 
   EventoController(this._eventosServices);
 
@@ -33,7 +38,60 @@ class EventoController extends GetxController {
   void onInit() {
     fetchEventos(1); // Carga inicial de eventos
     selectedSchedule.value = null; // Limpia la fecha
+    _getUserLocation(); // Obtener ubicación del usuario
     super.onInit();
+  }
+
+  // --- Obtener ubicación del usuario ---
+  Future<void> _getUserLocation() async {
+    isLoadingLocation.value = true;
+    try {
+      // Verificar si el servicio de ubicación está habilitado
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        print('Servicio de ubicación deshabilitado');
+        userLocation.value = defaultLocation;
+        isLoadingLocation.value = false;
+        return;
+      }
+
+      // Verificar permisos
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          print('Permisos de ubicación denegados');
+          userLocation.value = defaultLocation;
+          isLoadingLocation.value = false;
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        print('Permisos de ubicación denegados permanentemente');
+        userLocation.value = defaultLocation;
+        isLoadingLocation.value = false;
+        return;
+      }
+
+      // Obtener la posición actual
+      Position position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 100,
+        ),
+      );
+
+      userLocation.value = LatLng(position.latitude, position.longitude);
+      print(
+        'Ubicación del usuario: ${position.latitude}, ${position.longitude}',
+      );
+    } catch (e) {
+      print('Error obteniendo ubicación: $e');
+      userLocation.value = defaultLocation;
+    } finally {
+      isLoadingLocation.value = false;
+    }
   }
 
   // --- Limpia los campos del formulario ---
@@ -52,14 +110,16 @@ class EventoController extends GetxController {
       lastDate: DateTime(2101),
     );
 
-    if (date == null) return; 
+    if (date == null) return;
 
     final TimeOfDay? time = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.fromDateTime(selectedSchedule.value ?? DateTime.now()),
+      initialTime: TimeOfDay.fromDateTime(
+        selectedSchedule.value ?? DateTime.now(),
+      ),
     );
 
-    if (time == null) return; 
+    if (time == null) return;
 
     final DateTime combinedDateTime = DateTime(
       date.year,
@@ -72,27 +132,27 @@ class EventoController extends GetxController {
     selectedSchedule.value = combinedDateTime;
   }
 
- void fetchMapEvents(double north, double south, double east, double west) async {
+  void fetchMapEvents(
+    double north,
+    double south,
+    double east,
+    double west,
+  ) async {
     try {
       // Llamada al servicio
       var nuevosEventos = await _eventosServices.fetchEventsByBounds(
-        north: north, 
-        south: south, 
-        east: east, 
-        west: west
+        north: north,
+        south: south,
+        east: east,
+        west: west,
       );
-      
+
       mapEventosList.assignAll(nuevosEventos);
-      
     } catch (e) {
       print("Error cargando mapa: $e");
     }
   }
 
-
-
-
-  
   void fetchEventos(int page) async {
     isLoading.value = true;
     try {
@@ -156,7 +216,7 @@ class EventoController extends GetxController {
       isLoading(false);
     }
   }
-  
+
   // --- Función 'crearEvento' ---
   Future<void> crearEvento() async {
     final String titulo = tituloController.text;
@@ -164,18 +224,24 @@ class EventoController extends GetxController {
 
     // --- Validación ---
     if (titulo.isEmpty) {
-      Get.snackbar('Campo requerido', 'Por favor, introduce un título.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.orange,
-          colorText: Colors.white);
+      Get.snackbar(
+        'Campo requerido',
+        'Por favor, introduce un título.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+      );
       return;
     }
-    
+
     if (selectedSchedule.value == null) {
-      Get.snackbar('Campo requerido', 'Por favor, selecciona una fecha y hora.',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.orange,
-          colorText: Colors.white);
+      Get.snackbar(
+        'Campo requerido',
+        'Por favor, selecciona una fecha y hora.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+      );
       return;
     }
     // --- Fin Validación ---
@@ -203,11 +269,10 @@ class EventoController extends GetxController {
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
-    // 4. Refrescamos la lista de eventos en el Home
+      // 4. Refrescamos la lista de eventos en el Home
       // (refreshEventos() ya muestra su propio snackbar,
       // quizás quieras quitar el de 'Éxito' si te molesta)
       refreshEventos();
-
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -218,23 +283,17 @@ class EventoController extends GetxController {
       );
     }
   }
-  
- void onMapPositionChanged(MapCamera camera, bool hasGesture) {
+
+  void onMapPositionChanged(MapCamera camera, bool hasGesture) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
 
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      
       final bounds = camera.visibleBounds;
-      
-      fetchMapEvents(
-        bounds.north, 
-        bounds.south, 
-        bounds.east, 
-        bounds.west
-      );
+
+      fetchMapEvents(bounds.north, bounds.south, bounds.east, bounds.west);
     });
   }
-  
+
   // Limpia los controllers de texto
   @override
   void onClose() {
