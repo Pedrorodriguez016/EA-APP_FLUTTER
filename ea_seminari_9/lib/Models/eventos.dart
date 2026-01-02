@@ -108,6 +108,7 @@ class Evento {
   final double? lng;
   final int? capacidadMaxima;
   final List<String> participantes;
+  final List<String> listaEspera;
   final String categoria;
   final bool isPrivate;
   final List<String> invitados;
@@ -123,6 +124,7 @@ class Evento {
     this.lng,
     required this.participantes,
     required this.categoria,
+    this.listaEspera = const [],
     this.isPrivate = false,
     this.invitados = const [],
     this.invitacionesPendientes = const [],
@@ -137,14 +139,18 @@ class Evento {
     }
 
     return Evento(
-      id: extractId(json),
+      id: (json['_id'] ?? json['id'] ?? '').toString().trim(),
       name: json['name'] as String? ?? '',
       schedule: json['schedule'] as String? ?? '',
       address: json['address'] as String? ?? '',
-      capacidadMaxima: json['capacidadMaxima'] as int?,
+      capacidadMaxima: json['maxParticipantes'] as int?,
       lat: (json['lat'] != null) ? json['lat'].toDouble() : null,
       lng: (json['lng'] != null) ? json['lng'].toDouble() : null,
       participantes: (json['participantes'] as List? ?? [])
+          .map((p) => extractId(p))
+          .where((id) => id.isNotEmpty)
+          .toList(),
+      listaEspera: (json['listaEspera'] as List? ?? [])
           .map((p) => extractId(p))
           .where((id) => id.isNotEmpty)
           .toList(),

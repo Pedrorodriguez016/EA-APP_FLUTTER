@@ -39,6 +39,7 @@ class EventoController extends GetxController {
   // --- Controllers para formulario ---
   late TextEditingController tituloController;
   late TextEditingController direccionController;
+  late TextEditingController capacidadMaximaController;
   var selectedSchedule = Rxn<DateTime>();
   var selectedCategoria = Rxn<String>(); // Añadido para categoría
   var isPrivate = false.obs;
@@ -55,6 +56,7 @@ class EventoController extends GetxController {
     super.onInit();
     tituloController = TextEditingController();
     direccionController = TextEditingController();
+    capacidadMaximaController = TextEditingController();
 
     // Inicializar datos
     selectedSchedule.value = null;
@@ -75,6 +77,7 @@ class EventoController extends GetxController {
   void onClose() {
     tituloController.dispose();
     direccionController.dispose();
+    capacidadMaximaController.dispose();
     _debounce?.cancel();
     scrollController.removeListener(_scrollListener);
     super.onClose();
@@ -175,6 +178,7 @@ class EventoController extends GetxController {
   void limpiarFormularioCrear() {
     tituloController.clear();
     direccionController.clear();
+    capacidadMaximaController.clear();
     selectedSchedule.value = null;
     selectedCategoria.value = null;
     isPrivate.value = false;
@@ -337,6 +341,22 @@ class EventoController extends GetxController {
       return;
     }
 
+    // Validar capacidad máxima si el usuario ingresó algo
+    final capacidadText = capacidadMaximaController.text.trim();
+    if (capacidadText.isNotEmpty) {
+      final capacidad = int.tryParse(capacidadText);
+      if (capacidad == null || capacidad <= 0) {
+        Get.snackbar(
+          'Valor inválido',
+          'La capacidad máxima debe ser un número mayor a 0.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+        );
+        return;
+      }
+    }
+
     try {
       final Map<String, dynamic> nuevoEventoData = {
         'name': titulo,
@@ -346,6 +366,12 @@ class EventoController extends GetxController {
         'isPrivate': isPrivate.value,
         'invitados': selectedInvitedUsers.toList(),
       };
+
+      // Agregar capacidad máxima solo si el usuario ingresó un valor
+      if (capacidadText.isNotEmpty) {
+        nuevoEventoData['maxParticipantes'] = int.parse(capacidadText);
+      }
+      // Si no ingresó nada, el evento tendrá capacidad ilimitada
 
       await _eventosServices.createEvento(nuevoEventoData);
 
@@ -396,6 +422,10 @@ class EventoController extends GetxController {
       if (user.id.isEmpty) return false;
       return p.trim() == user.id.trim();
     });
+    final bool isOnWaitlist = event.listaEspera.any((p) {
+      if (user.id.isEmpty) return false;
+      return p.trim() == user.id.trim();
+    });
 
     try {
       isLoading(true);
@@ -410,17 +440,33 @@ class EventoController extends GetxController {
           backgroundColor: Colors.orange,
           colorText: Colors.white,
         );
-      } else {
-        updatedEvento = await _eventosServices.joinEvent(event.id);
+      } else if (isOnWaitlist) {
+        // Usar leaveWaitlist específicamente para lista de espera
+        updatedEvento = await _eventosServices.leaveWaitlist(event.id);
         Get.snackbar(
           translate('common.success'),
-          translate('events.joined_success'),
-          backgroundColor: Colors.green,
+          translate('events.left_waitlist'),
+          backgroundColor: Colors.orange,
           colorText: Colors.white,
+        );
+      } else {
+        final response = await _eventosServices.joinEvent(event.id);
+        updatedEvento = response['evento'] as Evento;
+        final enListaEspera = response['enListaEspera'] as bool;
+        final mensaje = response['mensaje'] as String;
+
+        // Mostrar el mensaje del backend
+        Get.snackbar(
+          enListaEspera ? "En lista de espera" : "Éxito!",
+          mensaje,
+          backgroundColor: enListaEspera ? Colors.orange : Colors.green,
+          colorText: Colors.white,
+          duration: Duration(seconds: enListaEspera ? 4 : 3),
         );
       }
 
       selectedEvento.value = updatedEvento;
+      selectedEvento.refresh();
 
       // Sincronizar en todas las listas reactivas
       _updateEventInLists(updatedEvento);

@@ -114,6 +114,7 @@
     "format_error": "Erreur de format",
     "joined_success": "Vous avez rejoint l'événement",
     "left_success": "Vous avez quitté l'événement",
+    "left_waitlist": "Quitter la liste d'attente",
     "my_events_tab": "Mes événements",
     "errors": {
       "title_required": "Le titre est obligatoire",

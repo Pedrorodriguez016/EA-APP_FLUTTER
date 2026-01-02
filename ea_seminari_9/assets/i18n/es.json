@@ -113,6 +113,7 @@
     "format_error": "Error de formato",
     "joined_success": "Te has unido al evento",
     "left_success": "Has salido del evento",
+    "left_waitlist": "Salir de la lista de espera",
     "my_events_tab": "Mis eventos",
     "errors": {
       "title_required": "El título es obligatorio",

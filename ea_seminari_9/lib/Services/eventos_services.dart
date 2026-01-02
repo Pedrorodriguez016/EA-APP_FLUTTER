@@ -141,17 +141,17 @@ class EventosServices {
     }
   }
 
-  Future<Evento> joinEvent(String eventId) async {
+  Future<Map<String, dynamic>> joinEvent(String eventId) async {
     try {
-      logger.i('💪 Uniendose al evento: $eventId');
+      logger.i('💪 Uniéndose al evento: $eventId');
       final response = await _client.post('/$eventId/join');
       final data = response.data;
 
-      // El backend devuelve { message, evento, enListaEspera }
-      if (data is Map && data.containsKey('evento')) {
-        return Evento.fromJson(data['evento']);
-      }
-      return Evento.fromJson(data);
+      return {
+        'evento': Evento.fromJson(data['evento']),
+        'enListaEspera': data['enListaEspera'] ?? false,
+        'mensaje': data['mensaje'] ?? 'Te has unido al evento',
+      };
     } catch (e) {
       logger.e('❌ Error al unirse al evento', error: e);
       throw Exception('Error al unirse al evento: $e');
@@ -164,14 +164,40 @@ class EventosServices {
       final response = await _client.post('/$eventId/leave');
       final data = response.data;
 
-      // El backend devuelve { message, evento }
+      // El backend devuelve { message, evento } o directamente el evento
       if (data is Map && data.containsKey('evento')) {
+        logger.i('✅ Salida exitosa del evento');
         return Evento.fromJson(data['evento']);
       }
       return Evento.fromJson(data);
     } catch (e) {
       logger.e('❌ Error al salir del evento', error: e);
       throw Exception('Error al salir del evento: $e');
+    }
+  }
+
+  Future<Evento> leaveWaitlist(String eventId) async {
+    try {
+      final response = await _client.delete('/$eventId/waitlist');
+
+      return Evento.fromJson(response.data['evento']);
+    } catch (e) {
+      print('Error in leaveWaitlist: $e');
+      throw Exception('Error al salir de la lista de espera: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> getWaitlistPosition(String eventId) async {
+    try {
+      final response = await _client.get('/$eventId/waitlist/position');
+
+      return {
+        'position': response.data['position'] ?? -1,
+        'enListaEspera': response.data['enListaEspera'] ?? false,
+      };
+    } catch (e) {
+      print('Error in getWaitlistPosition: $e');
+      throw Exception('Error al obtener posición en lista: $e');
     }
   }
 

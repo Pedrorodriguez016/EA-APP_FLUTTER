@@ -171,6 +171,30 @@ class CrearEventoScreen extends GetView<EventoController> {
               );
             }),
 
+            const SizedBox(height: 24),
+
+            // --- Campo de capacidad máxima (opcional) ---
+            _buildSectionTitle(context, 'Capacidad máxima (opcional)'),
+            const SizedBox(height: 12),
+            _buildTextField(
+              context,
+              controller.capacidadMaximaController,
+              icon: Icons.people_rounded,
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 4),
+            Padding(
+              padding: const EdgeInsets.only(left: 4),
+              child: Text(
+                'Dejar en blanco para capacidad ilimitada',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey.shade600,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ),
+
             const SizedBox(height: 40),
 
             Center(
@@ -234,6 +258,7 @@ class CrearEventoScreen extends GetView<EventoController> {
     TextEditingController ctrl, {
     int maxLines = 1,
     IconData? icon,
+    TextInputType? keyboardType,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -250,6 +275,7 @@ class CrearEventoScreen extends GetView<EventoController> {
       child: TextField(
         controller: ctrl,
         maxLines: maxLines,
+        keyboardType: keyboardType,
         style: context.textTheme.bodyLarge,
         decoration: InputDecoration(
           prefixIcon: icon != null

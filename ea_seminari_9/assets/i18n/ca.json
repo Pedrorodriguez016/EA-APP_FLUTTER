@@ -114,6 +114,7 @@
     "format_error": "Error de format",
     "joined_success": "T'has unit a l'esdeveniment",
     "left_success": "Has sortit de l'esdeveniment",
+    "left_waitlist": "Sortir de la llista d'espera",
     "my_events_tab": "Els meus esdeveniments",
     "errors": {
       "title_required": "El títol és obligatori",

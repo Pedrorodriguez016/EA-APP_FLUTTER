@@ -114,6 +114,7 @@
     "format_error": "Format error",
     "joined_success": "You have joined the event",
     "left_success": "You have left the event",
+    "left_waitlist": "Leave the waitlist",
     "my_events_tab": "My events",
     "errors": {
       "title_required": "Title is required",
