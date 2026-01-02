@@ -46,7 +46,7 @@ class HomeScreen extends GetView<UserController> {
           ],
         ),
       ),
-      bottomNavigationBar: CustomNavBar(currentIndex: 0),
+      bottomNavigationBar: const CustomNavBar(currentIndex: 0),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Get.toNamed('/chatbot'),
         backgroundColor: context.theme.colorScheme.primary,
@@ -239,6 +239,26 @@ class HomeScreen extends GetView<UserController> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(20),
                 child: Obx(() {
+                  if (eventoController.isLoadingLocation.value) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: context.theme.colorScheme.surfaceVariant
+                            .withValues(alpha: 0.3),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(),
+                            SizedBox(height: 12),
+                            Text('Obteniendo ubicación...'),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+
                   final eventos = eventoController.mapEventosList;
                   final myMarkers = eventos
                       .where((e) => e.lat != null && e.lng != null)
@@ -273,7 +293,9 @@ class HomeScreen extends GetView<UserController> {
 
                   return CustomMap(
                     height: 220,
-                    center: const LatLng(41.3851, 2.1734),
+                    center:
+                        eventoController.userLocation.value ??
+                        eventoController.defaultLocation,
                     zoom: 12,
                     enableExpansion: true,
                     markers: myMarkers,
@@ -290,67 +312,6 @@ class HomeScreen extends GetView<UserController> {
                     },
                   );
                 }),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActionButton(
-    BuildContext context,
-    IconData icon,
-    String label,
-    VoidCallback onTap, {
-    bool isPrimary = false,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: isPrimary
-              ? context.theme.colorScheme.primary
-              : context.theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: isPrimary
-              ? null
-              : Border.all(
-                  color: context.theme.colorScheme.outline.withValues(
-                    alpha: 0.2,
-                  ),
-                ),
-          boxShadow: isPrimary
-              ? [
-                  BoxShadow(
-                    color: context.theme.colorScheme.primary.withValues(
-                      alpha: 0.3,
-                    ),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 20,
-              color: isPrimary
-                  ? Colors.white
-                  : context.theme.colorScheme.onSurface,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: isPrimary
-                    ? Colors.white
-                    : context.theme.colorScheme.onSurface,
               ),
             ),
           ],
@@ -487,6 +448,67 @@ class HomeScreen extends GetView<UserController> {
                 },
               );
             }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton(
+    BuildContext context,
+    IconData icon,
+    String label,
+    VoidCallback onTap, {
+    bool isPrimary = false,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isPrimary
+              ? context.theme.colorScheme.primary
+              : context.theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: isPrimary
+              ? null
+              : Border.all(
+                  color: context.theme.colorScheme.outline.withValues(
+                    alpha: 0.2,
+                  ),
+                ),
+          boxShadow: isPrimary
+              ? [
+                  BoxShadow(
+                    color: context.theme.colorScheme.primary.withValues(
+                      alpha: 0.3,
+                    ),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              size: 20,
+              color: isPrimary
+                  ? Colors.white
+                  : context.theme.colorScheme.onSurface,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: isPrimary
+                    ? Colors.white
+                    : context.theme.colorScheme.onSurface,
+              ),
+            ),
           ],
         ),
       ),

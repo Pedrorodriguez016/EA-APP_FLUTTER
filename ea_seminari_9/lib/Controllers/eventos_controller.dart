@@ -9,8 +9,9 @@ import 'auth_controller.dart';
 import '../utils/logger.dart';
 import 'package:ea_seminari_9/Models/user.dart';
 import 'package:ea_seminari_9/Services/user_services.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart';
 
-// Definimos los tipos de filtro posibles
 enum EventFilter { all, myEvents }
 
 class EventoController extends GetxController {
@@ -47,6 +48,10 @@ class EventoController extends GetxController {
   var selectedInvitedUsers = <String>[].obs;
   var isLoadingFriends = false.obs;
   final UserServices _userServices = UserServices();
+  var userLocation = Rxn<LatLng>();
+  var isLoadingLocation = false.obs;
+  // Barcelona como ubicación por defecto
+  final LatLng defaultLocation = const LatLng(41.3851, 2.1734);
 
   EventoController(this._eventosServices);
   final ScrollController scrollController = ScrollController();
@@ -57,15 +62,10 @@ class EventoController extends GetxController {
     tituloController = TextEditingController();
     direccionController = TextEditingController();
     capacidadMaximaController = TextEditingController();
-
-    // Inicializar datos
     selectedSchedule.value = null;
     fetchEventos(1);
-
-    // Agregar listener una sola vez
+    _getUserLocation();
     scrollController.addListener(_scrollListener);
-
-    // Escucha el estado del usuario para refrescar la lista si es necesario.
     ever(_authController.currentUser, (user) {
       if (user != null) {
         refreshEventos();
@@ -175,6 +175,59 @@ class EventoController extends GetxController {
     }
   }
 
+  // --- Obtener ubicación del usuario ---
+  Future<void> _getUserLocation() async {
+    isLoadingLocation.value = true;
+    try {
+      // Verificar si el servicio de ubicación está habilitado
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        print('Servicio de ubicación deshabilitado');
+        userLocation.value = defaultLocation;
+        isLoadingLocation.value = false;
+        return;
+      }
+
+      // Verificar permisos
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          print('Permisos de ubicación denegados');
+          userLocation.value = defaultLocation;
+          isLoadingLocation.value = false;
+          return;
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        print('Permisos de ubicación denegados permanentemente');
+        userLocation.value = defaultLocation;
+        isLoadingLocation.value = false;
+        return;
+      }
+
+      // Obtener la posición actual
+      Position position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          distanceFilter: 100,
+        ),
+      );
+
+      userLocation.value = LatLng(position.latitude, position.longitude);
+      print(
+        'Ubicación del usuario: ${position.latitude}, ${position.longitude}',
+      );
+    } catch (e) {
+      print('Error obteniendo ubicación: $e');
+      userLocation.value = defaultLocation;
+    } finally {
+      isLoadingLocation.value = false;
+    }
+  }
+
+  // --- Limpia los campos del formulario ---
   void limpiarFormularioCrear() {
     tituloController.clear();
     direccionController.clear();
@@ -237,7 +290,7 @@ class EventoController extends GetxController {
     }
   }
 
-  void loadMoreUsers() {
+  void nextPage() {
     if (currentPage.value < totalPages.value) {
       fetchEventos(currentPage.value + 1);
     }

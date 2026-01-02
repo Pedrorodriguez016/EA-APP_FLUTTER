@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart'; // Exporta PositionCallback
+import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:get/get.dart';
 
@@ -31,9 +31,19 @@ class CustomMap extends StatelessWidget {
         interactionOptions: const InteractionOptions(
           flags: InteractiveFlag.all,
         ),
-        onPositionChanged: (camera, hasGesture) {
+        // Usamos onMapEvent que se ejecuta también en la carga inicial
+        onMapEvent: (MapEvent event) {
           if (onPositionChanged != null) {
-            onPositionChanged!(camera, hasGesture);
+            // Obtener los bounds de la cámara actual
+            final bounds = event.camera.visibleBounds;
+            onPositionChanged!(
+              MapPosition(
+                bounds: bounds,
+                center: event.camera.center,
+                zoom: event.camera.zoom,
+              ),
+              event is MapEventMove || event is MapEventRotate,
+            );
           }
         },
       ),
@@ -42,23 +52,8 @@ class CustomMap extends StatelessWidget {
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
           userAgentPackageName: 'com.tu_app.eventos',
         ),
-        if (markers.isNotEmpty)
-          MarkerLayer(markers: markers)
-        else
-          MarkerLayer(
-            markers: [
-              Marker(
-                point: center,
-                width: 40,
-                height: 40,
-                child: Icon(
-                  Icons.location_on,
-                  color: context.theme.colorScheme.primary,
-                  size: 40,
-                ),
-              ),
-            ],
-          ),
+        // Solo mostrar marcadores de eventos cuando existan
+        if (markers.isNotEmpty) MarkerLayer(markers: markers),
       ],
     );
 
