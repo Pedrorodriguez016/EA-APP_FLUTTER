@@ -107,8 +107,8 @@ class UserCard extends GetView<UserController> {
                             const SizedBox(width: 8),
                             Text(
                               isOnline
-                                  ? translate('common.online')
-                                  : translate('common.offline'),
+                                  ? translate('users.status_online')
+                                  : translate('users.status_offline'),
                               style: TextStyle(
                                 fontSize: 12,
                                 color: statusColor,
