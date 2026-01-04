@@ -23,7 +23,9 @@
       "action_btn": "Se connecter",
       "no_account": "Pas de compte ?",
       "register_link": "Inscrivez-vous ici",
-      "success_msg": "Connexion réussie"
+      "success_msg": "Connexion réussie",
+      "or_continue_with": "Ou continuer avec",
+      "google_btn": "Se connecter avec Google"
     },
     "register": {
       "title": "Créer un compte",
@@ -58,7 +60,10 @@
       "birthday_invalid": "Date invalide",
       "age_restriction": "Minimum 13 ans",
       "not_authenticated": "Utilisateur non authentifié",
-      "password_weak": "Le mot de passe est faible"
+      "password_weak": "Le mot de passe est faible",
+      "google_unsupported": "Cet appareil ne prend pas en charge l'authentification Google",
+      "google_token_error": "Impossible d'obtenir le jeton d'ID Google",
+      "google_failed": "Échec de la connexion Google"
     },
     "password_strength": {
       "medium": "Moyen",
@@ -201,11 +206,41 @@
       "confirm_btn": "Confirmer la suppression"
     }
   },
+  "chatbot": {
+    "title": "Assistant Virtuel",
+    "event_placeholder": "Événement",
+    "input_hint": "Écrivez votre question..."
+  },
+  "gamification": {
+    "title": "Gamification",
+    "in_development": "Gamification en développement",
+    "not_active": "Cette fonctionnalité sera bientôt disponible.\nLe backend de gamification n'est pas encore actif.",
+    "ranking_title": "Classement Global",
+    "next_level": "Niveau suivant : ",
+    "my_badges": "Mes Badges",
+    "no_badges": "Vous n'avez pas encore débloqué de badges",
+    "stats_title": "Statistiques",
+    "events_created": "Événements créés",
+    "events_joined": "Événements rejoints",
+    "reviews": "Évaluations",
+    "friends": "Amis",
+    "insignias_unit": "badges"
+  },
   "dialogs": {
     "logout": {
       "title": "Se déconnecter",
       "content": "Êtes-vous sûr de vouloir vous déconnecter ?",
       "confirm": "Oui, sortir"
     }
+  },
+  "events_extra": {
+    "private_event": "Événement Privé",
+    "private_subtitle": "Seuls les invités peuvent voir et rejoindre cet événement",
+    "waitlist_btn": "Entrer sur liste d'attente",
+    "full_label": "COMPLET",
+    "no_friends_to_invite": "Vous n'avez pas encore d'amis à inviter.",
+    "invite_friends": "Inviter des amis :",
+    "max_capacity": "Capacité maximale (optionnel)",
+    "unlimited_capacity_hint": "Laisser vide pour une capacité illimitée"
   }
 }

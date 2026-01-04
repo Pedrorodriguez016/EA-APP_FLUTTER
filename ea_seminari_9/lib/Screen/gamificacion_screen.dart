@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import '../Controllers/gamificacion_controller.dart';
 import '../Widgets/app_bar.dart';
 import '../Widgets/mi_progreso_card.dart';
@@ -14,7 +15,7 @@ class GamificacionScreen extends GetView<GamificacionController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: context.theme.scaffoldBackgroundColor,
-      appBar: const StandardAppBar(title: 'Gamificación'),
+      appBar: StandardAppBar(title: translate('gamification.title')),
       body: RefreshIndicator(
         onRefresh: () async {
           await controller.cargarMiProgreso();
@@ -54,7 +55,7 @@ class GamificacionScreen extends GetView<GamificacionController> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Gamificación en desarrollo',
+                          translate('gamification.in_development'),
                           style: context.textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -62,7 +63,7 @@ class GamificacionScreen extends GetView<GamificacionController> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Esta función estará disponible próximamente.\nEl backend de gamificación aún no está activo.',
+                          translate('gamification.not_active'),
                           style: context.textTheme.bodyMedium,
                           textAlign: TextAlign.center,
                         ),
@@ -98,7 +99,7 @@ class GamificacionScreen extends GetView<GamificacionController> {
 
               // Ranking
               Text(
-                'Ranking Global',
+                translate('gamification.ranking_title'),
                 style: context.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),

@@ -23,7 +23,9 @@
       "action_btn": "Inicia Sessió",
       "no_account": "No tens compte?",
       "register_link": "Registra't aquí",
-      "success_msg": "Sessió iniciada correctament"
+      "success_msg": "Sessió iniciada correctament",
+      "or_continue_with": "O continua amb",
+      "google_btn": "Inicia sessió amb Google"
     },
     "register": {
       "title": "Crear Compte",
@@ -58,7 +60,10 @@
       "birthday_invalid": "Data invàlida",
       "age_restriction": "Mínim 13 anys",
       "not_authenticated": "Usuari no autenticat",
-      "password_weak": "La contrasenya és feble"
+      "password_weak": "La contrasenya és feble",
+      "google_unsupported": "Aquest dispositiu no suporta l'autenticació de Google",
+      "google_token_error": "No s'ha pogut obtenir el ID Token de Google",
+      "google_failed": "Error en iniciar sessió amb Google"
     },
     "password_strength": {
       "medium": "Mitjana",
@@ -149,7 +154,7 @@
     "detail_title": "Detalls de l'Usuari",
     "info_card_title": "Informació Personal",
     "status_online": "Connectat",
-    "status_offline": "Desconnectat",
+    "status_offline": "Desconectat",
     "friend_requests_title": "Sol·licituds d'amistat",
     "no_requests": "No tens sol·licituds pendents.",
     "accept_req": "Accepta sol·licitud",
@@ -201,11 +206,41 @@
       "confirm_btn": "Confirma l'Eliminació"
     }
   },
+  "chatbot": {
+    "title": "Assistent Virtual",
+    "event_placeholder": "Esdeveniment",
+    "input_hint": "Escriu la teva consulta..."
+  },
+  "gamification": {
+    "title": "Gamificació",
+    "in_development": "Gamificació en desenvolupament",
+    "not_active": "Aquesta funció estarà disponible pròximament.\nEl backend de gamificació encara no està actiu.",
+    "ranking_title": "Rànquing Global",
+    "next_level": "Pròxim nivell: ",
+    "my_badges": "Les meves Insígnies",
+    "no_badges": "Encara no has desbloquejat cap insígnia",
+    "stats_title": "Estadístiques",
+    "events_created": "Esdeveniments creats",
+    "events_joined": "Esdeveniments units",
+    "reviews": "Valoracions",
+    "friends": "Amics",
+    "insignias_unit": "insígnies"
+  },
   "dialogs": {
     "logout": {
       "title": "Tancar sessió",
       "content": "Segur que vols tancar la sessió?",
       "confirm": "Sí, surt"
     }
+  },
+  "events_extra": {
+    "private_event": "Esdeveniment Privat",
+    "private_subtitle": "Només els convidats podran veure i unir-se a aquest esdeveniment",
+    "waitlist_btn": "Entrar a la llista d'espera",
+    "full_label": "PLE",
+    "no_friends_to_invite": "Encara no tens amics per convidar.",
+    "invite_friends": "Convidar amics:",
+    "max_capacity": "Capacitat màxima (opcional)",
+    "unlimited_capacity_hint": "Deixar en blanc per a capacitat il·limitada"
   }
 }

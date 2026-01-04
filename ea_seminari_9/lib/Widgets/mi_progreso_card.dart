@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import '../Controllers/gamificacion_controller.dart';
 import '../Models/usuario_progreso.dart';
 
@@ -66,7 +67,7 @@ class MiProgresoCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            'Próximo nivel: ${controller.getNivelSiguiente()}',
+            '${translate('gamification.next_level')}${controller.getNivelSiguiente()}',
             style: context.textTheme.bodyMedium?.copyWith(
               color: Colors.white.withValues(alpha: 0.9),
             ),

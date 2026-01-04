@@ -757,7 +757,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } else {
       Get.snackbar(
         translate('common.error'),
-        'Por favor corrige los errores',
+        translate('common.fix_errors'),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.orange,
         colorText: Colors.white,

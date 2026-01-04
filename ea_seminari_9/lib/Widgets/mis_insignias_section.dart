@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import '../Models/insignia.dart';
 
 class MisInsigniasSection extends StatelessWidget {
@@ -13,17 +14,17 @@ class MisInsigniasSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Mis Insignias (${insignias.length})',
+          '${translate('gamification.my_badges')} (${insignias.length})',
           style: context.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 16),
         if (insignias.isEmpty)
-          const Center(
+          Center(
             child: Padding(
-              padding: EdgeInsets.all(32.0),
-              child: Text('Aún no has desbloqueado insignias'),
+              padding: const EdgeInsets.all(32.0),
+              child: Text(translate('gamification.no_badges')),
             ),
           )
         else

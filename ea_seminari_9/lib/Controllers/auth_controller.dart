@@ -35,12 +35,11 @@ class AuthController extends GetxController {
       _checkAutoLogin();
     });
   }
+
   Future<void> _initGoogleSignIn() async {
     try {
       // Inicializar el plugin con el serverClientId proporcionado
-      await _googleSignIn.initialize(
-        serverClientId: dotenv.env['GOOGLE_ID']!,
-      );
+      await _googleSignIn.initialize(serverClientId: dotenv.env['GOOGLE_ID']!);
 
       // Escuchar eventos de autenticación
       _googleSignIn.authenticationEvents
@@ -56,6 +55,7 @@ class AuthController extends GetxController {
       logger.e('Error al inicializar Google Sign-In', error: e);
     }
   }
+
   Future<void> _checkAutoLogin() async {
     User? savedUser = _storageService.getUser();
     if (savedUser != null) {
@@ -134,14 +134,14 @@ class AuthController extends GetxController {
       if (_googleSignIn.supportsAuthenticate()) {
         await _googleSignIn.authenticate();
       } else {
-        throw Exception('Este dispositivo no soporta autenticación de Google');
+        throw Exception(translate('auth.errors.google_unsupported'));
       }
     } catch (e) {
       logger.e('Error al iniciar flujo de Google', error: e);
       isLoginLoading.value = false;
       Get.snackbar(
         translate('common.error'),
-        'Google login failed: $e',
+        '${translate('auth.errors.google_failed')}: $e',
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
@@ -157,7 +157,7 @@ class AuthController extends GetxController {
       final String? idToken = googleAuth.idToken;
 
       if (idToken == null) {
-        throw Exception('No se pudo obtener el ID Token de Google');
+        throw Exception(translate('auth.errors.google_token_error'));
       }
 
       final data = await _authService.loginWithGoogle(idToken);
@@ -188,7 +188,7 @@ class AuthController extends GetxController {
       logger.e('Error al procesar login de Google con el backend', error: e);
       Get.snackbar(
         translate('common.error'),
-        'Backend validation failed: $e',
+        '${translate('common.error')}: $e',
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
@@ -197,6 +197,7 @@ class AuthController extends GetxController {
       isLoginLoading.value = false;
     }
   }
+
   void logout() {
     isLoggedIn.value = false;
     currentUser.value = null;

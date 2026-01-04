@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import '../Models/usuario_progreso.dart';
 
 class RankingSection extends StatelessWidget {
@@ -83,7 +84,7 @@ class RankingSection extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  '${usuario.insignias} insignias',
+                  '${usuario.insignias} ${translate('gamification.insignias_unit')}',
                   style: context.textTheme.bodySmall,
                 ),
               ],

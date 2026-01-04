@@ -258,7 +258,7 @@ class EventosDetailScreen extends GetView<EventoController> {
                         const Icon(Icons.lock_outline, color: Colors.grey),
                         const SizedBox(width: 8),
                         Text(
-                          'Evento Privado',
+                          translate('events_extra.private_event'),
                           style: TextStyle(
                             color: context.theme.disabledColor,
                             fontWeight: FontWeight.w600,
@@ -349,7 +349,7 @@ class EventosDetailScreen extends GetView<EventoController> {
       buttonText = translate('events.left_waitlist');
       buttonStyle = Colors.orange;
     } else if (isFull) {
-      buttonText = 'Entrar en lista de espera';
+      buttonText = translate('events_extra.waitlist_btn');
       buttonStyle = Colors.orange.shade600;
     } else {
       buttonText = translate('events.join_btn');
@@ -496,7 +496,7 @@ class EventosDetailScreen extends GetView<EventoController> {
                               ),
                             ),
                             child: Text(
-                              'LLENO',
+                              translate('events_extra.full_label'),
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w800,

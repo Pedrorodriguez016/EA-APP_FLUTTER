@@ -23,7 +23,9 @@
       "action_btn": "Sign In",
       "no_account": "Don't have an account?",
       "register_link": "Sign up here",
-      "success_msg": "Logged in successfully"
+      "success_msg": "Logged in successfully",
+      "or_continue_with": "Or continue with",
+      "google_btn": "Sign in with Google"
     },
     "register": {
       "title": "Create Account",
@@ -58,7 +60,10 @@
       "birthday_invalid": "Invalid date",
       "age_restriction": "Minimum 13 years old",
       "not_authenticated": "User not authenticated",
-      "password_weak": "Password is weak"
+      "password_weak": "Password is weak",
+      "google_unsupported": "This device does not support Google authentication",
+      "google_token_error": "Could not obtain Google ID Token",
+      "google_failed": "Google login failed"
     },
     "password_strength": {
       "medium": "Medium",
@@ -201,11 +206,41 @@
       "confirm_btn": "Confirm Deletion"
     }
   },
+  "chatbot": {
+    "title": "Virtual Assistant",
+    "event_placeholder": "Event",
+    "input_hint": "Type your query..."
+  },
+  "gamification": {
+    "title": "Gamification",
+    "in_development": "Gamification in development",
+    "not_active": "This feature will be available soon.\nThe gamification backend is not yet active.",
+    "ranking_title": "Global Ranking",
+    "next_level": "Next level: ",
+    "my_badges": "My Badges",
+    "no_badges": "You haven't unlocked any badges yet",
+    "stats_title": "Statistics",
+    "events_created": "Events created",
+    "events_joined": "Events joined",
+    "reviews": "Ratings",
+    "friends": "Friends",
+    "insignias_unit": "badges"
+  },
   "dialogs": {
     "logout": {
       "title": "Log Out",
       "content": "Are you sure you want to log out?",
       "confirm": "Yes, log out"
     }
+  },
+  "events_extra": {
+    "private_event": "Private Event",
+    "private_subtitle": "Only invited guests can see and join this event",
+    "waitlist_btn": "Enter waitlist",
+    "full_label": "FULL",
+    "no_friends_to_invite": "You don't have friends to invite yet.",
+    "invite_friends": "Invite friends:",
+    "max_capacity": "Max capacity (optional)",
+    "unlimited_capacity_hint": "Leave blank for unlimited capacity"
   }
 }

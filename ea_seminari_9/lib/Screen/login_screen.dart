@@ -44,6 +44,11 @@ class LoginScreen extends GetView<AuthController> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: _buildLanguageSelector(context),
+                    ),
+                    const SizedBox(height: 20),
                     _buildWelcomeHeader(context),
                     const SizedBox(height: 48),
                     _buildLoginForm(context),
@@ -327,8 +332,8 @@ class LoginScreen extends GetView<AuthController> {
                         : Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Image.network(
-                                'https://www.gstatic.com/images/branding/product/2x/googleg_48dp.png',
+                              Image.asset(
+                                'assets/images/google.png',
                                 height: 24,
                               ),
                               const SizedBox(width: 12),
@@ -378,6 +383,58 @@ class LoginScreen extends GetView<AuthController> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLanguageSelector(BuildContext context) {
+    final delegate = LocalizedApp.of(context).delegate;
+    final currentLocale = delegate.currentLocale.languageCode;
+
+    final languages = {
+      'es': 'ESP',
+      'en': 'ENG',
+      'ca': 'CAT',
+      'fr': 'FRA',
+    };
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: context.theme.colorScheme.surface.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: context.theme.colorScheme.outline.withValues(alpha: 0.2),
+        ),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: currentLocale,
+          icon: Icon(
+            Icons.language_rounded,
+            size: 18,
+            color: context.theme.colorScheme.primary,
+          ),
+          elevation: 8,
+          dropdownColor: context.theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          style: context.textTheme.bodySmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: context.theme.colorScheme.onSurface,
+          ),
+          onChanged: (String? newValue) {
+            if (newValue != null) {
+              changeLocale(context, newValue);
+              Get.updateLocale(Locale(newValue));
+            }
+          },
+          items: languages.entries.map((entry) {
+            return DropdownMenuItem<String>(
+              value: entry.key,
+              child: Text(entry.value),
+            );
+          }).toList(),
         ),
       ),
     );

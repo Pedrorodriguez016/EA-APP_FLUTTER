@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import '../Models/usuario_progreso.dart';
 
 class EstadisticasSection extends StatelessWidget {
@@ -13,7 +14,7 @@ class EstadisticasSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Estadísticas',
+          translate('gamification.stats_title'),
           style: context.textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -24,7 +25,7 @@ class EstadisticasSection extends StatelessWidget {
             Expanded(
               child: StatCard(
                 icon: Icons.create,
-                label: 'Eventos creados',
+                label: translate('gamification.events_created'),
                 value: stats.eventosCreadosTotal.toString(),
                 color: Colors.blue,
               ),
@@ -33,7 +34,7 @@ class EstadisticasSection extends StatelessWidget {
             Expanded(
               child: StatCard(
                 icon: Icons.event_available,
-                label: 'Eventos unidos',
+                label: translate('gamification.events_joined'),
                 value: stats.eventosUnidosTotal.toString(),
                 color: Colors.green,
               ),
@@ -46,7 +47,7 @@ class EstadisticasSection extends StatelessWidget {
             Expanded(
               child: StatCard(
                 icon: Icons.star,
-                label: 'Valoraciones',
+                label: translate('gamification.reviews'),
                 value: stats.valoracionesTotal.toString(),
                 color: Colors.orange,
               ),
@@ -55,7 +56,7 @@ class EstadisticasSection extends StatelessWidget {
             Expanded(
               child: StatCard(
                 icon: Icons.group,
-                label: 'Amigos',
+                label: translate('gamification.friends'),
                 value: stats.amigosTotal.toString(),
                 color: Colors.purple,
               ),

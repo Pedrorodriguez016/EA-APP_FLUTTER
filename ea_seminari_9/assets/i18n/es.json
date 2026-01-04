@@ -23,7 +23,9 @@
       "action_btn": "Iniciar Sesión",
       "no_account": "¿No tienes cuenta?",
       "register_link": "Regístrate aquí",
-      "success_msg": "Sesión iniciada correctamente"
+      "success_msg": "Sesión iniciada correctamente",
+      "or_continue_with": "O continuar con",
+      "google_btn": "Iniciar sesión con Google"
     },
     "register": {
       "title": "Crear Cuenta",
@@ -57,7 +59,10 @@
       "birthday_empty": "Por favor ingresa tu fecha de nacimiento",
       "birthday_invalid": "Fecha inválida",
       "not_authenticated": "Usuario no autenticado",
-      "password_weak": "La contraseña es débil"
+      "password_weak": "La contraseña es débil",
+      "google_unsupported": "Este dispositivo no soporta autenticación de Google",
+      "google_token_error": "No se pudo obtener el ID Token de Google",
+      "google_failed": "Error al iniciar sesión con Google"
     },
     "password_strength": {
       "medium": "Media",
@@ -200,11 +205,41 @@
       "confirm_btn": "Confirmar Eliminación"
     }
   },
+  "chatbot": {
+    "title": "Asistente Virtual",
+    "event_placeholder": "Evento",
+    "input_hint": "Escribe tu consulta..."
+  },
+  "gamification": {
+    "title": "Gamificación",
+    "in_development": "Gamificación en desarrollo",
+    "not_active": "Esta función estará disponible próximamente.\nEl backend de gamificación aún no está activo.",
+    "ranking_title": "Ranking Global",
+    "next_level": "Próximo nivel: ",
+    "my_badges": "Mis Insignias",
+    "no_badges": "Aún no has desbloqueado insignias",
+    "stats_title": "Estadísticas",
+    "events_created": "Eventos creados",
+    "events_joined": "Eventos unidos",
+    "reviews": "Valoraciones",
+    "friends": "Amigos",
+    "insignias_unit": "insignias"
+  },
   "dialogs": {
     "logout": {
       "title": "Cerrar sesión",
       "content": "¿Seguro que quieres cerrar sesión?",
       "confirm": "Sí, salir"
     }
+  },
+  "events_extra": {
+    "private_event": "Evento Privado",
+    "private_subtitle": "Solo los invitados podrán ver y unirse a este evento",
+    "waitlist_btn": "Entrar en lista de espera",
+    "full_label": "LLENO",
+    "no_friends_to_invite": "No tienes amigos para invitar aún.",
+    "invite_friends": "Invitar amigos:",
+    "max_capacity": "Capacidad máxima (opcional)",
+    "unlimited_capacity_hint": "Dejar en blanco para capacidad ilimitada"
   }
 }

@@ -97,13 +97,11 @@ class CrearEventoScreen extends GetView<EventoController> {
             // --- SWITCH PRIVACIDAD ---
             Obx(
               () => SwitchListTile(
-                title: const Text(
-                  'Evento Privado',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                title: Text(
+                  translate('events_extra.private_event'),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                subtitle: const Text(
-                  'Solo los invitados podrán ver y unirse a este evento',
-                ),
+                subtitle: Text(translate('events_extra.private_subtitle')),
                 value: controller.isPrivate.value,
                 onChanged: (bool val) {
                   controller.isPrivate.value = val;
@@ -123,11 +121,11 @@ class CrearEventoScreen extends GetView<EventoController> {
               }
 
               if (controller.friendsList.isEmpty) {
-                return const Padding(
-                  padding: EdgeInsets.all(8.0),
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
                   child: Text(
-                    'No tienes amigos para invitar aún.',
-                    style: TextStyle(color: Colors.grey),
+                    translate('events_extra.no_friends_to_invite'),
+                    style: const TextStyle(color: Colors.grey),
                   ),
                 );
               }
@@ -135,11 +133,11 @@ class CrearEventoScreen extends GetView<EventoController> {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Text(
-                      'Invitar amigos:',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      translate('events_extra.invite_friends'),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                   ),
                   Container(
@@ -174,7 +172,7 @@ class CrearEventoScreen extends GetView<EventoController> {
             const SizedBox(height: 24),
 
             // --- Campo de capacidad máxima (opcional) ---
-            _buildSectionTitle(context, 'Capacidad máxima (opcional)'),
+            _buildSectionTitle(context, translate('events_extra.max_capacity')),
             const SizedBox(height: 12),
             _buildTextField(
               context,
@@ -186,7 +184,7 @@ class CrearEventoScreen extends GetView<EventoController> {
             Padding(
               padding: const EdgeInsets.only(left: 4),
               child: Text(
-                'Dejar en blanco para capacidad ilimitada',
+                translate('events_extra.unlimited_capacity_hint'),
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.grey.shade600,

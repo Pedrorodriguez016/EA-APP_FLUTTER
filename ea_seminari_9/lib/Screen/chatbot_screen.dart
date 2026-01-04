@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import '../Controllers/chatbot_controller.dart';
 
 class ChatBotScreen extends GetView<ChatBotController> {
@@ -12,7 +13,7 @@ class ChatBotScreen extends GetView<ChatBotController> {
       backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          'Asistente Virtual',
+          translate('chatbot.title'),
           style: context.textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.bold,
           ),
@@ -97,7 +98,8 @@ class ChatBotScreen extends GetView<ChatBotController> {
                 spacing: 8,
                 runSpacing: 4,
                 children: msg.relatedEvents!.map((event) {
-                  final String name = event['name'] ?? 'Evento';
+                  final String name =
+                      event['name'] ?? translate('chatbot.event_placeholder');
                   final String id = event['_id'] ?? event['id'] ?? '';
                   return ActionChip(
                     avatar: Icon(
@@ -178,7 +180,7 @@ class ChatBotScreen extends GetView<ChatBotController> {
               controller: controller.textController,
               style: context.textTheme.bodyLarge,
               decoration: InputDecoration(
-                hintText: 'Escribe tu consulta...',
+                hintText: translate('chatbot.input_hint'),
                 hintStyle: TextStyle(color: context.theme.hintColor),
                 filled: true,
                 fillColor: context.isDarkMode
