@@ -47,9 +47,9 @@ class CategoriesGrid extends StatelessWidget {
         'color': const Color(0xFF10B981),
       },
       {
-        'title': 'Otros',
-        'icon': Icons.more_horiz_rounded,
-        'color': const Color(0xFF94A3B8),
+        'title': 'Discoteca',
+        'icon': Icons.nightlife_rounded,
+        'color': const Color(0xFFD946EF),
       },
     ];
 
@@ -159,14 +159,6 @@ class CategoriesGrid extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Obx(
-                  () => Text(
-                    "${controller.getEventCountForCategory(title)} esdeveniments",
-                    style: context.textTheme.bodySmall?.copyWith(
-                      color: context.theme.hintColor,
-                    ),
-                  ),
-                ),
               ],
             ),
           ),

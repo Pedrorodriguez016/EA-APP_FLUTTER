@@ -8,8 +8,6 @@ import '../Controllers/auth_controller.dart';
 import '../Controllers/eventos_controller.dart';
 import '../Services/eventos_services.dart';
 import '../Widgets/navigation_bar.dart';
-import '../Widgets/user_card.dart';
-import '../Widgets/solicitudes.dart';
 import '../Widgets/mapa.dart';
 import '../Widgets/global_drawer.dart';
 import '../utils/app_theme.dart';
@@ -51,8 +49,6 @@ class HomeScreen extends GetView<UserController> {
               const SizedBox(height: 24),
               _buildEventsCard(context),
               const SizedBox(height: 24),
-              _buildFriendsCard(context),
-              const SizedBox(height: 24),
             ],
           ),
         ),
@@ -74,20 +70,6 @@ class HomeScreen extends GetView<UserController> {
     return AppBar(
       title: Text(translate('home.title')),
       actions: [
-        IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: context.theme.colorScheme.onSurface.withOpacity(0.05),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.notifications_outlined,
-              color: context.theme.colorScheme.onSurface,
-            ),
-          ),
-          onPressed: () {},
-        ),
         Builder(
           builder: (scaffoldContext) => IconButton(
             icon: Icon(
@@ -242,7 +224,7 @@ class HomeScreen extends GetView<UserController> {
             ),
             const SizedBox(height: 24),
             Container(
-              height: 220,
+              height: context.height * 0.60,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
@@ -309,7 +291,7 @@ class HomeScreen extends GetView<UserController> {
                       .toList();
 
                   return CustomMap(
-                    height: 220,
+                    height: context.height * 0.60,
                     center:
                         eventoController.userLocation.value ??
                         eventoController.defaultLocation,
@@ -331,140 +313,6 @@ class HomeScreen extends GetView<UserController> {
                 }),
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFriendsCard(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: context.theme.cardTheme.color,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: context.theme.colorScheme.outline.withValues(alpha: 0.1),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Text(
-                  translate('home.friends_section.title'),
-                  style: context.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 22,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: context.theme.colorScheme.primary.withValues(
-                      alpha: 0.1,
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Obx(
-                    () => Text(
-                      controller.friendsList.length.toString(),
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: context.theme.colorScheme.primary,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _buildActionButton(
-                    context,
-                    Icons.group_add_rounded,
-                    translate('home.friends_section.requests_btn'),
-                    () {
-                      FriendRequestsDialog.show(
-                        context,
-                        requests: controller.friendsRequests,
-                        onAccept: (user) =>
-                            controller.acceptFriendRequest(user),
-                        onReject: (user) =>
-                            controller.rejectFriendRequest(user),
-                      );
-                    },
-                    isPrimary: true,
-                  ),
-                  const SizedBox(width: 12),
-                  _buildActionButton(
-                    context,
-                    Icons.search_rounded,
-                    translate('home.friends_section.search_btn'),
-                    () => Get.toNamed('/users'),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            Obx(() {
-              if (controller.isLoading.value) {
-                return const Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              }
-
-              if (controller.friendsList.isEmpty) {
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 12.0),
-                    child: Text(
-                      translate('home.friends_section.empty_msg'),
-                      style: context.textTheme.bodySmall?.copyWith(
-                        fontStyle: FontStyle.italic,
-                        fontSize: 14,
-                        color: context.theme.colorScheme.onSurface.withValues(
-                          alpha: 0.6,
-                        ),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                );
-              }
-              return ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: controller.friendsList.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: UserCard(user: controller.friendsList[index]),
-                  );
-                },
-              );
-            }),
           ],
         ),
       ),

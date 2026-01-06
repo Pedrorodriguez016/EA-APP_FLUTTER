@@ -102,14 +102,26 @@ class UserServices {
     }
   }
 
-  Future<List<User>> fetchFriends(String id) async {
+  Future<Map<String, dynamic>> fetchFriends(
+    String id, {
+    int page = 1,
+    int limit = 20,
+  }) async {
     try {
-      logger.d('👥 Obteniendo amigos del usuario: $id');
-      final response = await _client.get('/$id/friends');
+      logger.d('👥 Obteniendo amigos del usuario: $id - Página: $page');
+      final response = await _client.get(
+        '/$id/friends',
+        queryParameters: {'page': page, 'limit': limit},
+      );
       final Map<String, dynamic> responseData = response.data;
       final List<dynamic> userList = responseData['data'];
       logger.i('✅ Amigos obtenidos: ${userList.length} amigos');
-      return userList.map((json) => User.fromJson(json)).toList();
+
+      return {
+        'friends': userList.map((json) => User.fromJson(json)).toList(),
+        'totalPages': responseData['totalPages'] ?? 1,
+        'currentPage': responseData['page'] ?? 1,
+      };
     } catch (e) {
       logger.e('❌ Error al cargar amigos', error: e);
       throw Exception('Error al cargar amigos: $e');

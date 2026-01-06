@@ -567,7 +567,8 @@ class EventoController extends GetxController {
 
     try {
       isLoadingFriends(true);
-      final friends = await _userServices.fetchFriends(userId);
+      final friendsData = await _userServices.fetchFriends(userId);
+      final List<User> friends = friendsData['friends'];
       friendsList.assignAll(friends);
     } catch (e) {
       print("Error fetching friends: $e");

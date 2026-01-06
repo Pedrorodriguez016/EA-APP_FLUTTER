@@ -43,7 +43,8 @@ class ChatListController extends GetxController {
 
       if (myId != null) {
         // Cargar amigos
-        List<User> friends = await _userServices.fetchFriends(myId);
+        final friendsData = await _userServices.fetchFriends(myId);
+        List<User> friends = friendsData['friends'];
         friendsList.assignAll(friends);
 
         // Cargar eventos (donde estoy apuntado)
