@@ -109,7 +109,7 @@
     "participants": "Participants:",
     "not_found": "Esdeveniment no trobat",
     "created_success": "L'esdeveniment s'ha creat correctament.",
-    "explore_tab": "Explorar esdeveniments",
+    "explore_tab": "Explorar",
     "no_my_events": "Encara no has creat ni t'has unit a cap esdeveniment.",
     "created_by_me": "Esdeveniments creats per mi",
     "attending": "Esdeveniments als que assisteixo",
@@ -140,10 +140,13 @@
     "review_dialog_title": "La teva Opinió",
     "review_comment_hint": "Escriu un comentari...",
     "review_send_btn": "Enviar Valoració",
-    "review_empty_msg": "Sigues el primer a valorar aquest esdeveniment"
+    "review_empty_msg": "Sigues el primer a valorar aquest esdeveniment",
+    "categories": "Categories",
+    "filters": "Filtres",
+    "popular_week": "Populars aquesta setmana"
   },
   "calendar": {
-    "title": "Calendari d'Esdeveniments",
+    "title": "Calendari",
     "no_events_day": "No hi ha esdeveniments per a aquest dia",
     "events_found": "esdeveniments trobats"
   },
@@ -195,7 +198,7 @@
     "coming_soon": "Pròximament"
   },
   "profile": {
-    "title": "El meu perfil",
+    "title": "Perfil",
     "save_changes": "Desa els canvis",
     "delete_account": "Elimina el compte",
     "update_success": "Perfil actualitzat correctament",

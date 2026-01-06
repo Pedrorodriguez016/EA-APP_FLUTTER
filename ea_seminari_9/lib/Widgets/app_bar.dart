@@ -44,7 +44,22 @@ class StandardAppBar extends StatelessWidget implements PreferredSizeWidget {
               onPressed: onSearchPressed,
             ),
           ),
+        builderMenuButton(context),
       ],
+    );
+  }
+
+  Widget builderMenuButton(BuildContext context) {
+    return Builder(
+      builder: (scaffoldContext) => IconButton(
+        icon: Icon(
+          Icons.menu_rounded,
+          color: context.theme.colorScheme.primary,
+        ),
+        onPressed: () {
+          Scaffold.of(scaffoldContext).openEndDrawer();
+        },
+      ),
     );
   }
 

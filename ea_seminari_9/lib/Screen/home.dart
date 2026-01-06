@@ -1,4 +1,3 @@
-import 'package:ea_seminari_9/Widgets/logout_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -12,6 +11,7 @@ import '../Widgets/navigation_bar.dart';
 import '../Widgets/user_card.dart';
 import '../Widgets/solicitudes.dart';
 import '../Widgets/mapa.dart';
+import '../Widgets/global_drawer.dart';
 import '../utils/app_theme.dart';
 
 class HomeScreen extends GetView<UserController> {
@@ -32,7 +32,9 @@ class HomeScreen extends GetView<UserController> {
     });
 
     return Scaffold(
+      backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: _buildAppBar(context),
+      endDrawer: const GlobalDrawer(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -62,15 +64,12 @@ class HomeScreen extends GetView<UserController> {
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       title: Text(translate('home.title')),
-      leading: const LogoutButton(),
       actions: [
         IconButton(
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: context.theme.colorScheme.onSurface.withValues(
-                alpha: 0.05,
-              ),
+              color: context.theme.colorScheme.onSurface.withOpacity(0.05),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -79,6 +78,15 @@ class HomeScreen extends GetView<UserController> {
             ),
           ),
           onPressed: () {},
+        ),
+        Builder(
+          builder: (scaffoldContext) => IconButton(
+            icon: Icon(
+              Icons.menu_rounded,
+              color: context.theme.colorScheme.primary,
+            ),
+            onPressed: () => Scaffold.of(scaffoldContext).openEndDrawer(),
+          ),
         ),
       ],
     );

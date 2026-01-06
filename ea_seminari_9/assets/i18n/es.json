@@ -108,7 +108,7 @@
     "participants": "Participantes:",
     "not_found": "Evento no encontrado",
     "created_success": "El evento se ha creado correctamente.",
-    "explore_tab": "Explorar eventos",
+    "explore_tab": "Explorar",
     "no_my_events": "Aún no has creado ni te has unido a eventos.",
     "created_by_me": "Eventos Creados por mí",
     "attending": "Eventos a los que asisto",
@@ -139,10 +139,13 @@
     "review_dialog_title": "Tu Opinión",
     "review_comment_hint": "Escribe un comentario...",
     "review_send_btn": "Enviar Valoración",
-    "review_empty_msg": "Sé el primero en valorar este evento"
+    "review_empty_msg": "Sé el primero en valorar este evento",
+    "categories": "Categorías",
+    "filters": "Filtros",
+    "popular_week": "Populares esta semana"
   },
   "calendar": {
-    "title": "Calendario de Eventos",
+    "title": "Calendario",
     "no_events_day": "No hay eventos para este día",
     "events_found": "eventos encontrados"
   },
@@ -194,7 +197,7 @@
     "coming_soon": "Próximamente"
   },
   "profile": {
-    "title": "Mi perfil",
+    "title": "Perfil",
     "save_changes": "Guardar cambios",
     "delete_account": "Eliminar cuenta",
     "update_success": "Perfil actualizado correctamente",

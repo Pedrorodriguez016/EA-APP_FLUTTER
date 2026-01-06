@@ -5,11 +5,11 @@ import '../Controllers/chat_list_controller.dart';
 import '../Widgets/navigation_bar.dart';
 import '../Models/user.dart';
 import '../Models/eventos.dart';
+import '../Widgets/global_drawer.dart';
 
 class ChatListScreen extends GetView<ChatListController> {
   const ChatListScreen({Key? key}) : super(key: key);
 
-  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,8 +28,18 @@ class ChatListScreen extends GetView<ChatListController> {
             icon: Icon(Icons.refresh, color: context.theme.iconTheme.color),
             onPressed: controller.loadData,
           ),
+          Builder(
+            builder: (scaffoldContext) => IconButton(
+              icon: Icon(
+                Icons.menu_rounded,
+                color: context.theme.colorScheme.primary,
+              ),
+              onPressed: () => Scaffold.of(scaffoldContext).openEndDrawer(),
+            ),
+          ),
         ],
       ),
+      endDrawer: const GlobalDrawer(),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());

@@ -45,43 +45,45 @@ class ValoracionList extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              TextButton(
-                onPressed: () => Get.dialog(ValoracionDialog(eventId: eventId)),
-                style: TextButton.styleFrom(
+              GestureDetector(
+                onTap: () => Get.dialog(ValoracionDialog(eventId: eventId)),
+                child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 8,
+                    horizontal: 14,
+                    vertical: 10,
                   ),
-                  backgroundColor: context.theme.colorScheme.primary.withValues(
-                    alpha: 0.1,
+                  decoration: BoxDecoration(
+                    gradient: AppGradients.primaryBtn,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: [
+                      BoxShadow(
+                        color: context.theme.colorScheme.primary.withValues(
+                          alpha: 0.3,
+                        ),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.add_comment_rounded,
-                      size: 16,
-                      color: context.theme.colorScheme.primary,
-                    ),
-                    const SizedBox(width: 4),
-                    Flexible(
-                      child: Text(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.add_comment_rounded,
+                        size: 16,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
                         translate('events.write_review'),
-                        style: TextStyle(
-                          color: context.theme.colorScheme.primary,
+                        style: const TextStyle(
+                          color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                         ),
-                        overflow: TextOverflow.ellipsis,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -143,14 +145,20 @@ class ValoracionList extends StatelessWidget {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CircleAvatar(
-                        backgroundColor: context.theme.colorScheme.primary
-                            .withValues(alpha: 0.2),
-                        child: Text(
-                          avatarInitial,
-                          style: TextStyle(
-                            color: context.theme.colorScheme.primary,
-                            fontWeight: FontWeight.bold,
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: AppGradients.primaryBtn,
+                        ),
+                        child: Center(
+                          child: Text(
+                            avatarInitial,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),

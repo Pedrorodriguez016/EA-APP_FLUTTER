@@ -27,6 +27,10 @@ class EventoController extends GetxController {
   var currentPage = 1.obs;
   var totalPages = 1.obs;
   var totalEventos = 0.obs;
+  var isSearching = false.obs;
+  var filterCategory = Rxn<String>(); // Category filter
+  var filterDateFrom = Rxn<DateTime>(); // Date range start
+  var filterDateTo = Rxn<DateTime>(); // Date range end
   final int limit = 10;
   var selectedEvento = Rxn<Evento>();
   final TextEditingController searchEditingController = TextEditingController();
@@ -109,29 +113,7 @@ class EventoController extends GetxController {
     }
   }
 
-  void fetchEventos(int page) async {
-    String? creatorId;
-    if (currentFilter.value == EventFilter.myEvents) {
-      creatorId = _authController.currentUser.value?.id;
-      logger.i('📄 Cargando mis eventos, creatorId: $creatorId');
-
-      if (creatorId == null) {
-        isLoading.value = false;
-        isMoreLoading.value = false;
-        eventosList.clear();
-        logger.w('⚠️ Usuario no autenticado, no se pueden cargar eventos');
-
-        // Esto evita que intente cargar eventos si el usuario no está logueado
-        Get.snackbar(
-          translate('events.errors.restricted_access_title'),
-          translate('events.errors.restricted_access_msg'),
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red,
-        );
-        return;
-      }
-    }
-
+  void fetchEventos(int page, {String? category}) async {
     if (page == 1) {
       isLoading.value = true;
     } else {
@@ -139,11 +121,33 @@ class EventoController extends GetxController {
     }
 
     try {
-      final data = await _eventosServices.fetchEvents(
-        page: page,
-        limit: limit,
-        creatorId: creatorId,
-      );
+      final String searchText = searchEditingController.text.trim();
+      Map<String, dynamic> data;
+
+      // La categoría puede venir del parámetro o del estado reactivo del filtro
+      final String? selectedCat = category ?? filterCategory.value;
+
+      // Si hay búsqueda por texto, categoría o fechas, usamos el endpoint /search
+      if (searchText.isNotEmpty ||
+          (selectedCat != null && selectedCat.isNotEmpty) ||
+          filterDateFrom.value != null ||
+          filterDateTo.value != null) {
+        data = await _eventosServices.searchEvents(
+          page: page,
+          limit: limit,
+          search: searchText.isNotEmpty ? searchText : null,
+          category: selectedCat,
+          dateFrom: filterDateFrom.value != null
+              ? "${filterDateFrom.value!.year}-${filterDateFrom.value!.month.toString().padLeft(2, '0')}-${filterDateFrom.value!.day.toString().padLeft(2, '0')}"
+              : null,
+          dateTo: filterDateTo.value != null
+              ? "${filterDateTo.value!.year}-${filterDateTo.value!.month.toString().padLeft(2, '0')}-${filterDateTo.value!.day.toString().padLeft(2, '0')}"
+              : null,
+        );
+      } else {
+        // Si no hay ningún filtro, usamos el /visible normal
+        data = await _eventosServices.fetchEvents(page: page, limit: limit);
+      }
 
       final List<Evento> newEventos = data['eventos'];
       if (page == 1) {
@@ -169,6 +173,26 @@ class EventoController extends GetxController {
     }
   }
 
+  void clearFilters() {
+    filterDateFrom.value = null;
+    filterDateTo.value = null;
+    filterCategory.value = null;
+    searchEditingController.clear();
+    isSearching.value = false;
+    fetchEventos(1);
+  }
+
+  void searchEventos(String query) {
+    // Alias to trigger a search from the UI
+    isSearching.value = query.isNotEmpty;
+    fetchEventos(1);
+  }
+
+  int getEventCountForCategory(String category) {
+    // Current count based on loaded events or we could fetch specifically
+    return eventosList.where((e) => e.categoria == category).length;
+  }
+
   void loadMoreEvents() {
     if (currentPage.value < totalPages.value) {
       fetchEventos(currentPage.value + 1);
@@ -179,7 +203,6 @@ class EventoController extends GetxController {
   Future<void> _getUserLocation() async {
     isLoadingLocation.value = true;
     try {
-      // Verificar si el servicio de ubicación está habilitado
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         print('Servicio de ubicación deshabilitado');
@@ -293,45 +316,6 @@ class EventoController extends GetxController {
   void nextPage() {
     if (currentPage.value < totalPages.value) {
       fetchEventos(currentPage.value + 1);
-    }
-  }
-
-  Future<void> searchEventos(String query) async {
-    if (searchEditingController.text.isEmpty) {
-      refreshEventos();
-      return;
-    }
-
-    try {
-      isLoading(true);
-
-      final Evento? evento = await _eventosServices.getEventoByName(
-        searchEditingController.text,
-      );
-
-      if (evento != null) {
-        eventosList.assignAll([evento]);
-      } else {
-        eventosList.clear();
-        Get.snackbar(
-          translate('common.search'),
-          translate('events.empty_search'),
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.orange,
-          colorText: Colors.white,
-          duration: const Duration(seconds: 2),
-        );
-      }
-    } catch (e) {
-      Get.snackbar(
-        translate('common.error'),
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-    } finally {
-      isLoading(false);
     }
   }
 
@@ -638,6 +622,327 @@ class EventoController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future<void> showFilterSheet(BuildContext context) async {
+    final List<String> allCategories = [
+      'Fútbol',
+      'Baloncesto',
+      'Tenis',
+      'Pádel',
+      'Running',
+      'Ciclismo',
+      'Natación',
+      'Yoga',
+      'Gimnasio',
+      'Senderismo',
+      'Escalada',
+      'Artes Marciales',
+      'Concierto Rock',
+      'Concierto Pop',
+      'Concierto Clásica',
+      'Jazz',
+      'Electrónica',
+      'Hip Hop',
+      'Karaoke',
+      'Discoteca',
+      'Festival Musical',
+      'Exposición Arte',
+      'Teatro',
+      'Cine',
+      'Museo',
+      'Literatura',
+      'Fotografía',
+      'Pintura',
+      'Escultura',
+      'Danza',
+      'Ópera',
+      'Restaurante',
+      'Tapas',
+      'Cocina Internacional',
+      'Vinos',
+      'Cerveza Artesanal',
+      'Repostería',
+      'Brunch',
+      'Food Truck',
+      'Fiesta Privada',
+      'Fiesta Temática',
+      'Cumpleaños',
+      'Boda',
+      'Despedida',
+      'After Work',
+      'Networking',
+      'Speed Dating',
+      'Taller',
+      'Curso',
+      'Conferencia',
+      'Seminario',
+      'Workshop',
+      'Idiomas',
+      'Masterclass',
+      'Hackathon',
+      'Meetup Tech',
+      'Gaming',
+      'eSports',
+      'Programación',
+      'Inteligencia Artificial',
+      'Blockchain',
+      'Startups',
+      'Meditación',
+      'Spa',
+      'Wellness',
+      'Mindfulness',
+      'Salud Mental',
+      'Voluntariado Ambiental',
+      'Voluntariado Social',
+      'Donación de Sangre',
+      'Rescate Animal',
+      'Limpieza Playas',
+      'Banco de Alimentos',
+      'Camping',
+      'Montañismo',
+      'Playa',
+      'Barbacoa',
+      'Picnic',
+      'Observación Aves',
+      'Safari',
+      'Juegos de Mesa',
+      'Ajedrez',
+      'Poker',
+      'Escape Room',
+      'Paintball',
+      'Laser Tag',
+      'Bolos',
+      'Evento Familiar',
+      'Parque Infantil',
+      'Teatro Infantil',
+      'Animación Infantil',
+      'Taller Niños',
+      'Mercadillo',
+      'Feria',
+      'Turismo',
+      'Excursión',
+      'Compras',
+      'Otros',
+    ];
+
+    await Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.symmetric(vertical: 24),
+        decoration: BoxDecoration(
+          color: context.theme.scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      translate('events.filters'),
+                      style: context.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        filterDateFrom.value = null;
+                        filterDateTo.value = null;
+                        filterCategory.value = null;
+                      },
+                      child: const Text('Limpiar'),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                  'Categoría',
+                  style: context.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 40,
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: allCategories.length,
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(width: 8),
+                  itemBuilder: (context, index) {
+                    final cat = allCategories[index];
+                    return Obx(() {
+                      final isSelected = filterCategory.value == cat;
+                      return ChoiceChip(
+                        label: Text(cat),
+                        selected: isSelected,
+                        onSelected: (val) {
+                          filterCategory.value = val ? cat : null;
+                        },
+                        selectedColor: context.theme.colorScheme.primary
+                            .withOpacity(0.2),
+                        labelStyle: TextStyle(
+                          color: isSelected
+                              ? context.theme.colorScheme.primary
+                              : context.theme.hintColor,
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                        ),
+                      );
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(height: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Text(
+                  'Rango de fechas',
+                  style: context.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _buildDateTile(
+                        context,
+                        'Desde',
+                        filterDateFrom,
+                        () async {
+                          final date = await showDatePicker(
+                            context: context,
+                            initialDate: filterDateFrom.value ?? DateTime.now(),
+                            firstDate: DateTime.now().subtract(
+                              const Duration(days: 365),
+                            ),
+                            lastDate: DateTime.now().add(
+                              const Duration(days: 365),
+                            ),
+                          );
+                          if (date != null) filterDateFrom.value = date;
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildDateTile(
+                        context,
+                        'Hasta',
+                        filterDateTo,
+                        () async {
+                          final date = await showDatePicker(
+                            context: context,
+                            initialDate:
+                                filterDateTo.value ??
+                                (filterDateFrom.value ?? DateTime.now()),
+                            firstDate: filterDateFrom.value ?? DateTime.now(),
+                            lastDate: DateTime.now().add(
+                              const Duration(days: 365),
+                            ),
+                          );
+                          if (date != null) filterDateTo.value = date;
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 55,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Get.back();
+                      isSearching.value = true;
+                      fetchEventos(1);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: context.theme.colorScheme.primary,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Text(
+                      'Aplicar Filtros',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        ),
+      ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+    );
+  }
+
+  Widget _buildDateTile(
+    BuildContext context,
+    String label,
+    Rxn<DateTime> dateObs,
+    VoidCallback onTap,
+  ) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: context.theme.cardColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: context.theme.dividerColor),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: context.textTheme.labelSmall?.copyWith(
+                color: context.theme.hintColor,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Obx(
+              () => Text(
+                dateObs.value != null
+                    ? "${dateObs.value!.day}/${dateObs.value!.month}/${dateObs.value!.year}"
+                    : 'Seleccionar',
+                style: context.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> fetchCalendarEvents(DateTime from, DateTime to) async {

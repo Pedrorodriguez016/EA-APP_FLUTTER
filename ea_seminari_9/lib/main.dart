@@ -93,7 +93,7 @@ class MyApp extends StatelessWidget {
         ),
         GetPage(
           name: '/eventos',
-          page: () => EventosListScreen(),
+          page: () => const EventosListScreen(),
           binding: UserBinding(),
         ),
         GetPage(
@@ -148,12 +148,12 @@ class MyApp extends StatelessWidget {
         ),
         GetPage(
           name: '/calendar',
-          page: () => const CalendarScreen(),
+          page: () => CalendarScreen(),
           binding: UserBinding(),
         ),
         GetPage(
           name: '/gamificacion',
-          page: () => const GamificacionScreen(),
+          page: () => GamificacionScreen(),
           binding: GamificacionBinding(),
         ),
       ],

@@ -7,9 +7,11 @@ import '../Widgets/calendar_widget.dart';
 import '../Widgets/eventos_card.dart';
 import '../Widgets/navigation_bar.dart';
 import '../Widgets/app_bar.dart';
+import '../Widgets/global_drawer.dart';
 
 class CalendarScreen extends GetView<EventoController> {
-  const CalendarScreen({super.key});
+  CalendarScreen({super.key});
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   void _fetchEventsForMonth(DateTime date) {
     final firstDay = DateTime(date.year, date.month, 1);
@@ -26,6 +28,7 @@ class CalendarScreen extends GetView<EventoController> {
     return Scaffold(
       backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: StandardAppBar(title: translate('calendar.title')),
+      endDrawer: const GlobalDrawer(),
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
@@ -110,7 +113,7 @@ class CalendarScreen extends GetView<EventoController> {
           }),
         ],
       ),
-      bottomNavigationBar: CustomNavBar(currentIndex: 1),
+      bottomNavigationBar: const CustomNavBar(currentIndex: 3),
     );
   }
 }

@@ -3,12 +3,14 @@ import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import '../Controllers/auth_controller.dart';
 import '../Controllers/user_controller.dart';
-import '../Widgets/logout_button.dart';
 import '../Widgets/gamificacion_card.dart';
+import '../Widgets/navigation_bar.dart';
+import '../Widgets/global_drawer.dart';
 import '../utils/app_theme.dart';
 
 class ProfileScreen extends GetView<UserController> {
   ProfileScreen({super.key});
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final authController = Get.find<AuthController>();
 
   @override
@@ -39,8 +41,19 @@ class ProfileScreen extends GetView<UserController> {
           ),
           onPressed: () => Get.back(),
         ),
-        actions: const [LogoutButton()],
+        actions: [
+          Builder(
+            builder: (scaffoldContext) => IconButton(
+              icon: Icon(
+                Icons.menu_rounded,
+                color: context.theme.colorScheme.primary,
+              ),
+              onPressed: () => Scaffold.of(scaffoldContext).openEndDrawer(),
+            ),
+          ),
+        ],
       ),
+      endDrawer: const GlobalDrawer(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -194,6 +207,7 @@ class ProfileScreen extends GetView<UserController> {
           ],
         ),
       ),
+      bottomNavigationBar: const CustomNavBar(currentIndex: 4),
     );
   }
 
