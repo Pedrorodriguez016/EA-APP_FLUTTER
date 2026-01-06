@@ -122,15 +122,15 @@ class HomeScreen extends GetView<UserController> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.all(8),
+                width: 30,
+                height: 30,
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.celebration_rounded,
-                  color: Colors.white,
-                  size: 20,
+                  image: const DecorationImage(
+                    image: AssetImage('assets/images/logo.png'),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ],

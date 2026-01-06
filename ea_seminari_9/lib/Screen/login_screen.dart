@@ -42,7 +42,7 @@ class LoginScreen extends GetView<AuthController> {
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Align(
                       alignment: Alignment.topRight,
@@ -66,31 +66,19 @@ class LoginScreen extends GetView<AuthController> {
 
   Widget _buildWelcomeHeader(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
-          width: 70,
-          height: 70,
-          decoration: BoxDecoration(
-            gradient: AppGradients.primaryBtn,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: context.theme.colorScheme.primary.withValues(alpha: 0.3),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: const Icon(
-            Icons.event_note_rounded,
-            color: Colors.white,
-            size: 36,
+          constraints: const BoxConstraints(maxHeight: 180),
+          child: Image.asset(
+            'assets/images/logo_grande.png',
+            fit: BoxFit.contain,
           ),
         ),
         const SizedBox(height: 32),
         Text(
           translate('auth.login.title'),
+          textAlign: TextAlign.center,
           style: context.textTheme.displaySmall?.copyWith(
             fontWeight: FontWeight.w900,
             color: context.theme.colorScheme.onBackground,
@@ -100,6 +88,7 @@ class LoginScreen extends GetView<AuthController> {
         const SizedBox(height: 12),
         Text(
           translate('auth.login.subtitle'),
+          textAlign: TextAlign.center,
           style: context.textTheme.bodyLarge?.copyWith(
             color: context.theme.colorScheme.onBackground.withValues(
               alpha: 0.7,
@@ -113,35 +102,37 @@ class LoginScreen extends GetView<AuthController> {
 
   Widget _buildLoginForm(BuildContext context) {
     final isDark = context.isDarkMode;
-    final inputDecoration = (String label, IconData icon) => InputDecoration(
-      labelText: label,
-      prefixIcon: Icon(icon, color: context.theme.colorScheme.primary),
-      filled: true,
-      fillColor: isDark
-          ? context.theme.colorScheme.surface.withValues(alpha: 0.5)
-          : Colors.white,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide.none,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(
-          color: context.theme.colorScheme.outline.withValues(alpha: 0.3),
+    InputDecoration inputDecoration(String label, IconData icon) {
+      return InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: context.theme.colorScheme.primary),
+        filled: true,
+        fillColor: isDark
+            ? context.theme.colorScheme.surface.withValues(alpha: 0.5)
+            : Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide.none,
         ),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(
-          color: context.theme.colorScheme.primary,
-          width: 1.5,
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(
+            color: context.theme.colorScheme.outline.withValues(alpha: 0.3),
+          ),
         ),
-      ),
-      contentPadding: const EdgeInsets.all(20),
-      labelStyle: TextStyle(
-        color: context.theme.colorScheme.onSurface.withValues(alpha: 0.6),
-      ),
-    );
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(
+            color: context.theme.colorScheme.primary,
+            width: 1.5,
+          ),
+        ),
+        contentPadding: const EdgeInsets.all(20),
+        labelStyle: TextStyle(
+          color: context.theme.colorScheme.onSurface.withValues(alpha: 0.6),
+        ),
+      );
+    }
 
     return Form(
       key: controller.loginFormKey,
@@ -392,12 +383,7 @@ class LoginScreen extends GetView<AuthController> {
     final delegate = LocalizedApp.of(context).delegate;
     final currentLocale = delegate.currentLocale.languageCode;
 
-    final languages = {
-      'es': 'ESP',
-      'en': 'ENG',
-      'ca': 'CAT',
-      'fr': 'FRA',
-    };
+    final languages = {'es': 'ESP', 'en': 'ENG', 'ca': 'CAT', 'fr': 'FRA'};
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
