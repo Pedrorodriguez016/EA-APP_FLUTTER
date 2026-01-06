@@ -10,7 +10,6 @@ import '../utils/app_theme.dart';
 
 class ProfileScreen extends GetView<UserController> {
   ProfileScreen({super.key});
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final authController = Get.find<AuthController>();
 
   @override

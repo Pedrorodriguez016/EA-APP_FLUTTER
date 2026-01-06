@@ -11,7 +11,6 @@ import '../Widgets/global_drawer.dart';
 
 class CalendarScreen extends GetView<EventoController> {
   CalendarScreen({super.key});
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   void _fetchEventsForMonth(DateTime date) {
     final firstDay = DateTime(date.year, date.month, 1);
