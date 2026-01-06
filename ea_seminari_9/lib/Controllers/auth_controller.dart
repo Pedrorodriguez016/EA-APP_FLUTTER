@@ -7,6 +7,7 @@ import '../Models/user.dart';
 import '../Services/auth_service.dart';
 import '../Services/storage_service.dart';
 import '../utils/logger.dart';
+import '../Services/user_services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthController extends GetxController {
@@ -211,6 +212,22 @@ class AuthController extends GetxController {
     isObscurePassword.value = true;
 
     Get.offAllNamed('/login');
+  }
+
+  Future<void> fetchCurrentUser() async {
+    try {
+      final user = currentUser.value;
+      if (user != null) {
+        final updatedUser = await Get.find<UserServices>().fetchUserById(
+          user.id,
+        );
+        currentUser.value = updatedUser;
+        await _storageService.saveSession(updatedUser);
+        logger.i('✅ Usuario actualizado desde el backend');
+      }
+    } catch (e) {
+      logger.e('❌ Error al refrescar usuario actual', error: e);
+    }
   }
 
   Future<Map<String, dynamic>> register(User newUser) async {

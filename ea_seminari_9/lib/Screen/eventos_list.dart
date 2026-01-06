@@ -23,22 +23,33 @@ class EventosListScreen extends GetView<EventoController> {
           return _buildInitialView(context);
         }),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Get.toNamed('/crear_evento'),
+        backgroundColor: context.theme.colorScheme.primary,
+        child: const Icon(Icons.add_rounded, color: Colors.white, size: 30),
+      ),
       bottomNavigationBar: const CustomNavBar(currentIndex: 1),
     );
   }
 
   Widget _buildInitialView(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(context, isResults: false),
-          const SizedBox(height: 20),
-          _buildSearchBar(context),
-          const SizedBox(height: 24),
-          CategoriesGrid(controller: controller),
-        ],
+    return RefreshIndicator(
+      onRefresh: () async {
+        await controller.fetchEventos(1);
+      },
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(context, isResults: false),
+            const SizedBox(height: 20),
+            _buildSearchBar(context),
+            const SizedBox(height: 24),
+            CategoriesGrid(controller: controller),
+          ],
+        ),
       ),
     );
   }

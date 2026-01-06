@@ -35,17 +35,26 @@ class HomeScreen extends GetView<UserController> {
       backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: _buildAppBar(context),
       endDrawer: const GlobalDrawer(),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            _buildWelcomeCard(authController, context),
-            const SizedBox(height: 24),
-            _buildEventsCard(context),
-            const SizedBox(height: 24),
-            _buildFriendsCard(context),
-            const SizedBox(height: 24),
-          ],
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await controller.fetchFriends();
+          await controller.fetchRequest();
+          await authController
+              .fetchCurrentUser(); // Opcional si quieres refrescar datos del user
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              _buildWelcomeCard(authController, context),
+              const SizedBox(height: 24),
+              _buildEventsCard(context),
+              const SizedBox(height: 24),
+              _buildFriendsCard(context),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: const CustomNavBar(currentIndex: 0),

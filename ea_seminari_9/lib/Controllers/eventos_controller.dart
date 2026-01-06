@@ -113,7 +113,7 @@ class EventoController extends GetxController {
     }
   }
 
-  void fetchEventos(int page, {String? category}) async {
+  Future<void> fetchEventos(int page, {String? category}) async {
     if (page == 1) {
       isLoading.value = true;
     } else {
@@ -313,15 +313,15 @@ class EventoController extends GetxController {
     }
   }
 
+  Future<void> refreshEventos() async {
+    searchEditingController.clear();
+    await fetchEventos(1);
+  }
+
   void nextPage() {
     if (currentPage.value < totalPages.value) {
       fetchEventos(currentPage.value + 1);
     }
-  }
-
-  void refreshEventos() {
-    searchEditingController.clear();
-    fetchEventos(1);
   }
 
   fetchEventoById(String id) async {

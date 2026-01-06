@@ -19,7 +19,7 @@ class UserController extends GetxController {
   var currentPage = 1.obs;
   var totalPages = 1.obs;
   var totalUsers = 0.obs;
-  final int limit = 10;
+  final int limit = 20;
   final TextEditingController searchEditingController = TextEditingController();
   final UserServices _userServices;
 
@@ -123,9 +123,9 @@ class UserController extends GetxController {
     }
   }
 
-  void refreshUsers() {
+  Future<void> refreshUsers() async {
     searchEditingController.clear();
-    fetchUsers(1);
+    await fetchUsers(1);
   }
 
   fetchUserById(String id) async {
@@ -192,7 +192,7 @@ class UserController extends GetxController {
     }
   }
 
-  void fetchFriends() async {
+  Future<void> fetchFriends() async {
     try {
       var id = authController.currentUser.value!.id;
       isLoading(true);
@@ -205,7 +205,7 @@ class UserController extends GetxController {
     }
   }
 
-  void fetchRequest() async {
+  Future<void> fetchRequest() async {
     try {
       var id = authController.currentUser.value!.id;
       isLoading(true);
