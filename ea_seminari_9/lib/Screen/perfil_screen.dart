@@ -6,6 +6,8 @@ import '../Controllers/user_controller.dart';
 import '../Widgets/logout_button.dart';
 import '../Widgets/gamificacion_card.dart';
 import '../utils/app_theme.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 class ProfileScreen extends GetView<UserController> {
   ProfileScreen({super.key});
@@ -46,38 +48,95 @@ class ProfileScreen extends GetView<UserController> {
         child: Column(
           children: [
             const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: AppGradients.primaryBtn,
-                boxShadow: [
-                  BoxShadow(
-                    color: context.theme.colorScheme.primary.withValues(
-                      alpha: 0.3,
-                    ),
-                    blurRadius: 20,
-                    offset: const Offset(0, 5),
+            Stack(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: AppGradients.primaryBtn,
+                    boxShadow: [
+                      BoxShadow(
+                        color: context.theme.colorScheme.primary.withValues(
+                          alpha: 0.3,
+                        ),
+                        blurRadius: 20,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: CircleAvatar(
-                radius: 60,
-                backgroundColor: context.theme.scaffoldBackgroundColor,
-                child: CircleAvatar(
-                  radius: 56,
-                  backgroundColor: context.theme.colorScheme.primary.withValues(
-                    alpha: 0.1,
-                  ),
-                  child: Icon(
-                    Icons.person_rounded,
-                    size: 60,
-                    color: context.theme.colorScheme.primary,
+                  child: CircleAvatar(
+                    radius: 60,
+                    backgroundColor: context.theme.scaffoldBackgroundColor,
+                    child: Obx(() {
+                      final currentUser = authController.currentUser.value;
+                      final fullUrl = controller.getFullPhotoUrl(
+                        currentUser?.profilePhoto,
+                      );
+
+                      return CircleAvatar(
+                        radius: 56,
+                        backgroundColor: Colors.grey.shade300,
+                        backgroundImage: fullUrl != null
+                            ? NetworkImage(fullUrl)
+                            : null,
+                        child: fullUrl == null
+                            ? const Icon(
+                                Icons.person,
+                                size: 70,
+                                color: Colors.white,
+                              )
+                            : null,
+                      );
+                    }),
                   ),
                 ),
-              ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: GestureDetector(
+                    onTap: () => _showPickerOptions(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: context.theme.colorScheme.primary,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 3),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 5,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.camera_alt_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 24),
+            Obx(() {
+              final currentUser = authController.currentUser.value;
+              if (currentUser?.profilePhoto != null) {
+                return TextButton(
+                  onPressed: () =>
+                      controller.deleteProfilePhoto(currentUser!.id),
+                  child: Text(
+                    translate('profile.delete_photo') ?? 'Eliminar foto',
+                    style: TextStyle(
+                      color: context.theme.colorScheme.error,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                );
+              }
+              return const SizedBox(height: 20);
+            }),
 
             // Card de gamificación
             const GamificacionCard(),
@@ -195,6 +254,66 @@ class ProfileScreen extends GetView<UserController> {
         ),
       ),
     );
+  }
+
+  void _showPickerOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: context.theme.cardColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (BuildContext bc) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Wrap(
+              children: <Widget>[
+                ListTile(
+                  leading: Icon(
+                    Icons.photo_library_rounded,
+                    color: context.theme.colorScheme.primary,
+                  ),
+                  title: Text(translate('profile.gallery') ?? 'Galería'),
+                  onTap: () {
+                    _pickImage(ImageSource.gallery);
+                    Navigator.of(context).pop();
+                  },
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.camera_alt_rounded,
+                    color: context.theme.colorScheme.primary,
+                  ),
+                  title: Text(translate('profile.camera') ?? 'Cámara'),
+                  onTap: () {
+                    _pickImage(ImageSource.camera);
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(
+      source: source,
+      maxWidth: 1000,
+      maxHeight: 1000,
+      imageQuality: 85,
+    );
+
+    if (image != null) {
+      final user = authController.currentUser.value;
+      if (user != null) {
+        await controller.uploadProfilePhoto(user.id, File(image.path));
+      }
+    }
   }
 
   Widget _buildTextField(

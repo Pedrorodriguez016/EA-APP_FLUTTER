@@ -1,7 +1,7 @@
+import 'package:ea_seminari_9/Models/user.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import '../Models/user.dart';
 import '../Controllers/user_controller.dart';
 import '../utils/app_theme.dart';
 
@@ -18,7 +18,7 @@ class UserCard extends GetView<UserController> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -43,16 +43,24 @@ class UserCard extends GetView<UserController> {
                   child: CircleAvatar(
                     radius: 26,
                     backgroundColor: context.theme.scaffoldBackgroundColor,
-                    child: Text(
-                      user.username.isNotEmpty
-                          ? user.username[0].toUpperCase()
-                          : '?',
-                      style: TextStyle(
-                        color: context.theme.colorScheme.primary,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 20,
-                      ),
-                    ),
+                    backgroundImage:
+                        controller.getFullPhotoUrl(user.profilePhoto) != null
+                        ? NetworkImage(
+                            controller.getFullPhotoUrl(user.profilePhoto)!,
+                          )
+                        : null,
+                    child: controller.getFullPhotoUrl(user.profilePhoto) == null
+                        ? Text(
+                            user.username.isNotEmpty
+                                ? user.username[0].toUpperCase()
+                                : '?',
+                            style: TextStyle(
+                              color: context.theme.colorScheme.primary,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 20,
+                            ),
+                          )
+                        : null,
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -98,7 +106,7 @@ class UserCard extends GetView<UserController> {
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: statusColor.withValues(alpha: 0.4),
+                                    color: statusColor.withOpacity(0.4),
                                     blurRadius: 6,
                                   ),
                                 ],

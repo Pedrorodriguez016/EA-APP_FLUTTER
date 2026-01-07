@@ -34,30 +34,20 @@ class UserInfoBasic extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Center(
-              child: Text(
-                name.isNotEmpty ? name[0].toUpperCase() : '?',
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.w900,
-                  color: context.theme.colorScheme.primary,
-                ),
-              ),
-            ),
+          CircleAvatar(
+            radius: 32,
+            backgroundColor: Colors.white,
+            backgroundImage: imageUrl != null ? NetworkImage(imageUrl!) : null,
+            child: imageUrl == null
+                ? Text(
+                    name.isNotEmpty ? name[0].toUpperCase() : '?',
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w900,
+                      color: context.theme.colorScheme.primary,
+                    ),
+                  )
+                : null,
           ),
           const SizedBox(width: 20),
           Expanded(

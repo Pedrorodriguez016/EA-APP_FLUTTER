@@ -1,19 +1,20 @@
 import 'package:ea_seminari_9/Models/user.dart';
-import 'package:dio/dio.dart';
-import 'package:get/get.dart';
+import 'package:dio/dio.dart' as d;
+import 'package:get/get.dart' hide Response, FormData, MultipartFile;
 import '../Interceptor/auth_interceptor.dart';
 import '../Controllers/auth_controller.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../utils/logger.dart';
+import 'dart:io';
 
 class UserServices {
   final String baseUrl = '${dotenv.env['BASE_URL']}/api/user';
   final AuthController _authController = Get.find<AuthController>();
 
-  late final Dio _client;
+  late final d.Dio _client;
 
   UserServices() {
-    _client = Dio(BaseOptions(baseUrl: baseUrl));
+    _client = d.Dio(d.BaseOptions(baseUrl: baseUrl));
     _client.interceptors.add(AuthInterceptor());
   }
 
@@ -77,6 +78,8 @@ class UserServices {
         username: updatedData['username'],
         gmail: updatedData['gmail'],
         birthday: updatedData['birthday'],
+        profilePhoto:
+            _authController.currentUser.value?.profilePhoto, // Mantener la foto
       );
       _authController.currentUser.value = user;
       return user;
@@ -183,7 +186,7 @@ class UserServices {
       final response = await _client.get('/by-username/$username');
       logger.i('✅ Usuario encontrado: $username');
       return User.fromJson(response.data);
-    } on DioException catch (e) {
+    } on d.DioException catch (e) {
       if (e.response?.statusCode == 404) {
         logger.w('⚠️ Usuario no encontrado: $username');
         return null;
@@ -193,6 +196,80 @@ class UserServices {
     } catch (e) {
       logger.e('❌ Error desconocido al buscar usuario', error: e);
       throw Exception('Error desconocido al buscar usuario: $e');
+    }
+  }
+
+  // --- MÉTODOS DE FOTO DE PERFIL ---
+
+  String? getFullPhotoUrl(String? photoPath) {
+    if (photoPath == null || photoPath.isEmpty) return null;
+    if (photoPath.startsWith('http')) return photoPath;
+
+    final serverUrl = _client.options.baseUrl.replaceAll('/api/user', '');
+    return '$serverUrl$photoPath';
+  }
+
+  Future<User?> uploadProfilePhoto(String userId, File imageFile) async {
+    try {
+      logger.i('📤 Subiendo foto de perfil para: $userId');
+
+      String fileName = imageFile.path.split('/').last;
+      final formData = d.FormData.fromMap({
+        'photo': await d.MultipartFile.fromFile(
+          imageFile.path,
+          filename: fileName,
+        ),
+      });
+
+      final response = await _client.post(
+        '/$userId/profile-photo',
+        data: formData,
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = response.data;
+        if (data['ok'] == true && data['user'] != null) {
+          final updatedUser = User.fromJson(data['user']);
+          _authController.currentUser.value = updatedUser;
+          logger.i('✅ Foto de perfil subida exitosamente');
+          return updatedUser;
+        }
+      }
+      throw Exception(
+        'Error al subir la foto de perfil: ${response.statusCode}',
+      );
+    } catch (e) {
+      logger.e('❌ Error en uploadProfilePhoto', error: e);
+      throw Exception('Error al subir la foto de perfil: $e');
+    }
+  }
+
+  Future<bool> deleteProfilePhoto(String userId) async {
+    try {
+      logger.i('🗑️ Eliminando foto de perfil: $userId');
+      final response = await _client.delete('/$userId/profile-photo');
+
+      if (response.statusCode == 200) {
+        final currentUser = _authController.currentUser.value;
+        if (currentUser != null) {
+          _authController.currentUser.value = User(
+            id: currentUser.id,
+            username: currentUser.username,
+            gmail: currentUser.gmail,
+            birthday: currentUser.birthday,
+            profilePhoto: null,
+            token: currentUser.token,
+            refreshToken: currentUser.refreshToken,
+            online: currentUser.online,
+          );
+        }
+        logger.i('✅ Foto de perfil eliminada exitosamente');
+        return true;
+      }
+      return false;
+    } catch (e) {
+      logger.e('❌ Error en deleteProfilePhoto', error: e);
+      return false;
     }
   }
 }

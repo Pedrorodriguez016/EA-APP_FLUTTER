@@ -26,7 +26,11 @@ class SettingsScreen extends GetView<UserController> {
               if (user == null) {
                 return const SizedBox.shrink();
               }
-              return UserInfoBasic(name: user.username, email: user.gmail);
+              return UserInfoBasic(
+                name: user.username,
+                email: user.gmail,
+                imageUrl: controller.getFullPhotoUrl(user.profilePhoto),
+              );
             }),
             const SizedBox(height: 20),
             _buildSettingsSection(context, currentLocale.languageCode),

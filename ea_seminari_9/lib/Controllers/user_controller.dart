@@ -6,6 +6,7 @@ import 'package:flutter_translate/flutter_translate.dart'; // Importar
 import '../Controllers/auth_controller.dart';
 import '../Services/socket_services.dart';
 import '../utils/logger.dart';
+import 'dart:io';
 
 class UserController extends GetxController {
   final AuthController authController = Get.find<AuthController>();
@@ -304,5 +305,61 @@ class UserController extends GetxController {
   void onClose() {
     _socketService.disconnect();
     super.onClose();
+  }
+
+  // --- MÉTODOS DE FOTO DE PERFIL ---
+
+  String? getFullPhotoUrl(String? photoPath) {
+    return _userServices.getFullPhotoUrl(photoPath);
+  }
+
+  Future<void> uploadProfilePhoto(String id, File imageFile) async {
+    try {
+      isLoading(true);
+      await _userServices.uploadProfilePhoto(id, imageFile);
+      Get.snackbar(
+        translate('common.success'),
+        translate('profile.update_success'),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar(
+        translate('common.error'),
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> deleteProfilePhoto(String id) async {
+    try {
+      isLoading(true);
+      bool success = await _userServices.deleteProfilePhoto(id);
+      if (success) {
+        Get.snackbar(
+          translate('common.success'),
+          'Foto eliminada',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        translate('common.error'),
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading(false);
+    }
   }
 }

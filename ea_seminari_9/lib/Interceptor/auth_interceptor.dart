@@ -59,8 +59,8 @@ class AuthInterceptor extends Interceptor {
             final opts = err.requestOptions;
             opts.headers['Authorization'] = 'Bearer $newAccessToken';
 
-            // Clonamos la petición original y la reenviamos usando la instancia de Dio original (err.requestOptions.extra)
-            final clonedRequest = await Dio().fetch(opts);
+            // Clonamos la petición original y la reenviamos usando la instancia de Dio configurada
+            final clonedRequest = await _tokenDio.fetch(opts);
             logger.d('🔄 Reintentando request: ${opts.path}');
 
             // Resolvemos la promesa original con el resultado del reintento
