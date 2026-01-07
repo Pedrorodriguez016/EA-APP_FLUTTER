@@ -21,7 +21,7 @@ import 'Screen/settings_screen.dart';
 import 'Bindings/user_bindings.dart';
 import 'Screen/perfil_screen.dart';
 import 'Screen/crear_evento_screen.dart';
-import 'Screen/eventChat_screen.dart';
+import 'Screen/eventchat_screen.dart';
 import 'Bindings/event_chat_binding.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -93,7 +93,7 @@ class MyApp extends StatelessWidget {
         ),
         GetPage(
           name: '/eventos',
-          page: () => EventosListScreen(),
+          page: () => const EventosListScreen(),
           binding: UserBinding(),
         ),
         GetPage(
@@ -148,12 +148,12 @@ class MyApp extends StatelessWidget {
         ),
         GetPage(
           name: '/calendar',
-          page: () => const CalendarScreen(),
+          page: () => CalendarScreen(),
           binding: UserBinding(),
         ),
         GetPage(
           name: '/gamificacion',
-          page: () => const GamificacionScreen(),
+          page: () => GamificacionScreen(),
           binding: GamificacionBinding(),
         ),
       ],

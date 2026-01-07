@@ -109,7 +109,7 @@
     "participants": "Participants:",
     "not_found": "Event not found",
     "created_success": "The event has been created successfully.",
-    "explore_tab": "Explore events",
+    "explore_tab": "Explore",
     "no_my_events": "You haven't created or joined any events yet.",
     "created_by_me": "Events created by me",
     "attending": "Events I'm attending",
@@ -140,10 +140,13 @@
     "review_dialog_title": "Your Opinion",
     "review_comment_hint": "Write a comment...",
     "review_send_btn": "Submit Review",
-    "review_empty_msg": "Be the first to review this event"
+    "review_empty_msg": "Be the first to review this event",
+    "categories": "Categories",
+    "filters": "Filters",
+    "popular_week": "Popular this week"
   },
   "calendar": {
-    "title": "Events Calendar",
+    "title": "Calendar",
     "no_events_day": "No events for this day",
     "events_found": "events found"
   },
@@ -195,7 +198,7 @@
     "coming_soon": "Coming Soon"
   },
   "profile": {
-    "title": "My Profile",
+    "title": "Profile",
     "save_changes": "Save changes",
     "delete_account": "Delete account",
     "update_success": "Profile updated successfully",

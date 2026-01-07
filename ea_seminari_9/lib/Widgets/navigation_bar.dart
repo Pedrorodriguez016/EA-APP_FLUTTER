@@ -62,65 +62,34 @@ class CustomNavBar extends StatelessWidget {
             height: 1.5,
           ),
           items: [
-            _buildNavItem(
-              context,
-              Icons.home_rounded,
-              translate('home.title'),
-              0,
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.home_outlined),
+              activeIcon: const Icon(Icons.home_rounded),
+              label: translate('home.title'),
             ),
-            _buildNavItem(
-              context,
-              Icons.event_available_rounded,
-              translate('events.list_title'),
-              1,
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.search_rounded),
+              activeIcon: const Icon(Icons.search_rounded),
+              label: translate('events.explore_tab'),
             ),
-            _buildNavItem(
-              context,
-              Icons.chat_bubble_rounded,
-              translate('chat.list_title'),
-              2,
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.chat_bubble_outline_rounded),
+              activeIcon: const Icon(Icons.chat_bubble_rounded),
+              label: translate('chat.list_title'),
             ),
-            _buildNavItem(
-              context,
-              Icons.settings_rounded,
-              translate('settings.title'),
-              3,
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.calendar_month_outlined),
+              activeIcon: const Icon(Icons.calendar_month_rounded),
+              label: translate('calendar.title'),
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.person_outline_rounded),
+              activeIcon: const Icon(Icons.person_rounded),
+              label: translate('profile.title'),
             ),
           ],
         ),
       ),
-    );
-  }
-
-  BottomNavigationBarItem _buildNavItem(
-    BuildContext context,
-    IconData icon,
-    String label,
-    int index,
-  ) {
-    final isSelected = currentIndex == index;
-    final theme = context.theme;
-
-    return BottomNavigationBarItem(
-      icon: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? theme.colorScheme.primary.withValues(alpha: 0.15)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Icon(
-          icon,
-          size: 26,
-          color: isSelected
-              ? theme.colorScheme.primary
-              : theme.colorScheme.onSurface.withValues(alpha: 0.5),
-        ),
-      ),
-      label: label,
-      backgroundColor: Colors.transparent,
     );
   }
 
@@ -132,13 +101,16 @@ class CustomNavBar extends StatelessWidget {
         Get.offNamed('/home');
         break;
       case 1:
-        Get.offNamed('/calendar');
+        Get.offNamed('/eventos');
         break;
       case 2:
         Get.offNamed('/chat-list');
         break;
       case 3:
-        Get.offNamed('/settings');
+        Get.offNamed('/calendar');
+        break;
+      case 4:
+        Get.offNamed('/profile');
         break;
     }
   }

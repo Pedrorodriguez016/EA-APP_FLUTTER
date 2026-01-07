@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import '../Widgets/user_card.dart';
-import '../Widgets/refresh_button.dart';
 
 class UserListScreen extends GetView<UserController> {
   const UserListScreen({super.key});
@@ -71,36 +70,40 @@ class UserListScreen extends GetView<UserController> {
                     );
                   }
 
-                  return ListView.separated(
+                  return Scrollbar(
                     controller: controller.scrollController,
-                    itemCount: controller.userList.length + 1,
-                    separatorBuilder: (c, i) => const SizedBox(height: 10),
-                    itemBuilder: (context, index) {
-                      if (index == controller.userList.length) {
-                        return Obx(
-                          () => controller.isMoreLoading.value
-                              ? const Center(
-                                  child: Padding(
-                                    padding: EdgeInsets.all(16.0),
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                )
-                              : const SizedBox.shrink(),
-                        );
-                      }
-                      final user = controller.userList[index];
-                      return UserCard(user: user);
-                    },
+                    thumbVisibility: true,
+                    child: RefreshIndicator(
+                      onRefresh: () => controller.refreshUsers(),
+                      child: ListView.separated(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        controller: controller.scrollController,
+                        itemCount: controller.userList.length + 1,
+                        separatorBuilder: (c, i) => const SizedBox(height: 10),
+                        itemBuilder: (context, index) {
+                          if (index == controller.userList.length) {
+                            return Obx(
+                              () => controller.isMoreLoading.value
+                                  ? const Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.all(16.0),
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    )
+                                  : const SizedBox.shrink(),
+                            );
+                          }
+                          final user = controller.userList[index];
+                          return UserCard(user: user);
+                        },
+                      ),
+                    ),
                   );
                 }),
               ),
             ],
           );
         }),
-      ),
-      floatingActionButton: RefreshButton(
-        onRefresh: () => controller.refreshUsers(),
-        message: translate('common.success'),
       ),
     );
   }

@@ -58,10 +58,12 @@ class EventosServices {
     int page = 1,
     int limit = 20,
     String q = '',
-    String? creatorId,
+    String? category,
   }) async {
     try {
-      logger.d('📄 Obteniendo eventos - Página: $page, Límite: $limit');
+      logger.d(
+        '📄 Obteniendo eventos - Página: $page, Límite: $limit, Categoria: $category',
+      );
 
       final response = await _client.get(
         '/visible',
@@ -69,17 +71,13 @@ class EventosServices {
           'page': page,
           'limit': limit,
           if (q.isNotEmpty) 'q': q,
+          if (category != null && category.isNotEmpty) 'categoria': category,
         },
       );
 
       final responseData = response.data;
-
-      // Intentar obtener la lista de eventos buscando en 'data' o 'docs'
       final List<dynamic> eventosList =
           responseData['data'] ?? responseData['docs'] ?? [];
-
-      logger.i('✅ Respuesta recibida. Claves: ${responseData.keys.join(", ")}');
-      logger.i('✅ Eventos obtenidos: ${eventosList.length}');
 
       return {
         'eventos': eventosList.map((json) => Evento.fromJson(json)).toList(),
@@ -90,6 +88,43 @@ class EventosServices {
     } catch (e) {
       logger.e('❌ Error al cargar eventos', error: e);
       throw Exception('Error al cargar eventos: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> searchEvents({
+    int page = 1,
+    int limit = 20,
+    String? search,
+    String? category,
+    String? dateFrom,
+    String? dateTo,
+  }) async {
+    try {
+      logger.d('🔍 Buscando eventos con filtros avanzados');
+      final response = await _client.get(
+        '/search',
+        queryParameters: {
+          'page': page,
+          'limit': limit,
+          if (search != null) 'search': search,
+          if (category != null) 'categoria': category,
+          if (dateFrom != null) 'dateFrom': dateFrom,
+          if (dateTo != null) 'dateTo': dateTo,
+        },
+      );
+
+      final responseData = response.data;
+      final List<dynamic> eventosList = responseData['data'] ?? [];
+
+      return {
+        'eventos': eventosList.map((json) => Evento.fromJson(json)).toList(),
+        'totalPages': responseData['totalPages'] ?? 1,
+        'currentPage': responseData['page'] ?? 1,
+        'total': responseData['totalItems'] ?? 0,
+      };
+    } catch (e) {
+      logger.e('❌ Error en búsqueda avanzada', error: e);
+      throw Exception('Error en búsqueda de eventos: $e');
     }
   }
 

@@ -17,10 +17,16 @@ class UserController extends GetxController {
   var selectedUser = Rxn<User>();
   var friendsList = <User>[].obs;
   var friendsRequests = <User>[].obs;
+  var friendsCurrentPage = 1.obs;
+  var friendsTotalPages = 1.obs;
+  var isMoreFriendsLoading = false.obs;
+
   var currentPage = 1.obs;
   var totalPages = 1.obs;
   var totalUsers = 0.obs;
-  final int limit = 10;
+  final int limit = 20;
+  final int friendsLimit = 20;
+
   final TextEditingController searchEditingController = TextEditingController();
   final UserServices _userServices;
 
@@ -124,9 +130,9 @@ class UserController extends GetxController {
     }
   }
 
-  void refreshUsers() {
+  Future<void> refreshUsers() async {
     searchEditingController.clear();
-    fetchUsers(1);
+    await fetchUsers(1);
   }
 
   fetchUserById(String id) async {
@@ -193,20 +199,46 @@ class UserController extends GetxController {
     }
   }
 
-  void fetchFriends() async {
+  Future<void> fetchFriends({int page = 1}) async {
     try {
       var id = authController.currentUser.value!.id;
-      isLoading(true);
-      var friends = await _userServices.fetchFriends(id);
-      if (friends.isNotEmpty) {
-        friendsList.assignAll(friends);
+      if (page == 1) {
+        isLoading.value = true;
+      } else {
+        isMoreFriendsLoading.value = true;
       }
+
+      final data = await _userServices.fetchFriends(
+        id,
+        page: page,
+        limit: friendsLimit,
+      );
+      final List<User> newFriends = data['friends'];
+
+      if (page == 1) {
+        friendsList.assignAll(newFriends);
+      } else {
+        friendsList.addAll(newFriends);
+      }
+
+      friendsCurrentPage.value = data['currentPage'];
+      friendsTotalPages.value = data['totalPages'];
+    } catch (e) {
+      logger.e('❌ Error al cargar amigos', error: e);
     } finally {
-      isLoading(false);
+      isLoading.value = false;
+      isMoreFriendsLoading.value = false;
     }
   }
 
-  void fetchRequest() async {
+  void loadMoreFriends() {
+    if (friendsCurrentPage.value < friendsTotalPages.value &&
+        !isMoreFriendsLoading.value) {
+      fetchFriends(page: friendsCurrentPage.value + 1);
+    }
+  }
+
+  Future<void> fetchRequest() async {
     try {
       var id = authController.currentUser.value!.id;
       isLoading(true);
