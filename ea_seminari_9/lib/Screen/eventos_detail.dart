@@ -16,7 +16,7 @@ class EventosDetailScreen extends GetView<EventoController> {
 
   const EventosDetailScreen({super.key, required this.eventoId});
 
-  String _formatSchedule(String scheduleString) {
+  String _formatSchedule(BuildContext context, String scheduleString) {
     final String cleanScheduleString = scheduleString.trim();
 
     if (cleanScheduleString.isEmpty) {
@@ -30,23 +30,28 @@ class EventosDetailScreen extends GetView<EventoController> {
         return translate('events.format_error');
       }
 
+      final String currentLocale = LocalizedApp.of(
+        context,
+      ).delegate.currentLocale.languageCode;
+
       final String formattedDate = DateFormat(
-        'd \'de\' MMMM \'de\' yyyy',
-        'es',
+        'd MMMM yyyy',
+        currentLocale,
       ).format(scheduleDate);
 
       final String formattedTime = DateFormat(
         'HH:mm',
-        'es',
+        currentLocale,
       ).format(scheduleDate);
 
       final String relativeTime = timeago.format(
         scheduleDate,
-        locale: 'es',
+        locale: currentLocale,
         allowFromNow: true,
       );
 
-      final String fixedTime = '$formattedDate a las $formattedTime';
+      final String atLabel = translate('events.at_time');
+      final String fixedTime = '$formattedDate $atLabel $formattedTime';
 
       return '$fixedTime ($relativeTime)';
     } catch (e) {
@@ -383,7 +388,7 @@ class EventosDetailScreen extends GetView<EventoController> {
   }
 
   Widget _buildInfoCard(BuildContext context, Evento evento) {
-    final String formattedSchedule = _formatSchedule(evento.schedule);
+    final String formattedSchedule = _formatSchedule(context, evento.schedule);
 
     return Container(
       width: double.infinity,

@@ -40,8 +40,11 @@ void main() async {
     supportedLocales: ['es', 'en', 'ca', 'fr'],
     basePath: 'assets/i18n/',
   );
-  await initializeDateFormatting('es', null);
+  await initializeDateFormatting(null, null);
   timeago.setLocaleMessages('es', timeago.EsMessages());
+  timeago.setLocaleMessages('ca', timeago.CaMessages());
+  timeago.setLocaleMessages('fr', timeago.FrMessages());
+  timeago.setLocaleMessages('en', timeago.EnMessages());
   await dotenv.load(fileName: '.env');
   logger.i('✅ Configuración completada, inicializando servicios');
 

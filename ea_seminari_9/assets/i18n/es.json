@@ -14,7 +14,8 @@
     "confirm": "Confirmar",
     "yes": "Sí",
     "no": "No",
-    "fix_errors": "Por favor corrige los errores"
+    "fix_errors": "Por favor corrige los errores",
+    "user": "Usuario"
   },
   "auth": {
     "login": {
@@ -60,6 +61,10 @@
       "birthday_invalid": "Fecha inválida",
       "not_authenticated": "Usuario no autenticado",
       "password_weak": "La contraseña es débil",
+      "password_medium": "Contraseña media",
+      "password_strong": "Contraseña fuerte",
+      "password_secure": "Contraseña segura",
+      "age_restriction": "Debes tener al menos 13 años",
       "google_unsupported": "Este dispositivo no soporta autenticación de Google",
       "google_token_error": "No se pudo obtener el ID Token de Google",
       "google_failed": "Error al iniciar sesión con Google"
@@ -69,6 +74,9 @@
       "strong": "Fuerte",
       "secure": "Segura",
       "weak": "La contraseña es débil"
+    },
+    "password_requirements": {
+      "chars": "Mínimo 12 caracteres"
     }
   },
   "home": {
@@ -88,7 +96,8 @@
       "requests_btn": "Solicitudes",
       "search_btn": "Buscar amigos",
       "empty_msg": "Aún no tienes amigos para mostrar."
-    }
+    },
+    "loading_location": "Obteniendo ubicación..."
   },
   "events": {
     "list_title": "Eventos",
@@ -142,7 +151,8 @@
     "review_empty_msg": "Sé el primero en valorar este evento",
     "categories": "Categorías",
     "filters": "Filtros",
-    "popular_week": "Populares esta semana"
+    "popular_week": "Populares esta semana",
+    "at_time": "a las"
   },
   "calendar": {
     "title": "Calendario",
@@ -194,7 +204,11 @@
     "version": "Versión",
     "help": "Ayuda y Soporte",
     "terms": "Términos y Condiciones",
-    "coming_soon": "Próximamente"
+    "coming_soon": "Próximamente",
+    "theme_mode": "Modo de tema",
+    "dark_mode": "Modo Oscuro",
+    "status_active": "Activado",
+    "status_inactive": "Desactivado"
   },
   "profile": {
     "title": "Perfil",
@@ -206,7 +220,21 @@
       "content": "Esta acción es permanente y no se puede deshacer. Tu cuenta se eliminará para siempre.",
       "password_confirm": "Confirma tu contraseña",
       "confirm_btn": "Confirmar Eliminación"
-    }
+    },
+    "stats": {
+      "friends": "Amigos",
+      "attendees": "Asistidos",
+      "rank": "Rango",
+      "default_rank": "Novato"
+    },
+    "update_btn": "Actualizar Datos de Perfil",
+    "snackbars": {
+      "success_title": "Perfil Actualizado",
+      "success_msg": "Tus cambios se han guardado correctamente."
+    },
+    "gallery": "Galería",
+    "camera": "Cámara",
+    "delete_photo": "Eliminar foto"
   },
   "chatbot": {
     "title": "Asistente Virtual",
@@ -226,7 +254,9 @@
     "events_joined": "Eventos unidos",
     "reviews": "Valoraciones",
     "friends": "Amigos",
-    "insignias_unit": "insignias"
+    "insignias_unit": "insignias",
+    "card_title": "Gamificación",
+    "card_subtitle": "Ver tu progreso y ranking"
   },
   "dialogs": {
     "logout": {

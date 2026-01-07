@@ -14,7 +14,8 @@
     "confirm": "Confirma",
     "yes": "Sí",
     "no": "No",
-    "fix_errors": "Si us plau, corregeix els errors"
+    "fix_errors": "Si us plau, corregeix els errors",
+    "user": "Usuari"
   },
   "auth": {
     "login": {
@@ -61,6 +62,9 @@
       "age_restriction": "Mínim 13 anys",
       "not_authenticated": "Usuari no autenticat",
       "password_weak": "La contrasenya és feble",
+      "password_medium": "Contrasenya mitjana",
+      "password_strong": "Contrasenya forta",
+      "password_secure": "Contrasenya segura",
       "google_unsupported": "Aquest dispositiu no suporta l'autenticació de Google",
       "google_token_error": "No s'ha pogut obtenir el ID Token de Google",
       "google_failed": "Error en iniciar sessió amb Google"
@@ -69,7 +73,10 @@
       "medium": "Mitjana",
       "strong": "Forta",
       "secure": "Segura",
-      "weak": "Feble"
+      "weak": "La contrasenya és feble"
+    },
+    "password_requirements": {
+      "chars": "Mínim 12 caràcters"
     }
   },
   "home": {
@@ -89,7 +96,8 @@
       "requests_btn": "Sol·licituds",
       "search_btn": "Cercar amics",
       "empty_msg": "Encara no tens amics per mostrar."
-    }
+    },
+    "loading_location": "Obtenint ubicació..."
   },
   "events": {
     "list_title": "Esdeveniments",
@@ -143,7 +151,8 @@
     "review_empty_msg": "Sigues el primer a valorar aquest esdeveniment",
     "categories": "Categories",
     "filters": "Filtres",
-    "popular_week": "Populars aquesta setmana"
+    "popular_week": "Populars aquesta setmana",
+    "at_time": "a les"
   },
   "calendar": {
     "title": "Calendari",
@@ -195,7 +204,11 @@
     "version": "Versió",
     "help": "Ajuda i Suport",
     "terms": "Termes i Condicions",
-    "coming_soon": "Pròximament"
+    "coming_soon": "Pròximament",
+    "theme_mode": "Mode de tema",
+    "dark_mode": "Mode fosc",
+    "status_active": "Activat",
+    "status_inactive": "Desactivat"
   },
   "profile": {
     "title": "Perfil",
@@ -207,7 +220,21 @@
       "content": "Aquesta acció és permanent i no es pot desfer. El teu compte s'eliminarà per sempre.",
       "password_confirm": "Confirma la teva contrasenya",
       "confirm_btn": "Confirma l'Eliminació"
-    }
+    },
+    "stats": {
+      "friends": "Amics",
+      "attendees": "Assistits",
+      "rank": "Rang",
+      "default_rank": "Novell"
+    },
+    "update_btn": "Actualitzar dades del perfil",
+    "snackbars": {
+      "success_title": "Perfil actualitzat",
+      "success_msg": "Els teus canvis s'han desat correctament."
+    },
+    "gallery": "Galeria",
+    "camera": "Càmera",
+    "delete_photo": "Eliminar foto"
   },
   "chatbot": {
     "title": "Assistent Virtual",
@@ -227,7 +254,9 @@
     "events_joined": "Esdeveniments units",
     "reviews": "Valoracions",
     "friends": "Amics",
-    "insignias_unit": "insígnies"
+    "insignias_unit": "insígnies",
+    "card_title": "Gamificació",
+    "card_subtitle": "Consulta el teu progrés i rànquing"
   },
   "dialogs": {
     "logout": {

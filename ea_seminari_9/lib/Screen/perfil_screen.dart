@@ -133,7 +133,7 @@ class ProfileScreen extends GetView<UserController> {
                     Icons.photo_library_rounded,
                     color: context.theme.colorScheme.primary,
                   ),
-                  title: Text(translate('profile.gallery') ?? 'Galería'),
+                  title: Text(translate('profile.gallery')),
                   onTap: () {
                     _pickImage(ImageSource.gallery);
                     Navigator.of(context).pop();
@@ -144,7 +144,7 @@ class ProfileScreen extends GetView<UserController> {
                     Icons.camera_alt_rounded,
                     color: context.theme.colorScheme.primary,
                   ),
-                  title: Text(translate('profile.camera') ?? 'Cámara'),
+                  title: Text(translate('profile.camera')),
                   onTap: () {
                     _pickImage(ImageSource.camera);
                     Navigator.of(context).pop();
@@ -365,7 +365,7 @@ class ProfileScreen extends GetView<UserController> {
                     onPressed: () =>
                         controller.deleteProfilePhoto(currentUser!.id),
                     child: Text(
-                      translate('profile.delete_photo') ?? 'Eliminar foto',
+                      translate('profile.delete_photo'),
                       style: TextStyle(
                         color: context.theme.colorScheme.error,
                         fontWeight: FontWeight.w600,
@@ -386,13 +386,14 @@ class ProfileScreen extends GetView<UserController> {
     return Obx(() {
       final amigosCount = controller.friendsList.length.toString();
       final nivelActual =
-          gamificacionController.miProgreso.value?.nivel ?? 'Novato';
+          gamificacionController.miProgreso.value?.nivel ??
+          translate('profile.stats.default_rank');
       final eventosAsistidos =
           gamificacionController
               .miProgreso
               .value
               ?.estadisticas
-              ?.eventosUnidosTotal
+              .eventosUnidosTotal
               .toString() ??
           '0';
 
@@ -415,21 +416,21 @@ class ProfileScreen extends GetView<UserController> {
             _buildStatItem(
               context,
               amigosCount,
-              'Amigos',
+              translate('profile.stats.friends'),
               Icons.people_outline_rounded,
             ),
             VerticalDivider(color: context.theme.dividerColor),
             _buildStatItem(
               context,
               eventosAsistidos,
-              'Asistidos',
+              translate('profile.stats.attendees'),
               Icons.event_available_rounded,
             ),
             VerticalDivider(color: context.theme.dividerColor),
             _buildStatItem(
               context,
               nivelActual,
-              'Rango',
+              translate('profile.stats.rank'),
               Icons.military_tech_rounded,
             ),
           ],
@@ -571,8 +572,8 @@ class ProfileScreen extends GetView<UserController> {
           };
           await controller.updateUserByid(userId, updatedUser);
           Get.snackbar(
-            'Perfil Actualizado',
-            'Tus cambios se han guardado correctamente.',
+            translate('profile.snackbars.success_title'),
+            translate('profile.snackbars.success_msg'),
             snackPosition: SnackPosition.TOP,
             backgroundColor: Colors.green.withValues(alpha: 0.9),
             colorText: Colors.white,
@@ -586,8 +587,8 @@ class ProfileScreen extends GetView<UserController> {
           );
         },
         icon: const Icon(Icons.sync_rounded, color: Colors.white),
-        label: const Text(
-          'Actualizar Datos de Perfil',
+        label: Text(
+          translate('profile.update_btn'),
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,

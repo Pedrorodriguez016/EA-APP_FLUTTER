@@ -14,7 +14,8 @@
     "confirm": "Confirm",
     "yes": "Yes",
     "no": "No",
-    "fix_errors": "Please fix the errors"
+    "fix_errors": "Please fix the errors",
+    "user": "User"
   },
   "auth": {
     "login": {
@@ -59,17 +60,21 @@
       "birthday_empty": "Please enter your date of birth",
       "birthday_invalid": "Invalid date",
       "age_restriction": "Minimum 13 years old",
-      "not_authenticated": "User not authenticated",
-      "password_weak": "Password is weak",
       "google_unsupported": "This device does not support Google authentication",
       "google_token_error": "Could not obtain Google ID Token",
-      "google_failed": "Google login failed"
+      "google_failed": "Google login failed",
+      "password_medium": "Medium password",
+      "password_strong": "Strong password",
+      "password_secure": "Secure password"
     },
     "password_strength": {
       "medium": "Medium",
       "strong": "Strong",
       "secure": "Secure",
       "weak": "Weak"
+    },
+    "password_requirements": {
+      "chars": "Minimum 12 characters"
     }
   },
   "home": {
@@ -89,7 +94,8 @@
       "requests_btn": "Requests",
       "search_btn": "Search friends",
       "empty_msg": "No friends to show yet."
-    }
+    },
+    "loading_location": "Obtaining location..."
   },
   "events": {
     "list_title": "Events",
@@ -143,7 +149,8 @@
     "review_empty_msg": "Be the first to review this event",
     "categories": "Categories",
     "filters": "Filters",
-    "popular_week": "Popular this week"
+    "popular_week": "Popular this week",
+    "at_time": "at"
   },
   "calendar": {
     "title": "Calendar",
@@ -195,7 +202,11 @@
     "version": "Version",
     "help": "Help & Support",
     "terms": "Terms & Conditions",
-    "coming_soon": "Coming Soon"
+    "coming_soon": "Coming Soon",
+    "theme_mode": "Theme Mode",
+    "dark_mode": "Dark Mode",
+    "status_active": "Activated",
+    "status_inactive": "Deactivated"
   },
   "profile": {
     "title": "Profile",
@@ -207,7 +218,21 @@
       "content": "This action is permanent and cannot be undone. Your account will be deleted forever.",
       "password_confirm": "Confirm your password",
       "confirm_btn": "Confirm Deletion"
-    }
+    },
+    "stats": {
+      "friends": "Friends",
+      "attendees": "Attended",
+      "rank": "Rank",
+      "default_rank": "Novice"
+    },
+    "update_btn": "Update Profile Info",
+    "snackbars": {
+      "success_title": "Profile Updated",
+      "success_msg": "Your changes have been saved successfully."
+    },
+    "gallery": "Gallery",
+    "camera": "Camera",
+    "delete_photo": "Delete photo"
   },
   "chatbot": {
     "title": "Virtual Assistant",
@@ -227,7 +252,9 @@
     "events_joined": "Events joined",
     "reviews": "Ratings",
     "friends": "Friends",
-    "insignias_unit": "badges"
+    "insignias_unit": "badges",
+    "card_title": "Gamification",
+    "card_subtitle": "See your progress and ranking"
   },
   "dialogs": {
     "logout": {

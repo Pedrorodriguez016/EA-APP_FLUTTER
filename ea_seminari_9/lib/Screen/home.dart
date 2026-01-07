@@ -245,13 +245,13 @@ class HomeScreen extends GetView<UserController> {
                             .withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             CircularProgressIndicator(),
                             SizedBox(height: 12),
-                            Text('Obteniendo ubicación...'),
+                            Text(translate('home.loading_location')),
                           ],
                         ),
                       ),

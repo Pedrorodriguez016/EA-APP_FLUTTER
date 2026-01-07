@@ -14,7 +14,8 @@
     "confirm": "Confirmer",
     "yes": "Oui",
     "no": "Non",
-    "fix_errors": "Veuillez corriger les erreurs"
+    "fix_errors": "Veuillez corriger les erreurs",
+    "user": "Utilisateur"
   },
   "auth": {
     "login": {
@@ -61,6 +62,9 @@
       "age_restriction": "Minimum 13 ans",
       "not_authenticated": "Utilisateur non authentifié",
       "password_weak": "Le mot de passe est faible",
+      "password_medium": "Mot de passe moyen",
+      "password_strong": "Mot de passe fort",
+      "password_secure": "Mot de passe sécurisé",
       "google_unsupported": "Cet appareil ne prend pas en charge l'authentification Google",
       "google_token_error": "Impossible d'obtenir le jeton d'ID Google",
       "google_failed": "Échec de la connexion Google"
@@ -70,6 +74,9 @@
       "strong": "Fort",
       "secure": "Sécurisé",
       "weak": "Faible"
+    },
+    "password_requirements": {
+      "chars": "12 caractères minimum"
     }
   },
   "home": {
@@ -89,7 +96,8 @@
       "requests_btn": "Demandes",
       "search_btn": "Rechercher des amis",
       "empty_msg": "Pas encore d'amis à afficher."
-    }
+    },
+    "loading_location": "Obtention de l'emplacement..."
   },
   "events": {
     "list_title": "Événements",
@@ -140,7 +148,11 @@
     "review_dialog_title": "Votre Avis",
     "review_comment_hint": "Écrire un commentaire...",
     "review_send_btn": "Envoyer l'Avis",
-    "review_empty_msg": "Soyez le premier à évaluer cet événement"
+    "review_empty_msg": "Soyez le premier à évaluer cet événement",
+    "categories": "Catégories",
+    "filters": "Filtres",
+    "popular_week": "Populaires cette semaine",
+    "at_time": "à"
   },
   "calendar": {
     "title": "Calendrier des Événements",
@@ -192,7 +204,11 @@
     "version": "Version",
     "help": "Aide et support",
     "terms": "Termes et conditions",
-    "coming_soon": "Bientôt disponible"
+    "coming_soon": "Bientôt disponible",
+    "theme_mode": "Mode de thème",
+    "dark_mode": "Mode sombre",
+    "status_active": "Activé",
+    "status_inactive": "Désactivé"
   },
   "profile": {
     "title": "Mon profil",
@@ -204,7 +220,21 @@
       "content": "Cette action est permanente et ne peut pas être annulée. Votre compte sera supprimé définitivement.",
       "password_confirm": "Confirmez votre mot de passe",
       "confirm_btn": "Confirmer la suppression"
-    }
+    },
+    "stats": {
+      "friends": "Amis",
+      "attendees": "Présents",
+      "rank": "Rang",
+      "default_rank": "Novice"
+    },
+    "update_btn": "Mettre à jour les infos du profil",
+    "snackbars": {
+      "success_title": "Profil mis à jour",
+      "success_msg": "Vos modifications ont été enregistrées avec succès."
+    },
+    "gallery": "Galerie",
+    "camera": "Caméra",
+    "delete_photo": "Supprimer la photo"
   },
   "chatbot": {
     "title": "Assistant Virtuel",
@@ -224,7 +254,9 @@
     "events_joined": "Événements rejoints",
     "reviews": "Évaluations",
     "friends": "Amis",
-    "insignias_unit": "badges"
+    "insignias_unit": "badges",
+    "card_title": "Gamification",
+    "card_subtitle": "Voir votre progression et votre classement"
   },
   "dialogs": {
     "logout": {
@@ -236,7 +268,7 @@
   "events_extra": {
     "private_event": "Événement Privé",
     "private_subtitle": "Seuls les invités peuvent voir et rejoindre cet événement",
-    "waitlist_btn": "Entrer sur liste d'attente",
+    "waitlist_btn": "Entrar sur liste d'attente",
     "full_label": "COMPLET",
     "no_friends_to_invite": "Vous n'avez pas encore d'amis à inviter.",
     "invite_friends": "Inviter des amis :",

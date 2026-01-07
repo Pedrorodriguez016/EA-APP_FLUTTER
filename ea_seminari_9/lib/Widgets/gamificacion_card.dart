@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 
 class GamificacionCard extends StatelessWidget {
   const GamificacionCard({super.key});
@@ -48,8 +49,8 @@ class GamificacionCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Gamificación',
+                  Text(
+                    translate('gamification.card_title'),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -58,7 +59,7 @@ class GamificacionCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Ver tu progreso y ranking',
+                    translate('gamification.card_subtitle'),
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.9),
                       fontSize: 14,

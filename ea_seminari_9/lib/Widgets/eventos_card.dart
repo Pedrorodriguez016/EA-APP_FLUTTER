@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../Models/eventos.dart';
 import 'package:get/get.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:intl/intl.dart';
 import '../utils/logger.dart';
 import '../utils/app_theme.dart';
@@ -17,34 +18,37 @@ class EventosCard extends StatelessWidget {
     this.showParticipationStatus = false,
   });
 
-  String _formatSchedule(String scheduleString) {
+  String _formatSchedule(BuildContext context, String scheduleString) {
     if (scheduleString.isEmpty) {
-      return 'Fecha no disponible';
+      return translate('events.date_unavailable');
     }
     try {
       final DateTime scheduleDate = DateTime.parse(scheduleString);
+      final String currentLocale = LocalizedApp.of(
+        context,
+      ).delegate.currentLocale.languageCode;
 
       final String fixedTime = DateFormat(
-        'd MMM. yyyy HH:mm',
-        'es',
+        'd MMM yyyy HH:mm',
+        currentLocale,
       ).format(scheduleDate);
 
       final String relativeTime = timeago.format(
         scheduleDate,
-        locale: 'es',
+        locale: currentLocale,
         allowFromNow: true,
       );
 
       return '$fixedTime ($relativeTime)';
     } catch (e) {
       logger.w('⚠️ Fallo al parsear la fecha: $scheduleString, Error: $e');
-      return 'Error de formato';
+      return translate('events.format_error');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final String displayTime = _formatSchedule(evento.schedule);
+    final String displayTime = _formatSchedule(context, evento.schedule);
     final authController = Get.find<AuthController>();
     final currentUserId = authController.currentUser.value?.id;
 

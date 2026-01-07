@@ -115,15 +115,15 @@ class SettingsScreen extends GetView<UserController> {
         ),
       ),
       title: Text(
-        translate('settings.theme_mode') == 'settings.theme_mode'
-            ? 'Modo Oscuro'
-            : translate('settings.theme_mode'),
+        translate('settings.theme_mode'),
         style: context.textTheme.bodyLarge?.copyWith(
           fontWeight: FontWeight.w600,
         ),
       ),
       subtitle: Text(
-        isDark ? 'Activado' : 'Desactivado',
+        isDark
+            ? translate('settings.status_active')
+            : translate('settings.status_inactive'),
         style: context.textTheme.bodyMedium?.copyWith(
           color: context.theme.hintColor,
         ),
