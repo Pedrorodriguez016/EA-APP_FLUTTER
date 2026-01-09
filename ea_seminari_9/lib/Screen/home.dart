@@ -8,7 +8,7 @@ import '../Widgets/logout_button.dart';
 import '../Widgets/user_card.dart';
 import '../Widgets/solicitudes.dart';
 import '../Widgets/mapa.dart';
-import '../Controllers/eventos_controller.dart ';
+import '../Controllers/eventos_controller.dart';
 import '../Services/eventos_services.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -260,12 +260,7 @@ class HomeScreen extends GetView<UserController> {
                   onPositionChanged: (MapPosition position, bool hasGesture) {
                     final bounds = position.bounds;
                     if (bounds != null) {
-                      eventoController.fetchMapEvents(
-                        bounds.north,
-                        bounds.south,
-                        bounds.east,
-                        bounds.west,
-                      );
+                      eventoController.fetchMapEventsDebounced(bounds);
                     }
                   },
                 );
