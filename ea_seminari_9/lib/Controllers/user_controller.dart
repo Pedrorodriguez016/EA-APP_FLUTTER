@@ -38,6 +38,19 @@ class UserController extends GetxController {
     _initSocketConnection();
     fetchUsers(1);
     fetchFriends();
+
+    // Escuchar cambios en el usuario para refrescar datos cuando se haga login/auto-login
+    ever(authController.currentUser, (user) {
+      if (user != null && user.id.isNotEmpty) {
+        logger.i(
+          '👤 Usuario detectado en UserController, refrescando amigos...',
+        );
+        fetchFriends();
+        fetchRequest();
+        _initSocketConnection();
+      }
+    });
+
     super.onInit();
     scrollController.addListener(() {
       if (scrollController.position.pixels >=
@@ -201,7 +214,12 @@ class UserController extends GetxController {
 
   Future<void> fetchFriends({int page = 1}) async {
     try {
-      var id = authController.currentUser.value!.id;
+      final user = authController.currentUser.value;
+      if (user == null || user.id.isEmpty) {
+        logger.w('⚠️ No se pueden cargar amigos: ID de usuario no disponible');
+        return;
+      }
+      var id = user.id;
       if (page == 1) {
         isLoading.value = true;
       } else {
@@ -240,7 +258,9 @@ class UserController extends GetxController {
 
   Future<void> fetchRequest() async {
     try {
-      var id = authController.currentUser.value!.id;
+      final user = authController.currentUser.value;
+      if (user == null || user.id.isEmpty) return;
+      var id = user.id;
       isLoading(true);
       logger.d('📄 Creando lista de solicitudes');
       var friends = await _userServices.fetchRequest(id);
@@ -327,7 +347,7 @@ class UserController extends GetxController {
     // Obtenemos el ID del usuario actual desde el AuthController
     final userId = authController.currentUser.value?.id;
 
-    if (userId != null) {
+    if (userId != null && userId.isNotEmpty) {
       logger.i('🔌 Inicializando conexión Socket para $userId');
       _socketService.connectWithUserId(userId);
     }

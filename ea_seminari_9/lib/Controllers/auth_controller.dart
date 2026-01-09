@@ -60,6 +60,11 @@ class AuthController extends GetxController {
   Future<void> _checkAutoLogin() async {
     User? savedUser = _storageService.getUser();
     if (savedUser != null) {
+      if (savedUser.id.isEmpty) {
+        logger.w('⚠️ Sesión corrupta (ID vacío). Cerrando sesión.');
+        logout();
+        return;
+      }
       currentUser.value = savedUser;
       token = savedUser.token;
       refreshToken = savedUser.refreshToken;
@@ -205,13 +210,15 @@ class AuthController extends GetxController {
     token = null;
     refreshToken = null;
     _storageService.clearSession();
-    // Sesión eliminada del Storage
-    // Opcional: limpiar campos de texto
+
     loginUserCtrl.clear();
     loginPassCtrl.clear();
     isObscurePassword.value = true;
 
-    Get.offAllNamed('/login');
+    // Solo navegar si no estamos ya en la pantalla de login
+    if (Get.currentRoute != '/login') {
+      Get.offAllNamed('/login');
+    }
   }
 
   Future<void> fetchCurrentUser() async {

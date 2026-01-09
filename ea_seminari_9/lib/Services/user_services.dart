@@ -47,6 +47,10 @@ class UserServices {
   }
 
   Future<User> fetchUserById(String id) async {
+    if (id.isEmpty) {
+      logger.e('❌ Error: ID de usuario vacío en fetchUserById');
+      throw Exception('ID de usuario vacío');
+    }
     try {
       logger.d('📑 Obteniendo usuario con ID: $id');
       final response = await _client.get('/$id');

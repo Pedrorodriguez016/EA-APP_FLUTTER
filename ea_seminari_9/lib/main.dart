@@ -82,7 +82,6 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: '/login',
           page: () => const LoginScreen(),
-          binding: AuthBinding(),
         ),
         GetPage(
           name: '/register',
