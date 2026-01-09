@@ -434,12 +434,22 @@ class EventoController extends GetxController {
     }
   }
 
+  // Versión con debounce de fetchMapEvents para evitar peticiones masivas
+  void fetchMapEventsDebounced(LatLngBounds bounds) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+    _debounce = Timer(const Duration(seconds: 1), () {
+      fetchMapEvents(bounds.north, bounds.south, bounds.east, bounds.west);
+    });
+  }
+
   void onMapPositionChanged(MapCamera camera, bool hasGesture) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
 
     _debounce = Timer(const Duration(milliseconds: 500), () {
       final bounds = camera.visibleBounds;
-      fetchMapEvents(bounds.north, bounds.south, bounds.east, bounds.west);
+
+      fetchMapEventsDebounced(bounds);
     });
   }
 

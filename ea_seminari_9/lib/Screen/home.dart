@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import '../Models/user.dart';
+import '../Controllers/auth_controller.dart';
+import '../Widgets/navigation_bar.dart';
+import '../Widgets/logout_button.dart';
+import '../Widgets/user_card.dart';
+import '../Widgets/solicitudes.dart';
+import '../Widgets/mapa.dart';
+import '../Controllers/eventos_controller.dart';
+import '../Services/eventos_services.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map/flutter_map.dart';
 import '../Controllers/user_controller.dart';
-import '../Controllers/auth_controller.dart';
-import '../Controllers/eventos_controller.dart';
-import '../Services/eventos_services.dart';
-import '../Widgets/navigation_bar.dart';
-import '../Widgets/mapa.dart';
 import '../Widgets/global_drawer.dart';
 import '../utils/app_theme.dart';
 
@@ -301,12 +305,7 @@ class HomeScreen extends GetView<UserController> {
                     onPositionChanged: (MapPosition position, bool hasGesture) {
                       final bounds = position.bounds;
                       if (bounds != null) {
-                        eventoController.fetchMapEvents(
-                          bounds.north,
-                          bounds.south,
-                          bounds.east,
-                          bounds.west,
-                        );
+                        eventoController.fetchMapEventsDebounced(bounds);
                       }
                     },
                   );
