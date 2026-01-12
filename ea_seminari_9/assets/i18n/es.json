@@ -161,7 +161,18 @@
     "req_sent": "Solicitud de amistad enviada",
     "friendship_accepted": "Amistad aceptada",
     "req_rejected": "Solicitud rechazada",
-    "load_error": "No se pudo cargar el usuario."
+    "load_error": "No se pudo cargar el usuario.",
+    "block_user": "Bloquear usuario",
+    "blocked_users_title": "Usuarios Bloqueados",
+    "no_blocked_users": "No tienes usuarios bloqueados",
+    "manage_blocked": "Gestiona los usuarios que has bloqueado",
+    "confirm_block_title": "¿Bloquear usuario?",
+    "confirm_block_content": "¿Estás seguro de que quieres bloquear a {username}? Dejaréis de ser amigos automáticamente y no podrá contactarte.",
+    "unblock_btn": "Desbloquear",
+    "confirm_unblock_title": "Desbloquear usuario",
+    "confirm_unblock_content": "¿Estás seguro de que quieres desbloquear a {username}?",
+    "block_success": "Usuario bloqueado correctamente",
+    "unblock_success": "Usuario desbloqueado"
   },
   "chat": {
     "list_title": "Mis Chats",

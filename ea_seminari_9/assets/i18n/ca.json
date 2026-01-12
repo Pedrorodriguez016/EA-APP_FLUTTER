@@ -162,7 +162,18 @@
     "req_sent": "Sol·licitud d'amistat enviada",
     "friendship_accepted": "Amistat acceptada",
     "req_rejected": "Sol·licitud rebutjada",
-    "load_error": "No s'ha pogut carregar l'usuari."
+    "load_error": "No s'ha pogut carregar l'usuari.",
+    "block_user": "Bloquejar usuari",
+    "blocked_users_title": "Usuaris Bloquejats",
+    "no_blocked_users": "No tens usuaris bloquejats",
+    "manage_blocked": "Gestiona els usuaris que has bloquejat",
+    "confirm_block_title": "Bloquejar usuari?",
+    "confirm_block_content": "Estàs segur que vols bloquejar a {username}? Deixareu de ser amics automàticament i no podrà contactar-te.",
+    "unblock_btn": "Desbloquejar",
+    "confirm_unblock_title": "Desbloquejar usuari",
+    "confirm_unblock_content": "Estàs segur que vols desbloquejar a {username}?",
+    "block_success": "Usuari bloquejat correctament",
+    "unblock_success": "Usuari desbloquejat"
   },
   "chat": {
     "list_title": "Els meus xats",

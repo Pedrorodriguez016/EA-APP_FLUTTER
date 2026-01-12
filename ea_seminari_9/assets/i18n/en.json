@@ -162,7 +162,18 @@
     "req_sent": "Friend request sent",
     "friendship_accepted": "Friendship accepted",
     "req_rejected": "Request rejected",
-    "load_error": "Could not load user."
+    "load_error": "Could not load user.",
+    "block_user": "Block User",
+    "blocked_users_title": "Blocked Users",
+    "no_blocked_users": "You have no blocked users",
+    "manage_blocked": "Manage the users you have blocked",
+    "confirm_block_title": "Block user?",
+    "confirm_block_content": "Are you sure you want to block {username}? You will automatically stop being friends and they won't be able to contact you.",
+    "unblock_btn": "Unblock",
+    "confirm_unblock_title": "Unblock user",
+    "confirm_unblock_content": "Are you sure you want to unblock {username}?",
+    "block_success": "User blocked successfully",
+    "unblock_success": "User unblocked"
   },
   "chat": {
     "list_title": "My Chats",

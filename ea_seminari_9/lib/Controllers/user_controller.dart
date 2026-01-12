@@ -17,6 +17,7 @@ class UserController extends GetxController {
   var selectedUser = Rxn<User>();
   var friendsList = <User>[].obs;
   var friendsRequests = <User>[].obs;
+  var blockedUsersList = <User>[].obs;
   var currentPage = 1.obs;
   var totalPages = 1.obs;
   var totalUsers = 0.obs;
@@ -350,6 +351,115 @@ class UserController extends GetxController {
           colorText: Colors.white,
         );
       }
+    } catch (e) {
+      Get.snackbar(
+        translate('common.error'),
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  // --- MÉTODOS DE BLOQUEO ---
+
+  void fetchBlockedUsers() async {
+    try {
+      isLoading(true);
+      var blocked = await _userServices.fetchBlockedUsers();
+      blockedUsersList.assignAll(blocked);
+    } catch (e) {
+      logger.e('❌ Error al cargar bloqueados', error: e);
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> blockUser(String blockId) async {
+    try {
+      isLoading(true);
+      await _userServices.blockUser(blockId);
+
+      // Eliminar de amigos localmente
+      friendsList.removeWhere((u) => u.id == blockId);
+      // Eliminar de la lista de usuarios si está ahí
+      userList.removeWhere((u) => u.id == blockId);
+
+      // Actualizar el usuario actual localmente (añadir a blockedUsers si lo tenemos)
+      final currentUser = authController.currentUser.value;
+      if (currentUser != null) {
+        List<String> newBlocked = List.from(currentUser.blockedUsers ?? []);
+        if (!newBlocked.contains(blockId)) {
+          newBlocked.add(blockId);
+          authController.currentUser.value = User(
+            id: currentUser.id,
+            username: currentUser.username,
+            gmail: currentUser.gmail,
+            birthday: currentUser.birthday,
+            profilePhoto: currentUser.profilePhoto,
+            token: currentUser.token,
+            refreshToken: currentUser.refreshToken,
+            online: currentUser.online,
+            blockedUsers: newBlocked,
+          );
+        }
+      }
+
+      Get.snackbar(
+        translate('common.success'),
+        translate('users.block_success'),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar(
+        translate('common.error'),
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> unblockUser(String blockId) async {
+    try {
+      isLoading(true);
+      await _userServices.unblockUser(blockId);
+
+      blockedUsersList.removeWhere((u) => u.id == blockId);
+
+      // Actualizar el usuario actual localmente
+      final currentUser = authController.currentUser.value;
+      if (currentUser != null && currentUser.blockedUsers != null) {
+        List<String> newBlocked = List.from(currentUser.blockedUsers!);
+        newBlocked.remove(blockId);
+        authController.currentUser.value = User(
+          id: currentUser.id,
+          username: currentUser.username,
+          gmail: currentUser.gmail,
+          birthday: currentUser.birthday,
+          profilePhoto: currentUser.profilePhoto,
+          token: currentUser.token,
+          refreshToken: currentUser.refreshToken,
+          online: currentUser.online,
+          blockedUsers: newBlocked,
+        );
+      }
+
+      Get.snackbar(
+        translate('common.success'),
+        translate('users.unblock_success'),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
     } catch (e) {
       Get.snackbar(
         translate('common.error'),
