@@ -174,7 +174,18 @@
     "req_sent": "Demande d'ami envoyée",
     "friendship_accepted": "Amitié acceptée",
     "req_rejected": "Demande refusée",
-    "load_error": "Impossible de charger l'utilisateur."
+    "load_error": "Impossible de charger l'utilisateur.",
+    "block_user": "Bloquer l'utilisateur",
+    "blocked_users_title": "Utilisateurs Bloqués",
+    "no_blocked_users": "Vous n'avez aucun utilisateur bloqué",
+    "manage_blocked": "Gérer les utilisateurs que vous avez bloqués",
+    "confirm_block_title": "Bloquer l'utilisateur ?",
+    "confirm_block_content": "Êtes-vous sûr de vouloir bloquer {username} ? Vous cesserez automatiquement d'être amis et il ne pourra plus vous contacter.",
+    "unblock_btn": "Débloquer",
+    "confirm_unblock_title": "Débloquer l'utilisateur",
+    "confirm_unblock_content": "Êtes-vous sûr de vouloir débloquer {username} ?",
+    "block_success": "Utilisateur bloqué avec succès",
+    "unblock_success": "Utilisateur débloqué"
   },
   "chat": {
     "list_title": "Mes discussions",

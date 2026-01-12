@@ -30,6 +30,33 @@ class UserDetailScreen extends GetView<UserController> {
           icon: Icon(Icons.arrow_back, color: context.theme.iconTheme.color),
           onPressed: () => Get.back(),
         ),
+        actions: [
+          Obx(() {
+            final user = controller.selectedUser.value;
+            final currentUser = controller.authController.currentUser.value;
+            if (user == null || currentUser == null)
+              return const SizedBox.shrink();
+
+            final isBlocked =
+                currentUser.blockedUsers?.contains(user.id) ?? false;
+
+            return IconButton(
+              icon: Icon(
+                isBlocked
+                    ? Icons.block
+                    : Icons
+                          .block, // Ambos iconos son block pero cambia el color/función
+                color: isBlocked ? Colors.green : Colors.redAccent,
+              ),
+              onPressed: () => isBlocked
+                  ? _showUnblockConfirmation(context, user)
+                  : _showBlockConfirmation(context, user),
+              tooltip: isBlocked
+                  ? translate('users.unblock_btn')
+                  : translate('users.block_user'),
+            );
+          }),
+        ],
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
@@ -237,6 +264,92 @@ class UserDetailScreen extends GetView<UserController> {
           ),
         ),
       ],
+    );
+  }
+
+  void _showBlockConfirmation(BuildContext context, User user) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: Colors.redAccent),
+            const SizedBox(width: 8),
+            Text(translate('users.confirm_block_title')),
+          ],
+        ),
+        content: Text(
+          translate(
+            'users.confirm_block_content',
+            args: {'username': user.username},
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              translate('common.cancel'),
+              style: TextStyle(color: context.theme.hintColor),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              controller.blockUser(user.id);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 0,
+            ),
+            child: Text(translate('users.block_user')),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showUnblockConfirmation(BuildContext context, User user) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(translate('users.confirm_unblock_title')),
+        content: Text(
+          translate(
+            'users.confirm_unblock_content',
+            args: {'username': user.username},
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              translate('common.cancel'),
+              style: TextStyle(color: context.theme.hintColor),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              controller.unblockUser(user.id);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: context.theme.colorScheme.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 0,
+            ),
+            child: Text(translate('users.unblock_btn')),
+          ),
+        ],
+      ),
     );
   }
 }

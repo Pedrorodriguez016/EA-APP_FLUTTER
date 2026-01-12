@@ -94,6 +94,14 @@ class SettingsScreen extends GetView<UserController> {
             subtitle: _getLanguageName(currentLangCode),
             onTap: () => _showLanguageSelector(context),
           ),
+          const Divider(height: 1),
+          _buildSettingItem(
+            context: context,
+            icon: Icons.block_outlined,
+            title: translate('users.blocked_users_title'),
+            subtitle: translate('users.manage_blocked'),
+            onTap: () => Get.toNamed('/blocked-users'),
+          ),
         ],
       ),
     );

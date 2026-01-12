@@ -31,6 +31,7 @@ import 'Screen/gamificacion_screen.dart';
 import 'Bindings/chatbot_binding.dart';
 import 'utils/app_theme.dart';
 import 'Screen/calendar_screen.dart';
+import 'Screen/blocked_users_screen.dart';
 
 void main() async {
   logger.i('🚀 Iniciando aplicación...');
@@ -157,6 +158,11 @@ class MyApp extends StatelessWidget {
           name: '/gamificacion',
           page: () => GamificacionScreen(),
           binding: GamificacionBinding(),
+        ),
+        GetPage(
+          name: '/blocked-users',
+          page: () => const BlockedUsersScreen(),
+          binding: UserBinding(),
         ),
       ],
       defaultTransition: Transition.cupertino,

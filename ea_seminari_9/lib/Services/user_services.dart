@@ -288,4 +288,50 @@ class UserServices {
       return false;
     }
   }
+
+  Future<void> blockUser(String blockId) async {
+    try {
+      final myId = _authController.currentUser.value!.id;
+      logger.i('Bloqueando usuario: $blockId');
+      await _client.post('/info/block', data: {'id': myId, 'blockId': blockId});
+      logger.i('Usuario bloqueado exitosamente');
+    } catch (e) {
+      logger.e(' Error al bloquear usuario', error: e);
+      throw Exception('Error al bloquear usuario: $e');
+    }
+  }
+
+  Future<void> unblockUser(String unblockId) async {
+    try {
+      final myId = _authController.currentUser.value!.id;
+      logger.i('Desbloqueando usuario: $unblockId');
+      await _client.post(
+        '/info/unblock',
+        data: {'id': myId, 'unblockId': unblockId},
+      );
+      logger.i(' Usuario desbloqueado exitosamente');
+    } catch (e) {
+      logger.e('Error al desbloquear usuario', error: e);
+      throw Exception('Error al desbloquear usuario: $e');
+    }
+  }
+
+  Future<List<User>> fetchBlockedUsers() async {
+    try {
+      final myId = _authController.currentUser.value!.id;
+      logger.d('Obteniendo lista de usuarios bloqueados para: $myId');
+      final response = await _client.get('/$myId/blocked');
+
+      if (response.data is List) {
+        final List<dynamic> blockedList = response.data;
+        logger.i('Usuarios bloqueados obtenidos: ${blockedList.length}');
+        return blockedList.map((json) => User.fromJson(json)).toList();
+      }
+      logger.w('Formato inesperado en respuesta de bloqueados');
+      return [];
+    } catch (e) {
+      logger.e('Error al cargar usuarios bloqueados', error: e);
+      throw Exception('Error al cargar usuarios bloqueados: $e');
+    }
+  }
 }
