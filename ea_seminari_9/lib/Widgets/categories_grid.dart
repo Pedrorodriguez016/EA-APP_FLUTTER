@@ -12,6 +12,12 @@ class CategoriesGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final categories = [
       {
+        'title': 'Recomendados',
+        'icon': Icons.stars_rounded,
+        'color': context.theme.colorScheme.primary,
+        'isSpecial': true,
+      },
+      {
         'title': 'Fútbol',
         'icon': Icons.sports_soccer_rounded,
         'color': const Color(0xFF6366F1),
@@ -102,6 +108,7 @@ class CategoriesGrid extends StatelessWidget {
               title,
               cat['icon'] as IconData,
               cat['color'] as Color,
+              isSpecial: cat['isSpecial'] as bool? ?? false,
             );
           },
         ),
@@ -113,15 +120,16 @@ class CategoriesGrid extends StatelessWidget {
     BuildContext context,
     String title,
     IconData icon,
-    Color color,
-  ) {
+    Color color, {
+    bool isSpecial = false,
+  }) {
     return Container(
       decoration: BoxDecoration(
         color: context.theme.cardColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: Colors.black.withOpacity(0.03),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -131,10 +139,14 @@ class CategoriesGrid extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           onTap: () {
-            controller.searchEditingController.clear();
-            controller.filterCategory.value = title;
-            controller.isSearching.value = true;
-            controller.fetchEventos(1);
+            if (isSpecial) {
+              controller.showRecommendedOnly();
+            } else {
+              controller.searchEditingController.clear();
+              controller.filterCategory.value = title;
+              controller.isSearching.value = true;
+              controller.fetchEventos(1);
+            }
           },
           borderRadius: BorderRadius.circular(24),
           child: Padding(

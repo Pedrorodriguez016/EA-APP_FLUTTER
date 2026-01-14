@@ -13,6 +13,7 @@ import '../Widgets/global_drawer.dart';
 import '../utils/app_theme.dart';
 import '../Controllers/notificacion_controller.dart';
 import '../Widgets/notifications_popup.dart';
+import '../Widgets/recommended_section.dart';
 
 class HomeScreen extends GetView<UserController> {
   HomeScreen({Key? key}) : super(key: key);
@@ -41,9 +42,9 @@ class HomeScreen extends GetView<UserController> {
         onRefresh: () async {
           await controller.fetchFriends();
           await controller.fetchRequest();
-          await authController
-              .fetchCurrentUser(); // Opcional si quieres refrescar datos del user
+          await authController.fetchCurrentUser();
           await notifController.fetchNotificaciones();
+          await eventoController.fetchRecommended();
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -52,7 +53,7 @@ class HomeScreen extends GetView<UserController> {
             children: [
               _buildWelcomeCard(authController, context),
               const SizedBox(height: 24),
-              _buildRecommendedSection(context),
+              RecommendedSection(controller: eventoController),
               const SizedBox(height: 24),
               _buildEventsCard(context),
               const SizedBox(height: 24),
@@ -275,7 +276,7 @@ class HomeScreen extends GetView<UserController> {
             ),
             const SizedBox(height: 24),
             Container(
-              height: context.height * 0.60,
+              height: 400,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
@@ -300,8 +301,8 @@ class HomeScreen extends GetView<UserController> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            CircularProgressIndicator(),
-                            SizedBox(height: 12),
+                            const CircularProgressIndicator(),
+                            const SizedBox(height: 12),
                             Text(translate('home.loading_location')),
                           ],
                         ),
@@ -342,7 +343,7 @@ class HomeScreen extends GetView<UserController> {
                       .toList();
 
                   return CustomMap(
-                    height: context.height * 0.60,
+                    height: 400,
                     center:
                         eventoController.userLocation.value ??
                         eventoController.defaultLocation,
@@ -363,151 +364,6 @@ class HomeScreen extends GetView<UserController> {
         ),
       ),
     );
-  }
-
-  Widget _buildRecommendedSection(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Recomendados para ti',
-                style: context.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 20,
-                ),
-              ),
-              TextButton(
-                onPressed: () => Get.toNamed('/eventos'),
-                child: const Text('Ver todos'),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        SizedBox(
-          height: 200,
-          child: Obx(() {
-            final recommended = eventoController.recommendedEventos;
-            if (recommended.isEmpty) {
-              return Center(
-                child: Text(
-                  'No hay recomendaciones aún.\n¡Selecciona tus intereses!',
-                  textAlign: TextAlign.center,
-                  style: context.textTheme.bodyMedium?.copyWith(
-                    color: context.theme.hintColor,
-                  ),
-                ),
-              );
-            }
-            return ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: recommended.length,
-              separatorBuilder: (context, index) => const SizedBox(width: 16),
-              itemBuilder: (context, index) {
-                final evento = recommended[index];
-                return _buildRecommendedCard(context, evento);
-              },
-            );
-          }),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRecommendedCard(BuildContext context, dynamic evento) {
-    return GestureDetector(
-      onTap: () => Get.toNamed('/evento/${evento.id}'),
-      child: Container(
-        width: 280,
-        decoration: BoxDecoration(
-          color: context.theme.cardColor,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: AppGradients.primaryBtn,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(20),
-                  ),
-                ),
-                child: Center(
-                  child: Icon(
-                    _getCategoryIcon(evento.categoria),
-                    color: Colors.white,
-                    size: 40,
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    evento.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.calendar_today_rounded,
-                        size: 14,
-                        color: context.theme.colorScheme.primary,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        evento.categoria,
-                        style: context.textTheme.bodySmall,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  IconData _getCategoryIcon(String category) {
-    switch (category.toLowerCase()) {
-      case 'deportes':
-        return Icons.sports_soccer_rounded;
-      case 'música':
-        return Icons.music_note_rounded;
-      case 'cultura':
-        return Icons.museum_rounded;
-      case 'tecnología':
-        return Icons.biotech_rounded;
-      case 'gastronomía':
-        return Icons.restaurant_rounded;
-      default:
-        return Icons.event_available_rounded;
-    }
   }
 
   Widget _buildActionButton(

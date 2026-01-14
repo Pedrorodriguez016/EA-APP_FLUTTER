@@ -116,6 +116,16 @@ class EventosListScreen extends GetView<EventoController> {
             overflow: TextOverflow.ellipsis,
           ),
         ),
+        if (isResults)
+          IconButton(
+            icon: const Icon(Icons.arrow_back_rounded),
+            onPressed: () {
+              controller.isSearching.value = false;
+              controller.searchEditingController.clear();
+              controller.filterCategory.value = null;
+              controller.fetchEventos(1);
+            },
+          ),
         Builder(
           builder: (scaffoldContext) => IconButton(
             icon: Icon(

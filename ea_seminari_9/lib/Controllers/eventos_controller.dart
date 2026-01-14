@@ -29,6 +29,12 @@ class EventoController extends GetxController {
   var totalPages = 1.obs;
   var totalEventos = 0.obs;
   var isSearching = false.obs;
+
+  // Paginación para Recomendados
+  var currentRecommendedPage = 1.obs;
+  var hasMoreRecommended = true.obs;
+  var isRecommendedLoadingMore = false.obs;
+
   var filterCategory = Rxn<String>(); // Category filter
   var filterDateFrom = Rxn<DateTime>(); // Date range start
   var filterDateTo = Rxn<DateTime>(); // Date range end
@@ -970,12 +976,58 @@ class EventoController extends GetxController {
     }
   }
 
-  Future<void> fetchRecommended() async {
+  Future<void> fetchRecommended({bool isRefresh = false}) async {
+    if (isRefresh) {
+      currentRecommendedPage.value = 1;
+      hasMoreRecommended.value = true;
+    }
+
+    if (!hasMoreRecommended.value || isRecommendedLoadingMore.value) return;
+
     try {
-      final eventos = await _eventosServices.fetchRecommendedEvents();
-      recommendedEventos.assignAll(eventos);
+      if (currentRecommendedPage.value == 1) {
+        isLoading.value = true;
+      } else {
+        isRecommendedLoadingMore.value = true;
+      }
+
+      final eventos = await _eventosServices.fetchRecommendedEvents(
+        page: currentRecommendedPage.value,
+        limit: 5, // Vamos de 5 en 5 para que se note la paginación horizontal
+      );
+
+      if (eventos.isEmpty) {
+        hasMoreRecommended.value = false;
+      } else {
+        if (currentRecommendedPage.value == 1) {
+          recommendedEventos.assignAll(eventos);
+        } else {
+          recommendedEventos.addAll(eventos);
+        }
+        currentRecommendedPage.value++;
+
+        // Si han llegado menos del límite, es que no hay más
+        if (eventos.length < 5) {
+          hasMoreRecommended.value = false;
+        }
+      }
     } catch (e) {
       logger.e('❌ Error en fetchRecommended', error: e);
+    } finally {
+      isLoading.value = false;
+      isRecommendedLoadingMore.value = false;
     }
+  }
+
+  Future<void> fetchMoreRecommended() async {
+    await fetchRecommended();
+  }
+
+  void showRecommendedOnly() {
+    searchEditingController.text = 'Recomendado';
+    filterCategory.value = null;
+    isSearching.value = true;
+    isLoading.value = false; // Asegurar que no se quede el spinner
+    eventosList.assignAll(recommendedEventos);
   }
 }

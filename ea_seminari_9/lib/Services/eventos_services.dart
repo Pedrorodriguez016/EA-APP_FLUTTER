@@ -310,13 +310,21 @@ class EventosServices {
     }
   }
 
-  Future<List<Evento>> fetchRecommendedEvents() async {
+  Future<List<Evento>> fetchRecommendedEvents({
+    int page = 1,
+    int limit = 10,
+  }) async {
     try {
-      logger.d('🌟 Obteniendo eventos recomendados');
-      final response = await _client.get('/recommended');
+      logger.d('🌟 Obteniendo eventos recomendados (Pág: $page)');
+      final response = await _client.get(
+        '/recommended',
+        queryParameters: {'page': page, 'limit': limit},
+      );
 
       final List<dynamic> eventosList = response.data['data'] ?? [];
-      logger.i('✅ Recomendaciones obtenidas: ${eventosList.length}');
+      logger.i(
+        '✅ Recomendaciones obtenidas: ${eventosList.length} (Pág: $page)',
+      );
 
       return eventosList.map((json) => Evento.fromJson(json)).toList();
     } catch (e) {

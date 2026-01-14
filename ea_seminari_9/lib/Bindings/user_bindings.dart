@@ -14,9 +14,9 @@ class UserBinding extends Bindings {
     Get.lazyPut<UserController>(
       () => UserController(Get.find<UserServices>(), Get.find<SocketService>()),
     );
-    Get.lazyPut<EventoController>(
-      () => EventoController(EventosServices()),
-      fenix: true,
+    Get.put<EventoController>(
+      EventoController(EventosServices()),
+      permanent: true,
     );
     Get.put<NotificacionController>(NotificacionController(), permanent: true);
   }

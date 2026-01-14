@@ -97,6 +97,14 @@ class SettingsScreen extends GetView<UserController> {
           const Divider(height: 1),
           _buildSettingItem(
             context: context,
+            icon: Icons.auto_awesome_outlined,
+            title: translate('settings.preferences'),
+            subtitle: translate('settings.preferences_subtitle'),
+            onTap: () => Get.toNamed('/questionnaire'),
+          ),
+          const Divider(height: 1),
+          _buildSettingItem(
+            context: context,
             icon: Icons.block_outlined,
             title: translate('users.blocked_users_title'),
             subtitle: translate('users.manage_blocked'),
