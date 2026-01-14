@@ -39,8 +39,11 @@ class EventChatScreen extends GetView<EventChatController> {
       body: Column(
         children: [
           Expanded(
-            child: Obx(
-              () => ListView.builder(
+            child: Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              return ListView.builder(
                 controller: controller.scrollController,
                 reverse: true,
                 itemCount: controller.messages.length,
@@ -48,8 +51,8 @@ class EventChatScreen extends GetView<EventChatController> {
                 itemBuilder: (context, index) {
                   return _EventChatBubble(message: controller.messages[index]);
                 },
-              ),
-            ),
+              );
+            }),
           ),
           const Divider(height: 1),
           _buildInputArea(),
