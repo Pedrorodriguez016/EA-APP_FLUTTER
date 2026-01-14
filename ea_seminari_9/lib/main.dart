@@ -10,6 +10,8 @@ import 'package:get/get.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:intl/date_symbol_data_local.dart';
 import 'Services/storage_service.dart';
+import 'Services/local_notification_service.dart';
+import 'package:geolocator/geolocator.dart';
 import 'Screen/login_screen.dart';
 import 'Screen/register_screen.dart';
 import 'Screen/home.dart';
@@ -36,6 +38,10 @@ import 'Screen/blocked_users_screen.dart';
 void main() async {
   logger.i('🚀 Iniciando aplicación...');
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Inicializar notificaciones locales
+  await LocalNotificationService.init();
+
   var delegate = await LocalizationDelegate.create(
     fallbackLocale: 'es',
     supportedLocales: ['es', 'en', 'ca', 'fr'],
@@ -51,8 +57,26 @@ void main() async {
 
   await Get.putAsync<StorageService>(() async => await StorageService().init());
 
+  // Gestionar permisos de forma secuencial (sin bloquear el arranque)
+  _requestPermissionsSequentially();
+
   logger.i('✅ Servicios inicializados, iniciando aplicación');
   runApp(LocalizedApp(delegate, const MyApp()));
+}
+
+Future<void> _requestPermissionsSequentially() async {
+  logger.i('🛡️ Gestionando permisos secuencialmente...');
+  try {
+    // 1. Petición de localización (espera a que el usuario decida)
+    await Geolocator.requestPermission();
+    logger.i('📍 Permiso de localización procesado');
+
+    // 2. Petición de notificaciones (solo cuando el anterior ha terminado)
+    await LocalNotificationService.requestPermission();
+    logger.i('🔔 Permiso de notificaciones procesado');
+  } catch (e) {
+    logger.e('❌ Error en la secuencia de permisos', error: e);
+  }
 }
 
 class MyApp extends StatelessWidget {

@@ -22,12 +22,18 @@ class SocketService extends GetxService {
   void connectWithUserId(String userId) {
     if (!_socket.connected) {
       _socket.connect();
+    } else {
+      // Si ya estaba conectado, identificamos al usuario igualmente
+      _socket.emit('user:online', userId);
+      logger.d(
+        '📤 Socket ya conectado, re-emitiendo user:online para: $userId',
+      );
     }
 
     _socket.onConnect((_) {
       logger.i('✅ Conectado al Socket Server');
 
-      // Emitimos el evento que tu backend espera en la línea 63
+      // Emitimos el evento que tu backend espera
       _socket.emit('user:online', userId);
       logger.d('📤 Evento user:online emitido para: $userId');
     });
@@ -137,6 +143,13 @@ class SocketService extends GetxService {
       }
     } catch (e) {
       logger.e('❌ Error al desconectar del socket', error: e);
+    }
+  }
+
+  void forceOffline(String userId) {
+    if (_socket.connected) {
+      _socket.emit('user:force_offline', userId);
+      logger.d('📤 Enviado user:force_offline para: $userId');
     }
   }
 }

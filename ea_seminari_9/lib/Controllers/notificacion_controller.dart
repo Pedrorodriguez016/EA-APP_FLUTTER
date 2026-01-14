@@ -5,8 +5,10 @@ import '../Services/notificacion_services.dart';
 import '../Services/socket_services.dart';
 import '../Controllers/auth_controller.dart';
 import '../utils/logger.dart';
+import '../Services/local_notification_service.dart';
 
-class NotificacionController extends GetxController {
+class NotificacionController extends GetxController
+    with WidgetsBindingObserver {
   final NotificacionServices _services = NotificacionServices();
   final SocketService _socketService = Get.find<SocketService>();
   final AuthController _authController = Get.find<AuthController>();
@@ -18,6 +20,7 @@ class NotificacionController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    WidgetsBinding.instance.addObserver(this);
     if (_authController.currentUser.value != null) {
       fetchNotificaciones();
       listenToNotifications();
@@ -65,21 +68,31 @@ class NotificacionController extends GetxController {
       logger.i('🔔 Nueva notificación recibida vía Socket: $data');
       final newNotif = Notificacion.fromJson(data);
 
-      // Insertar al inicio de la lista
-      notificaciones.insert(0, newNotif);
-      _updateUnreadCount();
+      try {
+        // 1. Mostrar Snackbar (Aviso interno de la app) - PRIORIDAD
+        Get.snackbar(
+          newNotif.title,
+          newNotif.message,
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Get.theme.colorScheme.primary.withOpacity(0.9),
+          colorText: Colors.white,
+          onTap: (_) => markAsRead(newNotif.id),
+        );
 
-      Get.snackbar(
-        newNotif.title,
-        newNotif.message,
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Get.theme.colorScheme.primary.withOpacity(0.9),
-        colorText: Colors.white,
-        onTap: (_) {
-          // Marcar como leída si el usuario hace click en el snackbar
-          markAsRead(newNotif.id);
-        },
-      );
+        // 2. Actualizar lista y contador localmente
+        notificaciones.insert(0, newNotif);
+        _updateUnreadCount();
+
+        // 3. Mostrar notificación de Android (Aviso externo)
+        LocalNotificationService.show(
+          id: newNotif.id.hashCode.abs(),
+          title: newNotif.title,
+          body: newNotif.message,
+          payload: newNotif.actionUrl,
+        );
+      } catch (e) {
+        logger.e('❌ Error procesando nueva notificación', error: e);
+      }
     });
   }
 
@@ -143,6 +156,33 @@ class NotificacionController extends GetxController {
       }
     }
     _updateUnreadCount();
+  }
+
+  @override
+  void onClose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _onLogout();
+    super.onClose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    final userId = _authController.currentUser.value?.id;
+    if (userId == null || userId.isEmpty) return;
+
+    if (state == AppLifecycleState.paused) {
+      // App minimizada: Forzar Offline en DB pero mantener socket vivo
+      logger.i(
+        '📱 App en segundo plano, forzando estado Offline (Modo Invisible)',
+      );
+      _socketService.forceOffline(userId);
+    } else if (state == AppLifecycleState.resumed) {
+      // App abierta de nuevo: Volver a estar Online
+      logger.i('📱 App vuelve a primer plano, restaurando estado Online');
+      _socketService.connectWithUserId(userId);
+      fetchNotificaciones();
+    }
   }
 
   Future<void> deleteNotificacion(String notificacionId) async {

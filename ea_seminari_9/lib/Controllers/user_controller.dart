@@ -356,7 +356,8 @@ class UserController extends GetxController {
 
   @override
   void onClose() {
-    _socketService.disconnect();
+    // No desconectamos el socket aquí porque es un servicio global
+    // que necesitamos para las notificaciones en segundo plano.
     super.onClose();
   }
 
