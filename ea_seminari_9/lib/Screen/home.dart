@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import '../Models/user.dart';
 import '../Controllers/auth_controller.dart';
 import '../Widgets/navigation_bar.dart';
-import '../Widgets/logout_button.dart';
-import '../Widgets/user_card.dart';
-import '../Widgets/solicitudes.dart';
 import '../Widgets/mapa.dart';
 import '../Controllers/eventos_controller.dart';
 import '../Services/eventos_services.dart';
@@ -15,6 +11,8 @@ import 'package:flutter_map/flutter_map.dart';
 import '../Controllers/user_controller.dart';
 import '../Widgets/global_drawer.dart';
 import '../utils/app_theme.dart';
+import '../Controllers/notificacion_controller.dart';
+import '../Widgets/notifications_popup.dart';
 
 class HomeScreen extends GetView<UserController> {
   HomeScreen({Key? key}) : super(key: key);
@@ -23,6 +21,8 @@ class HomeScreen extends GetView<UserController> {
   final EventoController eventoController = Get.put(
     EventoController(EventosServices()),
   );
+  final NotificacionController notifController =
+      Get.find<NotificacionController>();
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +43,7 @@ class HomeScreen extends GetView<UserController> {
           await controller.fetchRequest();
           await authController
               .fetchCurrentUser(); // Opcional si quieres refrescar datos del user
+          await notifController.fetchNotificaciones();
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -74,6 +75,50 @@ class HomeScreen extends GetView<UserController> {
     return AppBar(
       title: Text(translate('home.title')),
       actions: [
+        Obx(
+          () => Stack(
+            children: [
+              IconButton(
+                icon: Icon(
+                  Icons.notifications_outlined,
+                  color: context.theme.colorScheme.primary,
+                ),
+                onPressed: () {
+                  Get.bottomSheet(
+                    const NotificationsPopup(),
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                  );
+                },
+              ),
+              if (notifController.unreadCount.value > 0)
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
+                    child: Text(
+                      '${notifController.unreadCount.value}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
         Builder(
           builder: (scaffoldContext) => IconButton(
             icon: Icon(

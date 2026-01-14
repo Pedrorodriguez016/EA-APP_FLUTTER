@@ -283,5 +283,10 @@
     "invite_friends": "Invite friends:",
     "max_capacity": "Max capacity (optional)",
     "unlimited_capacity_hint": "Leave blank for unlimited capacity"
+  },
+  "notificaciones": {
+    "titulo": "Notifications",
+    "vacia": "You have no notifications",
+    "marcar_todas_leidas": "Mark all as read"
   }
 }

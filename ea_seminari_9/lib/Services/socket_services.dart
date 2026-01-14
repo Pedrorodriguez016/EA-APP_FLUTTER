@@ -118,6 +118,17 @@ class SocketService extends GetxService {
     _socket.off('chat:error');
   }
 
+  void listenToNotifications(Function(dynamic) onNotificationReceived) {
+    _socket.on('notification:new', (data) {
+      logger.d('🔍 [SocketService] RAW notification:new received: $data');
+      onNotificationReceived(data);
+    });
+  }
+
+  void stopListeningToNotifications() {
+    _socket.off('notification:new');
+  }
+
   void disconnect() {
     try {
       if (_socket.connected) {

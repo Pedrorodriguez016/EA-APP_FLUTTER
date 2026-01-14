@@ -80,10 +80,7 @@ class MyApp extends StatelessWidget {
       themeMode: initialThemeMode,
       initialRoute: '/login',
       getPages: [
-        GetPage(
-          name: '/login',
-          page: () => const LoginScreen(),
-        ),
+        GetPage(name: '/login', page: () => const LoginScreen()),
         GetPage(
           name: '/register',
           page: () => const RegisterScreen(),

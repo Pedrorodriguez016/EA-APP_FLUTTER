@@ -4,6 +4,7 @@ import '../Controllers/eventos_controller.dart';
 import '../Services/eventos_services.dart';
 import 'package:get/get.dart';
 import '../Services/socket_services.dart';
+import '../Controllers/notificacion_controller.dart';
 
 class UserBinding extends Bindings {
   @override
@@ -17,5 +18,6 @@ class UserBinding extends Bindings {
       () => EventoController(EventosServices()),
       fenix: true,
     );
+    Get.put<NotificacionController>(NotificacionController(), permanent: true);
   }
 }

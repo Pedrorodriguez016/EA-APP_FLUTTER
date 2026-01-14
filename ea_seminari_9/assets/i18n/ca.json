@@ -285,5 +285,10 @@
     "invite_friends": "Convidar amics:",
     "max_capacity": "Capacitat màxima (opcional)",
     "unlimited_capacity_hint": "Deixar en blanc per a capacitat il·limitada"
+  },
+  "notificaciones": {
+    "titulo": "Notificacions",
+    "vacia": "No tens notificacions",
+    "marcar_todas_leidas": "Marca-ho tot com a llegit"
   }
 }
