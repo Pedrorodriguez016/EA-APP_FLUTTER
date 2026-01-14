@@ -34,6 +34,7 @@ import 'Bindings/chatbot_binding.dart';
 import 'utils/app_theme.dart';
 import 'Screen/calendar_screen.dart';
 import 'Screen/blocked_users_screen.dart';
+import 'Screen/questionnaire_screen.dart';
 
 void main() async {
   logger.i('🚀 Iniciando aplicación...');
@@ -183,6 +184,11 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: '/blocked-users',
           page: () => const BlockedUsersScreen(),
+          binding: UserBinding(),
+        ),
+        GetPage(
+          name: '/questionnaire',
+          page: () => const QuestionnaireScreen(),
           binding: UserBinding(),
         ),
       ],

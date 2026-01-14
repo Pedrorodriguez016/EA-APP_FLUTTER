@@ -23,6 +23,7 @@ class EventoController extends GetxController {
   var misEventosInscritos = <Evento>[].obs;
   var calendarEvents = <Evento>[].obs;
   var selectedDayEvents = <Evento>[].obs;
+  var recommendedEventos = <Evento>[].obs;
   var isCalendarView = false.obs;
   var currentPage = 1.obs;
   var totalPages = 1.obs;
@@ -68,6 +69,7 @@ class EventoController extends GetxController {
     capacidadMaximaController = TextEditingController();
     selectedSchedule.value = null;
     fetchEventos(1);
+    fetchRecommended();
     _getUserLocation();
     scrollController.addListener(_scrollListener);
     ever(_authController.currentUser, (user) {
@@ -965,6 +967,15 @@ class EventoController extends GetxController {
       logger.e('❌ Error fetching calendar events', error: e);
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchRecommended() async {
+    try {
+      final eventos = await _eventosServices.fetchRecommendedEvents();
+      recommendedEventos.assignAll(eventos);
+    } catch (e) {
+      logger.e('❌ Error en fetchRecommended', error: e);
     }
   }
 }

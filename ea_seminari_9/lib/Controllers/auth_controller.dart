@@ -240,6 +240,29 @@ class AuthController extends GetxController {
   Future<Map<String, dynamic>> register(User newUser) async {
     try {
       await _authService.register(newUser);
+      logger.i('✅ Registro completado. Iniciando sesión automática...');
+
+      // Realizamos el login automático usando las credenciales del registro
+      final loginData = await _authService.login(
+        newUser.username,
+        newUser.password!,
+      );
+
+      final userData = loginData['user'];
+      final user = User.fromJson({
+        ...userData,
+        'token': loginData['token'],
+        'refreshToken': loginData['refreshToken'],
+      });
+
+      currentUser.value = user;
+      token = loginData['token'];
+      refreshToken = loginData['refreshToken'];
+      isLoggedIn.value = true;
+
+      await _storageService.saveSession(user);
+      logger.i('✅ Login automático tras registro exitoso');
+
       return {
         'success': true,
         'message': translate('auth.register.success_msg'),

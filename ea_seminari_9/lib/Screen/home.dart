@@ -52,6 +52,8 @@ class HomeScreen extends GetView<UserController> {
             children: [
               _buildWelcomeCard(authController, context),
               const SizedBox(height: 24),
+              _buildRecommendedSection(context),
+              const SizedBox(height: 24),
               _buildEventsCard(context),
               const SizedBox(height: 24),
             ],
@@ -361,6 +363,151 @@ class HomeScreen extends GetView<UserController> {
         ),
       ),
     );
+  }
+
+  Widget _buildRecommendedSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Recomendados para ti',
+                style: context.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 20,
+                ),
+              ),
+              TextButton(
+                onPressed: () => Get.toNamed('/eventos'),
+                child: const Text('Ver todos'),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 200,
+          child: Obx(() {
+            final recommended = eventoController.recommendedEventos;
+            if (recommended.isEmpty) {
+              return Center(
+                child: Text(
+                  'No hay recomendaciones aún.\n¡Selecciona tus intereses!',
+                  textAlign: TextAlign.center,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: context.theme.hintColor,
+                  ),
+                ),
+              );
+            }
+            return ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: recommended.length,
+              separatorBuilder: (context, index) => const SizedBox(width: 16),
+              itemBuilder: (context, index) {
+                final evento = recommended[index];
+                return _buildRecommendedCard(context, evento);
+              },
+            );
+          }),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRecommendedCard(BuildContext context, dynamic evento) {
+    return GestureDetector(
+      onTap: () => Get.toNamed('/evento/${evento.id}'),
+      child: Container(
+        width: 280,
+        decoration: BoxDecoration(
+          color: context.theme.cardColor,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: AppGradients.primaryBtn,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(20),
+                  ),
+                ),
+                child: Center(
+                  child: Icon(
+                    _getCategoryIcon(evento.categoria),
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    evento.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_today_rounded,
+                        size: 14,
+                        color: context.theme.colorScheme.primary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        evento.categoria,
+                        style: context.textTheme.bodySmall,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  IconData _getCategoryIcon(String category) {
+    switch (category.toLowerCase()) {
+      case 'deportes':
+        return Icons.sports_soccer_rounded;
+      case 'música':
+        return Icons.music_note_rounded;
+      case 'cultura':
+        return Icons.museum_rounded;
+      case 'tecnología':
+        return Icons.biotech_rounded;
+      case 'gastronomía':
+        return Icons.restaurant_rounded;
+      default:
+        return Icons.event_available_rounded;
+    }
   }
 
   Widget _buildActionButton(

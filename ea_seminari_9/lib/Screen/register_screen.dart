@@ -43,6 +43,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   final _formKey = GlobalKey<FormState>();
 
+  final List<String> _temporaryDomains = [
+    'tempmail.com',
+    '10minutemail.com',
+    'guerrillamail.com',
+    'mailinator.com',
+    'throwaway.email',
+    'temp-mail.org',
+  ];
+
+  final List<String> _reservedUsernames = [
+    'admin',
+    'root',
+    'system',
+    'null',
+    'undefined',
+  ];
+
   void _showSuccessDialog() {
     Get.dialog(
       AlertDialog(
@@ -70,8 +87,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              Get.back();
-              Get.back();
+              Get.offAllNamed('/questionnaire');
             },
             child: Text(
               translate('auth.register.continue'),
@@ -92,27 +108,30 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (value == null || value.isEmpty) {
       return translate('auth.errors.username_empty');
     }
-    if (value.length < 3) {
+    final trimmed = value.trim();
+    if (trimmed.length < 3 || trimmed.length > 30) {
       return translate('auth.errors.username_short');
     }
-    if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
+    if (!RegExp(r'^[a-zA-Z][a-zA-Z0-9_]*$').hasMatch(trimmed)) {
       return translate('auth.errors.username_chars');
+    }
+    if (_reservedUsernames.contains(trimmed.toLowerCase())) {
+      return 'Nombre de usuario no permitido';
     }
     return null;
   }
 
   Widget _buildPasswordRequirements(String password) {
     final requirements = [
-      {
-        'label': translate('auth.password_requirements.chars'),
-        'valid': password.length >= 12,
-      },
+      {'label': 'Min. 8 caracteres', 'valid': password.length >= 8},
       {'label': 'a-z', 'valid': RegExp(r'[a-z]').hasMatch(password)},
       {'label': 'A-Z', 'valid': RegExp(r'[A-Z]').hasMatch(password)},
       {'label': '0-9', 'valid': RegExp(r'[0-9]').hasMatch(password)},
       {
-        'label': '!@#\$',
-        'valid': RegExp(r'[!@#\$%^&*(),.?":{}|<>]').hasMatch(password),
+        'label': r'!@#$',
+        'valid': RegExp(
+          r'''[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]''',
+        ).hasMatch(password),
       },
     ];
 
@@ -158,8 +177,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? _validateGmail(String? value) {
     if (value == null || value.isEmpty)
       return translate('auth.errors.email_empty');
-    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value))
+    final email = value.trim();
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9]([a-zA-Z0-9._-]*[a-zA-Z0-9])?@[a-zA-Z0-9]([a-zA-Z0-9.-]*[a-zA-Z0-9])?\.[a-zA-Z]{2,}$',
+    );
+    if (!emailRegex.hasMatch(email))
       return translate('auth.errors.email_invalid');
+
+    final domain = email.split('@').last.toLowerCase();
+    if (_temporaryDomains.contains(domain)) {
+      return 'No se permiten correos temporales';
+    }
     return null;
   }
 
@@ -183,7 +211,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final day = int.parse(parts[2]);
       final birthday = DateTime(year, month, day);
       final now = DateTime.now();
-      final age = now.year - birthday.year;
+
+      // Cálculo exacto de edad
+      int age = now.year - birthday.year;
+      final monthDiff = now.month - birthday.month;
+      if (monthDiff < 0 || (monthDiff == 0 && now.day < birthday.day)) {
+        age--;
+      }
 
       if (birthday.isAfter(now))
         return translate('auth.errors.birthday_invalid');
@@ -197,11 +231,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   PasswordStrength _customPasswordStrength(String password) {
     int count = 0;
-    if (password.length >= 12) count++;
+    if (password.length >= 8) count++;
     if (RegExp(r'[a-z]').hasMatch(password)) count++;
     if (RegExp(r'[A-Z]').hasMatch(password)) count++;
     if (RegExp(r'[0-9]').hasMatch(password)) count++;
-    if (RegExp(r'[!@#\$%^&*(),.?":{}|<>]').hasMatch(password)) count++;
+    if (RegExp(r'''[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]''').hasMatch(password))
+      count++;
     switch (count) {
       case 5:
         return PasswordStrength.secure;

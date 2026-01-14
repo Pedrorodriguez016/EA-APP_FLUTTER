@@ -309,4 +309,19 @@ class EventosServices {
       return [];
     }
   }
+
+  Future<List<Evento>> fetchRecommendedEvents() async {
+    try {
+      logger.d('🌟 Obteniendo eventos recomendados');
+      final response = await _client.get('/recommended');
+
+      final List<dynamic> eventosList = response.data['data'] ?? [];
+      logger.i('✅ Recomendaciones obtenidas: ${eventosList.length}');
+
+      return eventosList.map((json) => Evento.fromJson(json)).toList();
+    } catch (e) {
+      logger.e('❌ Error en fetchRecommendedEvents', error: e);
+      return [];
+    }
+  }
 }

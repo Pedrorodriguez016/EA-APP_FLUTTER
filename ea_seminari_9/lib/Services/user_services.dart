@@ -362,4 +362,28 @@ class UserServices {
       return [];
     }
   }
+
+  Future<bool> updateInterests(List<String> interests) async {
+    try {
+      logger.i('🌟 Actualizando intereses del usuario');
+      final response = await _client.post(
+        '/interests/update',
+        data: {'interests': interests},
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = response.data;
+        if (data['ok'] == true && data['user'] != null) {
+          final updatedUser = User.fromJson(data['user']);
+          _authController.currentUser.value = updatedUser;
+          logger.i('✅ Intereses actualizados exitosamente');
+          return true;
+        }
+      }
+      return false;
+    } catch (e) {
+      logger.e('❌ Error en updateInterests', error: e);
+      return false;
+    }
+  }
 }

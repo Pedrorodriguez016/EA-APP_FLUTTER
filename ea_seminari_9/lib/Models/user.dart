@@ -9,6 +9,7 @@ class User {
   final String? refreshToken;
   final bool? online;
   final List<String>? blockedUsers;
+  final List<String>? interests;
 
   User({
     required this.id,
@@ -21,6 +22,7 @@ class User {
     this.token,
     this.refreshToken,
     this.blockedUsers,
+    this.interests,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -36,6 +38,9 @@ class User {
       blockedUsers: json['blockedUsers'] != null
           ? List<String>.from(json['blockedUsers'])
           : null,
+      interests: json['interests'] != null
+          ? List<String>.from(json['interests'])
+          : null,
     );
   }
 
@@ -49,6 +54,7 @@ class User {
       'profilePhoto': profilePhoto,
       'online': online,
       'blockedUsers': blockedUsers,
+      'interests': interests,
     };
   }
 }
