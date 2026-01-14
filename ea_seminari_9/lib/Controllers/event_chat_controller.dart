@@ -4,16 +4,19 @@ import '../Services/socket_services.dart';
 import '../Controllers/auth_controller.dart';
 import '../Models/event_chat.dart';
 import '../utils/logger.dart';
+import '../Services/user_services.dart';
 
 class EventChatController extends GetxController {
   final SocketService _socketService;
   final AuthController _authController;
+  final UserServices _userServices = Get.find<UserServices>();
 
   final TextEditingController textController = TextEditingController();
   final ScrollController scrollController = ScrollController();
   final FocusNode focusNode = FocusNode();
 
   var messages = <EventChatMessage>[].obs;
+  var isLoading = false.obs;
 
   late String myUserId;
   late String myUsername;
@@ -42,6 +45,7 @@ class EventChatController extends GetxController {
     logger.i(
       '🏟️ EventChatController: Inicializando chat para el evento $eventName ($eventId)',
     );
+    fetchEventHistory();
     _socketService.joinEventChatRoom(eventId);
     _socketService.listenToEventChatMessages(_handleNewMessage);
     _socketService.listenToChatErrors(_handleChatError);
@@ -63,6 +67,27 @@ class EventChatController extends GetxController {
     // Remove the optimistic message if it exists (assuming it's the last added one)
     if (messages.isNotEmpty && messages.first.isMine) {
       messages.removeAt(0);
+    }
+  }
+
+  Future<void> fetchEventHistory() async {
+    isLoading.value = true;
+    try {
+      final List<dynamic> history = await _userServices.fetchEventChatHistory(
+        eventId,
+      );
+      final List<EventChatMessage> historyMessages = history
+          .map((json) => EventChatMessage.fromJson(json, myUserId))
+          .toList();
+
+      messages.assignAll(historyMessages.reversed.toList());
+      logger.i(
+        '✅ Historial de chat de evento cargado con ${messages.length} mensajes',
+      );
+    } catch (e) {
+      logger.e('❌ Error al cargar historial de evento', error: e);
+    } finally {
+      isLoading.value = false;
     }
   }
 

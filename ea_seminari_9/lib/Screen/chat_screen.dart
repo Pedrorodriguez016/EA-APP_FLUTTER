@@ -56,8 +56,11 @@ class ChatScreen extends GetView<ChatController> {
         children: [
           // LISTA DE MENSAJES
           Expanded(
-            child: Obx(
-              () => ListView.builder(
+            child: Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              return ListView.builder(
                 controller: controller.scrollController,
                 reverse: true,
                 itemCount: controller.messages.length,
@@ -65,8 +68,8 @@ class ChatScreen extends GetView<ChatController> {
                 itemBuilder: (context, index) {
                   return _ChatBubble(message: controller.messages[index]);
                 },
-              ),
-            ),
+              );
+            }),
           ),
 
           Divider(height: 1, color: context.theme.dividerColor),

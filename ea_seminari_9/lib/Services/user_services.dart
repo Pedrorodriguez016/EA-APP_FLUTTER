@@ -334,4 +334,32 @@ class UserServices {
       throw Exception('Error al cargar usuarios bloqueados: $e');
     }
   }
+
+  Future<List<dynamic>> fetchChatHistory(String userId, String friendId) async {
+    try {
+      logger.d('📑 Cargando historial de chat entre $userId y $friendId');
+      final response = await _client.get('/$userId/chat/$friendId');
+      logger.i(
+        '✅ Historial de chat cargado: ${(response.data as List).length} mensajes',
+      );
+      return response.data;
+    } catch (e) {
+      logger.e('❌ Error al cargar historial de chat', error: e);
+      return [];
+    }
+  }
+
+  Future<List<dynamic>> fetchEventChatHistory(String eventId) async {
+    try {
+      logger.d('📑 Cargando historial de chat para evento: $eventId');
+      final response = await _client.get('/events/$eventId/chat');
+      logger.i(
+        '✅ Historial de chat de evento cargado: ${(response.data as List).length} mensajes',
+      );
+      return response.data;
+    } catch (e) {
+      logger.e('❌ Error al cargar historial de chat de evento', error: e);
+      return [];
+    }
+  }
 }
