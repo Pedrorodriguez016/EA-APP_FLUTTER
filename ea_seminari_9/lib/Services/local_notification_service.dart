@@ -38,7 +38,26 @@ class LocalNotificationService {
       initSettings,
       onDidReceiveNotificationResponse: (NotificationResponse details) {
         if (details.payload != null && details.payload!.isNotEmpty) {
-          Get.toNamed(details.payload!);
+          final payload = details.payload!;
+          logger.i('🔔 Notificación pulsada con payload: $payload');
+
+          if (payload.startsWith('chat|')) {
+            final parts = payload.split('|');
+            if (parts.length >= 3) {
+              Get.toNamed(
+                '/chat',
+                arguments: {'friendId': parts[1], 'friendName': parts[2]},
+              );
+            }
+          } else {
+            // Mapeo dinámico: si el backend envía algo tipo web (/menu),
+            // lo traducimos a lo que Flutter entiende (/home)
+            String targetRoute = payload;
+            if (targetRoute == '/menu') {
+              targetRoute = '/home';
+            }
+            Get.toNamed(targetRoute);
+          }
         }
       },
     );

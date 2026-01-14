@@ -69,26 +69,37 @@ class NotificacionController extends GetxController
       final newNotif = Notificacion.fromJson(data);
 
       try {
-        // 1. Mostrar Snackbar (Aviso interno de la app) - PRIORIDAD
+        // 1. Mostrar Snackbar (Aviso interno de la app)
         Get.snackbar(
           newNotif.title,
           newNotif.message,
           snackPosition: SnackPosition.TOP,
           backgroundColor: Get.theme.colorScheme.primary.withOpacity(0.9),
           colorText: Colors.white,
-          onTap: (_) => markAsRead(newNotif.id),
+          onTap: (_) {
+            markAsRead(newNotif.id);
+            _handleNotificationClick(newNotif);
+          },
         );
 
         // 2. Actualizar lista y contador localmente
         notificaciones.insert(0, newNotif);
         _updateUnreadCount();
 
-        // 3. Mostrar notificación de Android (Aviso externo)
+        // 3. Determinar el payload para la navegación
+        String payload = newNotif.actionUrl ?? '/home';
+        if (newNotif.type == 'new_message' && newNotif.relatedUserId != null) {
+          // Formato especial para ir directo al chat: chat|id|nombre
+          payload =
+              'chat|${newNotif.relatedUserId}|${newNotif.relatedUsername ?? 'Chat'}';
+        }
+
+        // 4. Mostrar notificación de Android (Aviso externo)
         LocalNotificationService.show(
           id: newNotif.id.hashCode.abs(),
           title: newNotif.title,
           body: newNotif.message,
-          payload: newNotif.actionUrl,
+          payload: payload,
         );
       } catch (e) {
         logger.e('❌ Error procesando nueva notificación', error: e);
@@ -190,6 +201,29 @@ class NotificacionController extends GetxController
     if (success) {
       notificaciones.removeWhere((n) => n.id == notificacionId);
       _updateUnreadCount();
+    }
+  }
+
+  void _handleNotificationClick(Notificacion notif) {
+    if (notif.type == 'new_message' && notif.relatedUserId != null) {
+      Get.toNamed(
+        '/chat',
+        arguments: {
+          'friendId': notif.relatedUserId,
+          'friendName': notif.relatedUsername ?? 'Chat',
+        },
+      );
+    } else if (notif.relatedEventId != null) {
+      Get.toNamed('/evento/${notif.relatedEventId}');
+    } else if (notif.type == 'friend_request' ||
+        notif.type == 'friend_accepted') {
+      if (notif.relatedUserId != null) {
+        Get.toNamed('/user/${notif.relatedUserId}');
+      }
+    } else if (notif.actionUrl != null && notif.actionUrl!.isNotEmpty) {
+      String target = notif.actionUrl!;
+      if (target == '/menu') target = '/home';
+      Get.toNamed(target);
     }
   }
 }
