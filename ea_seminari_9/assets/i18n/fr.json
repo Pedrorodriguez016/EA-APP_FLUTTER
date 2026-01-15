@@ -15,7 +15,8 @@
     "yes": "Oui",
     "no": "Non",
     "fix_errors": "Veuillez corriger les erreurs",
-    "user": "Utilisateur"
+    "user": "Utilisateur",
+    "continue": "Continuer"
   },
   "auth": {
     "login": {
@@ -40,26 +41,28 @@
       "generate_password_btn": "Générer un mot de passe",
       "chars": "Minimum 12 caractères"
     },
+    "google_data_title": "Profil incomplet",
+    "google_data_subtitle": "Veuillez compléter les détails suivants pour continuer avec votre compte Google.",
     "fields": {
       "username": "Nom d'utilisateur",
-      "email": "Gmail",
+      "email": "Adresse e-mail",
       "password": "Mot de passe",
       "confirm_password": "Confirmer le mot de passe",
-      "birthday": "Date de naissance (AAAA-MM-JJ)",
-      "birthday_hint": "2000-01-01"
+      "birthday": "Date de naissance",
+      "birthday_hint": "Sélectionnez une date"
     },
     "errors": {
       "username_empty": "Veuillez entrer un nom d'utilisateur",
       "username_short": "Le nom d'utilisateur doit comporter au moins 3 caractères",
       "username_chars": "Seuls les lettres, les chiffres et les traits de soulignement sont autorisés",
-      "email_empty": "Veuillez entrer votre gmail",
+      "email_empty": "Veuillez entrer votre adresse e-mail",
       "email_invalid": "Veuillez entrer un gmail valide",
       "password_empty": "Veuillez entrer un mot de passe",
       "password_short": "Le mot de passe doit comporter au moins 6 caractères",
       "password_mismatch": "Les mots de passe ne correspondent pas",
       "birthday_empty": "Veuillez entrer votre date de naissance",
       "birthday_invalid": "Date invalide",
-      "age_restriction": "Minimum 13 ans",
+      "age_restriction": "Vous devez avoir au moins 13 ans",
       "not_authenticated": "Utilisateur non authentifié",
       "password_weak": "Le mot de passe est faible",
       "password_medium": "Mot de passe moyen",

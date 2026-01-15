@@ -15,11 +15,9 @@ class AuthService {
         receiveTimeout: const Duration(seconds: 5),
       ),
     );
-    // Agregamos el interceptor para manejar tokens automáticamente
     _client.interceptors.add(AuthInterceptor());
   }
 
-  // Login: Devuelve la respuesta cruda (Map) o lanza un error
   Future<Map<String, dynamic>> login(String username, String password) async {
     try {
       logger.d('📡 POST /user/auth/login - username: $username');
@@ -35,7 +33,7 @@ class AuthService {
     }
   }
 
-  // Register
+  
   Future<dynamic> register(User newUser) async {
     try {
       logger.d('📡 POST /user - registrando usuario: ${newUser.username}');
@@ -59,17 +57,37 @@ class AuthService {
     }
   }
   // Google Login: Envía el idToken al backend para validación
-  Future<Map<String, dynamic>> loginWithGoogle(String idToken) async {
+  Future<Map<String, dynamic>> loginWithGoogle(
+    String idToken, {
+    String? birthday,
+    String? username,
+  }) async {
     try {
       logger.d('📡 POST /user/auth/google - Enviando idToken');
-      final response = await _client.post(
-        '/user/auth/google',
-        data: {'credential': idToken},
-      );
+      final Map<String, dynamic> data = {'credential': idToken};
+      if (birthday != null) data['birthday'] = birthday;
+      if (username != null) data['username'] = username;
+
+      final response = await _client.post('/user/auth/google', data: data);
       logger.i('✅ Google Login HTTP OK');
       return response.data;
     } catch (e) {
       logger.e('❌ Error en Google login HTTP', error: e);
+      throw e;
+    }
+  }
+
+  Future<Map<String, dynamic>> checkGoogleUser(String idToken) async {
+    try {
+      logger.d('📡 POST /user/auth/google/check - Comprobando usuario');
+      final response = await _client.post(
+        '/user/auth/google/check',
+        data: {'credential': idToken},
+      );
+      logger.i('✅ Check Google User HTTP OK');
+      return response.data;
+    } catch (e) {
+      logger.e('❌ Error en check Google User HTTP', error: e);
       throw e;
     }
   }
