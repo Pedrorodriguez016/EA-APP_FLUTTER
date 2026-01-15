@@ -14,7 +14,8 @@
     "confirm": "Confirm",
     "yes": "Yes",
     "no": "No",
-    "fix_errors": "Please fix the errors"
+    "fix_errors": "Please fix the errors",
+    "continue": "Continue"
   },
   "auth": {
     "login": {
@@ -37,13 +38,15 @@
       "generate_password_btn": "Generate password",
       "chars": "Minimum 12 characters"
     },
+    "google_data_title": "Incomplete profile",
+    "google_data_subtitle": "Please complete the following details to continue with your Google account.",
     "fields": {
       "username": "Username",
       "email": "Gmail",
       "password": "Password",
       "confirm_password": "Confirm Password",
-      "birthday": "Date of Birth (YYYY-MM-DD)",
-      "birthday_hint": "2000-01-01"
+      "birthday": "Date of Birth",
+      "birthday_hint": "Select a date"
     },
     "errors": {
       "username_empty": "Please enter a username",

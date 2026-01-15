@@ -14,7 +14,8 @@
     "confirm": "Confirma",
     "yes": "Sí",
     "no": "No",
-    "fix_errors": "Si us plau, corregeix els errors"
+    "fix_errors": "Si us plau, corregeix els errors",
+    "continue": "Continua"
   },
   "auth": {
     "login": {
@@ -37,13 +38,15 @@
       "generate_password_btn": "Generar contrasenya",
       "chars": "Mínim 12 caràcters"
     },
+    "google_data_title": "Perfil incomplet",
+    "google_data_subtitle": "Si us plau, completa les següents dades per continuar amb el teu compte de Google.",
     "fields": {
       "username": "Nom d'usuari",
       "email": "Gmail",
       "password": "Contrasenya",
       "confirm_password": "Confirma la contrasenya",
-      "birthday": "Data de naixement (AAAA-MM-DD)",
-      "birthday_hint": "2000-01-01"
+      "birthday": "Data de naixement",
+      "birthday_hint": "Selecciona una data"
     },
     "errors": {
       "username_empty": "Si us plau, introdueix un nom d'usuari",
@@ -56,7 +59,7 @@
       "password_mismatch": "Les contrasenyes no coincideixen",
       "birthday_empty": "Si us plau, introdueix la teva data de naixement",
       "birthday_invalid": "Data invàlida",
-      "age_restriction": "Mínim 13 anys",
+      "age_restriction": "Has de ser major de 13 anys",
       "not_authenticated": "Usuari no autenticat",
       "password_weak": "La contrasenya és feble"
     },

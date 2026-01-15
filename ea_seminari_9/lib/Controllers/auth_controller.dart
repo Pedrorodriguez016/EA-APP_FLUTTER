@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import '../Models/user.dart';
 import '../Services/auth_service.dart';
 import '../Services/storage_service.dart';
@@ -41,9 +42,7 @@ class AuthController extends GetxController {
   Future<void> _initGoogleSignIn() async {
     try {
       // Inicializar el plugin con el serverClientId proporcionado
-      await _googleSignIn.initialize(
-        serverClientId: dotenv.env['GOOGLE_ID']!,
-      );
+      await _googleSignIn.initialize(serverClientId: dotenv.env['GOOGLE_ID']!);
 
       // Escuchar eventos de autenticación
       _googleSignIn.authenticationEvents
@@ -153,20 +152,56 @@ class AuthController extends GetxController {
         snackPosition: SnackPosition.BOTTOM,
       );
     }
-    // El spinner se desactiva en _handleGoogleSignInSuccess o por error
   }
 
   Future<void> _handleGoogleSignInSuccess(GoogleSignInAccount user) async {
     try {
-      // En v7.0+, authentication no es un Future
-      final GoogleSignInAuthentication googleAuth = user.authentication;
+      final GoogleSignInAuthentication googleAuth = await user.authentication;
       final String? idToken = googleAuth.idToken;
 
       if (idToken == null) {
         throw Exception("No se pudo obtener el ID Token de Google");
       }
 
-      final data = await _authService.loginWithGoogle(idToken);
+      // 1. Sincronizado con la web: Comprobar si el usuario existe y qué necesita
+      final checkData = await _authService.checkGoogleUser(idToken);
+
+      String? finalUsername;
+      String? finalBirthday;
+
+      if (checkData['exists'] == true && checkData['needsData'] == false) {
+        // Caso A: El usuario ya existe y está completo, login directo
+        logger.i('✅ Usuario Google ya existe, procediendo a login directo');
+      } else {
+        // Caso B o C: Falta información
+        final result = await _showGoogleDataDialog(
+          // Si no existe, sugerimos nombre. Si existe pero falta username, también.
+          suggestedUsername:
+              checkData['suggestedUsername'] ?? user.displayName ?? '',
+          // Pedir username si no existe el usuario o si el backend dice que no tiene
+          needsUsername:
+              checkData['exists'] == false || checkData['hasUsername'] == false,
+          // Pedir birthday si no existe el usuario o si el backend dice que no tiene
+          needsBirthday:
+              checkData['exists'] == false || checkData['hasBirthday'] == false,
+        );
+
+        if (result == null) {
+          // El usuario canceló el diálogo
+          isLoginLoading.value = false;
+          return;
+        }
+
+        finalUsername = result['username'];
+        finalBirthday = result['birthday'];
+      }
+
+      // 2. Finalizar el login/registro con Google (como en la web: credential, birthday, username)
+      final data = await _authService.loginWithGoogle(
+        idToken,
+        birthday: finalBirthday,
+        username: finalUsername,
+      );
 
       final userData = data['user'];
       final userModel = User.fromJson({
@@ -192,9 +227,17 @@ class AuthController extends GetxController {
       );
     } catch (e) {
       logger.e('Error al procesar login de Google con el backend', error: e);
+      String errorMsg = e.toString();
+      if (e is DioException && e.response?.data != null) {
+        errorMsg = e.response?.data['message'] ?? e.message;
+        if (e.response?.data['message'] == 'USERNAME_EXISTS') {
+          errorMsg = 'El nombre de usuario ya está en uso. Prueba con otro.';
+        }
+      }
+
       Get.snackbar(
         translate('common.error'),
-        'Backend validation failed: $e',
+        errorMsg,
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
@@ -202,6 +245,124 @@ class AuthController extends GetxController {
     } finally {
       isLoginLoading.value = false;
     }
+  }
+
+  Future<Map<String, String>?> _showGoogleDataDialog({
+    required String suggestedUsername,
+    bool needsUsername = true,
+    bool needsBirthday = true,
+  }) async {
+    final DateTime now = DateTime.now();
+    final DateTime initialDate = now.subtract(const Duration(days: 18 * 365));
+
+    final TextEditingController userCtrl = TextEditingController(
+      text: suggestedUsername,
+    );
+    final TextEditingController birthCtrl = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    return await Get.dialog<Map<String, String>>(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          translate('auth.google_data_title'),
+          style: TextStyle(fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
+        ),
+        content: Form(
+          key: formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                translate('auth.google_data_subtitle'),
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              ),
+              const SizedBox(height: 20),
+              if (needsUsername)
+                TextFormField(
+                  controller: userCtrl,
+                  decoration: InputDecoration(
+                    labelText: translate('auth.fields.username'),
+                    prefixIcon: Icon(Icons.person),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  validator: (v) => (v == null || v.isEmpty)
+                      ? translate('auth.errors.username_empty')
+                      : null,
+                ),
+              if (needsBirthday) ...[
+                if (needsUsername) const SizedBox(height: 16),
+                TextFormField(
+                  controller: birthCtrl,
+                  readOnly: true,
+                  decoration: InputDecoration(
+                    labelText: translate('auth.fields.birthday'),
+                    hintText: translate('auth.fields.birthday_hint'),
+                    prefixIcon: Icon(Icons.cake),
+                    suffixIcon: Icon(Icons.calendar_today),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onTap: () async {
+                    final DateTime? picked = await showDatePicker(
+                      context: Get.context!,
+                      initialDate: initialDate,
+                      firstDate: DateTime(1900),
+                      lastDate: now,
+                    );
+                    if (picked != null) {
+                      birthCtrl.text =
+                          "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+                    }
+                  },
+                  validator: (v) {
+                    if (v == null || v.isEmpty)
+                      return translate('auth.errors.birthday_empty');
+                    final birth = DateTime.tryParse(v);
+                    if (birth != null) {
+                      final age = now.year - birth.year;
+                      if (age < 13)
+                        return translate('auth.errors.age_restriction');
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(translate('common.cancel')),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            onPressed: () {
+              if (formKey.currentState!.validate()) {
+                Get.back(
+                  result: {
+                    'username': userCtrl.text,
+                    'birthday': birthCtrl.text,
+                  },
+                );
+              }
+            },
+            child: Text(translate('common.continue')),
+          ),
+        ],
+      ),
+      barrierDismissible: false,
+    );
   }
 
   void logout() {
