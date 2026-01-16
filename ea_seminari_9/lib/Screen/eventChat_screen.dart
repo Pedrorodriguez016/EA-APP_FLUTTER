@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import '../Controllers/event_chat_controller.dart';
 import '../Models/event_chat.dart';
+import '../Models/evento_photo.dart';
+import '../Services/eventos_services.dart';
 
 class EventChatScreen extends GetView<EventChatController> {
   const EventChatScreen({Key? key}) : super(key: key);
@@ -35,6 +37,12 @@ class EventChatScreen extends GetView<EventChatController> {
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.photo_library),
+            onPressed: () => _showPhotoGallery(context),
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -68,6 +76,13 @@ class EventChatScreen extends GetView<EventChatController> {
       child: SafeArea(
         child: Row(
           children: [
+            IconButton(
+              icon: Icon(
+                Icons.add_circle_outline,
+                color: context.theme.colorScheme.primary,
+              ),
+              onPressed: () => controller.uploadPhoto(),
+            ),
             Expanded(
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -111,6 +126,124 @@ class EventChatScreen extends GetView<EventChatController> {
       ),
     );
   }
+
+  void _showPhotoGallery(BuildContext context) {
+    controller.fetchPhotos();
+    Get.bottomSheet(
+      Container(
+        height: Get.height * 0.8,
+        decoration: BoxDecoration(
+          color: context.theme.scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Fotos del Evento',
+                    style: context.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.add_a_photo),
+                    onPressed: () => controller.uploadPhoto(),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+            Expanded(
+              child: Obx(() {
+                if (controller.isPhotosLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (controller.photos.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.photo_library_outlined,
+                          size: 64,
+                          color: context.theme.hintColor,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No hay fotos compartidas aún',
+                          style: TextStyle(color: context.theme.hintColor),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return GridView.builder(
+                  padding: const EdgeInsets.all(8),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                  ),
+                  itemCount: controller.photos.length,
+                  itemBuilder: (context, index) {
+                    final photo = controller.photos[index];
+                    return InkWell(
+                      onTap: () => _viewPhoto(context, photo),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          '${Get.find<EventosServices>().baseUrl.replaceAll('/api/event', '')}${photo.url}',
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              Container(
+                                color: Colors.grey.shade300,
+                                child: const Icon(Icons.broken_image),
+                              ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              }),
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
+  void _viewPhoto(BuildContext context, EventoPhoto photo) {
+    final fullUrl =
+        '${Get.find<EventosServices>().baseUrl.replaceAll('/api/event', '')}${photo.url}';
+    Get.to(
+      Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          iconTheme: const IconThemeData(color: Colors.white),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.download),
+              onPressed: () {
+                Get.snackbar(
+                  'Descarga',
+                  'La descarga se ha iniciado (Simulado)',
+                  backgroundColor: Colors.green,
+                  colorText: Colors.white,
+                );
+              },
+            ),
+          ],
+        ),
+        body: Center(child: InteractiveViewer(child: Image.network(fullUrl))),
+      ),
+    );
+  }
 }
 
 class _EventChatBubble extends StatelessWidget {
@@ -122,15 +255,12 @@ class _EventChatBubble extends StatelessWidget {
     final time =
         "${message.createdAt.hour.toString().padLeft(2, '0')}:${message.createdAt.minute.toString().padLeft(2, '0')}";
 
-    // Color fijo para mis mensajes (Morado marca) para asegurar contraste con blanco
     const myBubbleColor = Color(0xFF7C3AED);
-    // Fixed grey colors for better visibility
     final otherBubbleColor = context.isDarkMode
-        ? Color(0xFF424242) // Solid Dark Grey
-        : Color(0xFFEEEEEE); // Solid Light Grey
+        ? const Color(0xFF424242)
+        : const Color(0xFFEEEEEE);
 
     const myTextColor = Colors.white;
-    // Forzamos el color del texto recibido
     final otherTextColor = context.isDarkMode ? Colors.white : Colors.black;
 
     return Align(
@@ -162,7 +292,7 @@ class _EventChatBubble extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 4),
                 child: Text(
                   message.username,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 12,
                     color: myBubbleColor,

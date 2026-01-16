@@ -5,11 +5,15 @@ import '../Controllers/auth_controller.dart';
 import '../Models/event_chat.dart';
 import '../utils/logger.dart';
 import '../Services/user_services.dart';
+import '../Services/eventos_services.dart';
+import '../Models/evento_photo.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EventChatController extends GetxController {
   final SocketService _socketService;
   final AuthController _authController;
   final UserServices _userServices = Get.find<UserServices>();
+  final EventosServices _eventosServices = Get.find<EventosServices>();
 
   final TextEditingController textController = TextEditingController();
   final ScrollController scrollController = ScrollController();
@@ -17,6 +21,9 @@ class EventChatController extends GetxController {
 
   var messages = <EventChatMessage>[].obs;
   var isLoading = false.obs;
+
+  var photos = <EventoPhoto>[].obs;
+  var isPhotosLoading = false.obs;
 
   late String myUserId;
   late String myUsername;
@@ -146,6 +153,51 @@ class EventChatController extends GetxController {
 
     logger.d('📤 Enviando mensaje al chat del evento');
     _socketService.sendEventChatMessage(eventId, myUserId, myUsername, text);
+  }
+
+  Future<void> fetchPhotos() async {
+    isPhotosLoading.value = true;
+    try {
+      final fetchedPhotos = await _eventosServices.fetchEventPhotos(eventId);
+      photos.assignAll(fetchedPhotos);
+    } catch (e) {
+      logger.e('❌ Error al cargar fotos del evento', error: e);
+    } finally {
+      isPhotosLoading.value = false;
+    }
+  }
+
+  Future<void> uploadPhoto() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 70,
+      );
+
+      if (image == null) return;
+
+      isLoading.value = true;
+      final newPhoto = await _eventosServices.uploadPhoto(eventId, image.path);
+      photos.insert(0, newPhoto);
+
+      Get.snackbar(
+        '¡Éxito!',
+        'Foto compartida correctamente',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      logger.e('❌ Error al subir foto', error: e);
+      Get.snackbar(
+        'Error',
+        'No se pudo compartir la foto',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   @override

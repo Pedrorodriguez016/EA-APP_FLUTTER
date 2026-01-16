@@ -1,10 +1,11 @@
 import 'package:ea_seminari_9/Models/user.dart';
 import '../Models/eventos.dart';
+import '../Models/evento_photo.dart';
 import 'package:dio/dio.dart';
 import '../Interceptor/auth_interceptor.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../utils/logger.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide Response, FormData, MultipartFile;
 import '../Services/storage_service.dart';
 
 class EventosServices {
@@ -331,6 +332,39 @@ class EventosServices {
       return eventosList.map((json) => Evento.fromJson(json)).toList();
     } catch (e) {
       logger.e('❌ Error en fetchRecommendedEvents', error: e);
+      return [];
+    }
+  }
+
+  Future<EventoPhoto> uploadPhoto(String eventId, String filePath) async {
+    try {
+      logger.i('📸 Subiendo foto al evento: $eventId');
+      String fileName = filePath.split('/').last;
+
+      FormData formData = FormData.fromMap({
+        "photo": await MultipartFile.fromFile(filePath, filename: fileName),
+      });
+
+      final response = await _client.post('/$eventId/photos', data: formData);
+
+      logger.i('✅ Foto subida exitosamente');
+      return EventoPhoto.fromJson(response.data);
+    } catch (e) {
+      logger.e('❌ Error al subir foto al evento', error: e);
+      throw Exception('Error al subir la foto: $e');
+    }
+  }
+
+  Future<List<EventoPhoto>> fetchEventPhotos(String eventId) async {
+    try {
+      logger.d('🖼️ Obteniendo fotos del evento: $eventId');
+      final response = await _client.get('/$eventId/photos');
+
+      final List<dynamic> data = response.data;
+      logger.i('✅ Fotos obtenidas: ${data.length}');
+      return data.map((json) => EventoPhoto.fromJson(json)).toList();
+    } catch (e) {
+      logger.e('❌ Error al obtener fotos del evento', error: e);
       return [];
     }
   }

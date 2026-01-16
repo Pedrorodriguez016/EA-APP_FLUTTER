@@ -11,6 +11,8 @@ import 'package:ea_seminari_9/Models/user.dart';
 import 'package:ea_seminari_9/Services/user_services.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:ea_seminari_9/Models/evento_photo.dart';
+import 'package:image_picker/image_picker.dart';
 
 enum EventFilter { all, myEvents }
 
@@ -29,6 +31,10 @@ class EventoController extends GetxController {
   var totalPages = 1.obs;
   var totalEventos = 0.obs;
   var isSearching = false.obs;
+
+  // Fotos del evento
+  var eventoPhotos = <EventoPhoto>[].obs;
+  var isPhotosLoading = false.obs;
 
   // Paginación para Recomendados
   var currentRecommendedPage = 1.obs;
@@ -592,6 +598,51 @@ class EventoController extends GetxController {
       print("Error fetching friends: $e");
     } finally {
       isLoadingFriends(false);
+    }
+  }
+
+  Future<void> fetchEventPhotos(String eventId) async {
+    try {
+      isPhotosLoading(true);
+      final photos = await _eventosServices.fetchEventPhotos(eventId);
+      eventoPhotos.assignAll(photos);
+    } catch (e) {
+      logger.e('Error fetching event photos: $e');
+    } finally {
+      isPhotosLoading(false);
+    }
+  }
+
+  Future<void> uploadEventPhoto(String eventId) async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 70,
+      );
+
+      if (image == null) return;
+
+      isLoading(true);
+      final newPhoto = await _eventosServices.uploadPhoto(eventId, image.path);
+      eventoPhotos.insert(0, newPhoto);
+
+      Get.snackbar(
+        '¡Éxito!',
+        'Foto compartida correctamente',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      logger.e('Error uploading photo: $e');
+      Get.snackbar(
+        'Error',
+        'No se pudo compartir la foto',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading(false);
     }
   }
 
