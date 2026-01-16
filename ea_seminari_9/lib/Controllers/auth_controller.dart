@@ -211,7 +211,16 @@ class AuthController extends GetxController {
       isLoggedIn.value = true;
 
       await _storageService.saveSession(userModel);
-      Get.offAllNamed('/home');
+
+      // Si es un usuario nuevo o necesitaba completar datos, lo mandamos al cuestionario
+      if (checkData['exists'] == false || checkData['needsData'] == true) {
+        logger.i(
+          '🆕 Nuevo usuario de Google o requiere datos. Redirigiendo a cuestionario.',
+        );
+        Get.offAllNamed('/questionnaire');
+      } else {
+        Get.offAllNamed('/home');
+      }
 
       Get.snackbar(
         translate('common.success'),

@@ -977,10 +977,9 @@ class EventoController extends GetxController {
   }
 
   Future<void> fetchRecommended({bool isRefresh = false}) async {
-    if (isRefresh) {
-      currentRecommendedPage.value = 1;
-      hasMoreRecommended.value = true;
-    }
+    logger.i(
+      '🌟 [EventoController] fetchRecommended INICIAL - isRefresh: $isRefresh, hasMore: ${hasMoreRecommended.value}, isLoadingMore: ${isRecommendedLoadingMore.value}',
+    );
 
     if (!hasMoreRecommended.value || isRecommendedLoadingMore.value) return;
 
@@ -995,6 +994,8 @@ class EventoController extends GetxController {
         page: currentRecommendedPage.value,
         limit: 5, // Vamos de 5 en 5 para que se note la paginación horizontal
       );
+
+      logger.i('🌟 [EventoController] Eventos recibidos: ${eventos.length}');
 
       if (eventos.isEmpty) {
         hasMoreRecommended.value = false;

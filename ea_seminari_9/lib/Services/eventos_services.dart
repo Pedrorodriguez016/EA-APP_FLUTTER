@@ -13,6 +13,8 @@ class EventosServices {
   final User currentUser = Get.find<StorageService>().getUser()!;
 
   EventosServices() {
+    print('🚀 [EventosServices] Constructor iniciado');
+    logger.i('🚀 [EventosServices] Constructor iniciado');
     _client = Dio(BaseOptions(baseUrl: baseUrl));
     _client.interceptors.add(AuthInterceptor());
   }
