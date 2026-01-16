@@ -5,6 +5,7 @@ import '../Controllers/event_chat_controller.dart';
 import '../Models/event_chat.dart';
 import '../Models/evento_photo.dart';
 import '../Services/eventos_services.dart';
+import '../Controllers/auth_controller.dart';
 
 class EventChatScreen extends GetView<EventChatController> {
   const EventChatScreen({Key? key}) : super(key: key);
@@ -197,6 +198,10 @@ class EventChatScreen extends GetView<EventChatController> {
                         borderRadius: BorderRadius.circular(8),
                         child: Image.network(
                           '${Get.find<EventosServices>().baseUrl.replaceAll('/api/event', '')}${photo.url}',
+                          headers: {
+                            'Authorization':
+                                'Bearer ${Get.find<AuthController>().token ?? ''}',
+                          },
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) =>
                               Container(
@@ -229,18 +234,21 @@ class EventChatScreen extends GetView<EventChatController> {
           actions: [
             IconButton(
               icon: const Icon(Icons.download),
-              onPressed: () {
-                Get.snackbar(
-                  'Descarga',
-                  'La descarga se ha iniciado (Simulado)',
-                  backgroundColor: Colors.green,
-                  colorText: Colors.white,
-                );
-              },
+              onPressed: () => controller.downloadPhoto(photo.url),
             ),
           ],
         ),
-        body: Center(child: InteractiveViewer(child: Image.network(fullUrl))),
+        body: Center(
+          child: InteractiveViewer(
+            child: Image.network(
+              fullUrl,
+              headers: {
+                'Authorization':
+                    'Bearer ${Get.find<AuthController>().token ?? ''}',
+              },
+            ),
+          ),
+        ),
       ),
     );
   }

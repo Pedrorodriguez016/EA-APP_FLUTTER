@@ -8,6 +8,9 @@ import '../Services/user_services.dart';
 import '../Services/eventos_services.dart';
 import '../Models/evento_photo.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:gal/gal.dart';
+import 'package:dio/dio.dart';
 
 class EventChatController extends GetxController {
   final SocketService _socketService;
@@ -197,6 +200,47 @@ class EventChatController extends GetxController {
       );
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> downloadPhoto(String photoUrl) async {
+    try {
+      final fullUrl =
+          '${_eventosServices.baseUrl.replaceAll('/api/event', '')}$photoUrl';
+
+      // 1. Obtener directorio temporal
+      final tempDir = await getTemporaryDirectory();
+      final String fileName = photoUrl.split('/').last;
+      final String fullPath = '${tempDir.path}/$fileName';
+
+      // 2. Descargar la imagen
+      await Dio().download(
+        fullUrl,
+        fullPath,
+        options: Options(
+          headers: {'Authorization': 'Bearer ${_authController.token ?? ''}'},
+        ),
+      );
+
+      // 3. Guardar en la galería usando Gal
+      await Gal.putImage(fullPath);
+
+      Get.snackbar(
+        '¡Descarga completada!',
+        'La foto se ha guardado en tu galería',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } catch (e) {
+      logger.e('❌ Error al descargar la foto', error: e);
+      Get.snackbar(
+        'Error de descarga',
+        'No se pudo guardar la foto en la galería',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
     }
   }
 
