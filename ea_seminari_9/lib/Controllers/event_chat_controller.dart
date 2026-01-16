@@ -170,31 +170,47 @@ class EventChatController extends GetxController {
     }
   }
 
-  Future<void> uploadPhoto() async {
+  Future<void> uploadMedia({
+    bool isVideo = false,
+    bool fromCamera = false,
+    bool isGeneralGallery = false,
+  }) async {
     try {
       final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 70,
-      );
+      XFile? file;
 
-      if (image == null) return;
+      if (isGeneralGallery) {
+        file = await picker.pickMedia();
+      } else {
+        final source = fromCamera ? ImageSource.camera : ImageSource.gallery;
+
+        if (isVideo) {
+          file = await picker.pickVideo(
+            source: source,
+            maxDuration: const Duration(minutes: 5),
+          );
+        } else {
+          file = await picker.pickImage(source: source, imageQuality: 70);
+        }
+      }
+
+      if (file == null) return;
 
       isLoading.value = true;
-      final newPhoto = await _eventosServices.uploadPhoto(eventId, image.path);
-      photos.insert(0, newPhoto);
+      final newMedia = await _eventosServices.uploadMedia(eventId, file.path);
+      photos.insert(0, newMedia);
 
       Get.snackbar(
         '¡Éxito!',
-        'Foto compartida correctamente',
+        'Contenido compartido correctamente',
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
     } catch (e) {
-      logger.e('❌ Error al subir foto', error: e);
+      logger.e('❌ Error al subir contenido', error: e);
       Get.snackbar(
         'Error',
-        'No se pudo compartir la foto',
+        'No se pudo compartir el contenido',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -203,17 +219,17 @@ class EventChatController extends GetxController {
     }
   }
 
-  Future<void> downloadPhoto(String photoUrl) async {
+  Future<void> downloadMedia(String mediaUrl, String type) async {
     try {
       final fullUrl =
-          '${_eventosServices.baseUrl.replaceAll('/api/event', '')}$photoUrl';
+          '${_eventosServices.baseUrl.replaceAll('/api/event', '')}$mediaUrl';
 
       // 1. Obtener directorio temporal
       final tempDir = await getTemporaryDirectory();
-      final String fileName = photoUrl.split('/').last;
+      final String fileName = mediaUrl.split('/').last;
       final String fullPath = '${tempDir.path}/$fileName';
 
-      // 2. Descargar la imagen
+      // 2. Descargar el archivo
       await Dio().download(
         fullUrl,
         fullPath,
@@ -223,20 +239,24 @@ class EventChatController extends GetxController {
       );
 
       // 3. Guardar en la galería usando Gal
-      await Gal.putImage(fullPath);
+      if (type == 'video') {
+        await Gal.putVideo(fullPath);
+      } else {
+        await Gal.putImage(fullPath);
+      }
 
       Get.snackbar(
         '¡Descarga completada!',
-        'La foto se ha guardado en tu galería',
+        'El archivo se ha guardado en tu galería',
         backgroundColor: Colors.green,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
     } catch (e) {
-      logger.e('❌ Error al descargar la foto', error: e);
+      logger.e('❌ Error al descargar el contenido', error: e);
       Get.snackbar(
         'Error de descarga',
-        'No se pudo guardar la foto en la galería',
+        'No se pudo guardar el archivo en la galería',
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,

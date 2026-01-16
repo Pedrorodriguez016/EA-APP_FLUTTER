@@ -4,6 +4,7 @@ class EventoPhoto {
   final String userId;
   final String username;
   final String url;
+  final String type; // 'image' or 'video'
   final DateTime createdAt;
 
   EventoPhoto({
@@ -12,6 +13,7 @@ class EventoPhoto {
     required this.userId,
     required this.username,
     required this.url,
+    required this.type,
     required this.createdAt,
   });
 
@@ -22,6 +24,7 @@ class EventoPhoto {
       userId: json['userId'] ?? '',
       username: json['username'] ?? '',
       url: json['url'] ?? '',
+      type: json['type'] ?? 'image',
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'])
           : DateTime.now(),
@@ -35,6 +38,7 @@ class EventoPhoto {
       'userId': userId,
       'username': username,
       'url': url,
+      'type': type,
       'createdAt': createdAt.toIso8601String(),
     };
   }

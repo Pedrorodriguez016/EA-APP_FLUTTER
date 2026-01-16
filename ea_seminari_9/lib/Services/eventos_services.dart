@@ -336,9 +336,9 @@ class EventosServices {
     }
   }
 
-  Future<EventoPhoto> uploadPhoto(String eventId, String filePath) async {
+  Future<EventoPhoto> uploadMedia(String eventId, String filePath) async {
     try {
-      logger.i('📸 Subiendo foto al evento: $eventId');
+      logger.i('📤 Subiendo contenido multimedia al evento: $eventId');
       String fileName = filePath.split('/').last;
 
       FormData formData = FormData.fromMap({
@@ -347,11 +347,11 @@ class EventosServices {
 
       final response = await _client.post('/$eventId/photos', data: formData);
 
-      logger.i('✅ Foto subida exitosamente');
+      logger.i('✅ Contenido subido exitosamente');
       return EventoPhoto.fromJson(response.data);
     } catch (e) {
-      logger.e('❌ Error al subir foto al evento', error: e);
-      throw Exception('Error al subir la foto: $e');
+      logger.e('❌ Error al subir contenido al evento', error: e);
+      throw Exception('Error al subir el contenido: $e');
     }
   }
 

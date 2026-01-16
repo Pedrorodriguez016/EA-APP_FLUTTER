@@ -624,12 +624,12 @@ class EventoController extends GetxController {
       if (image == null) return;
 
       isLoading(true);
-      final newPhoto = await _eventosServices.uploadPhoto(eventId, image.path);
+      final newPhoto = await _eventosServices.uploadMedia(eventId, image.path);
       eventoPhotos.insert(0, newPhoto);
 
       Get.snackbar(
         '¡Éxito!',
-        'Foto compartida correctamente',
+        'Contenido compartido correctamente',
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );

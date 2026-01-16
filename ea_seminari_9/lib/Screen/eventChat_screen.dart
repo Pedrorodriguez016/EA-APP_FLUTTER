@@ -6,6 +6,7 @@ import '../Models/event_chat.dart';
 import '../Models/evento_photo.dart';
 import '../Services/eventos_services.dart';
 import '../Controllers/auth_controller.dart';
+import 'package:video_player/video_player.dart';
 
 class EventChatScreen extends GetView<EventChatController> {
   const EventChatScreen({Key? key}) : super(key: key);
@@ -82,7 +83,7 @@ class EventChatScreen extends GetView<EventChatController> {
                 Icons.add_circle_outline,
                 color: context.theme.colorScheme.primary,
               ),
-              onPressed: () => controller.uploadPhoto(),
+              onPressed: () => _showMediaUploadOptions(context),
             ),
             Expanded(
               child: Container(
@@ -151,8 +152,8 @@ class EventChatScreen extends GetView<EventChatController> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.add_a_photo),
-                    onPressed: () => controller.uploadPhoto(),
+                    icon: const Icon(Icons.add_circle_outline),
+                    onPressed: () => _showMediaUploadOptions(context),
                   ),
                 ],
               ),
@@ -193,21 +194,41 @@ class EventChatScreen extends GetView<EventChatController> {
                   itemBuilder: (context, index) {
                     final photo = controller.photos[index];
                     return InkWell(
-                      onTap: () => _viewPhoto(context, photo),
+                      onTap: () => _viewMedia(context, photo),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          '${Get.find<EventosServices>().baseUrl.replaceAll('/api/event', '')}${photo.url}',
-                          headers: {
-                            'Authorization':
-                                'Bearer ${Get.find<AuthController>().token ?? ''}',
-                          },
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              Container(
-                                color: Colors.grey.shade300,
-                                child: const Icon(Icons.broken_image),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            Image.network(
+                              '${Get.find<EventosServices>().baseUrl.replaceAll('/api/event', '')}${photo.url}',
+                              headers: {
+                                'Authorization':
+                                    'Bearer ${Get.find<AuthController>().token ?? ''}',
+                              },
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Container(
+                                    color: Colors.grey.shade300,
+                                    child: const Icon(Icons.broken_image),
+                                  ),
+                            ),
+                            if (photo.type == 'video')
+                              Center(
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.5),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.play_arrow,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                ),
                               ),
+                          ],
                         ),
                       ),
                     );
@@ -222,34 +243,237 @@ class EventChatScreen extends GetView<EventChatController> {
     );
   }
 
-  void _viewPhoto(BuildContext context, EventoPhoto photo) {
+  void _showMediaUploadOptions(BuildContext context) {
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: context.theme.scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Compartir Multimedia',
+              style: context.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Abrir Galería'),
+              subtitle: const Text('Fotos y vídeos'),
+              onTap: () {
+                Get.back();
+                controller.uploadMedia(isGeneralGallery: true);
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Abrir Cámara'),
+              subtitle: const Text('Capturar foto o vídeo ahora'),
+              onTap: () {
+                Get.back();
+                Get.bottomSheet(
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: context.theme.scaffoldBackgroundColor,
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(24),
+                      ),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Cámara',
+                          style: context.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        ListTile(
+                          leading: const Icon(Icons.camera_alt),
+                          title: const Text('Tomar Foto'),
+                          onTap: () {
+                            Get.back();
+                            controller.uploadMedia(
+                              isVideo: false,
+                              fromCamera: true,
+                            );
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(Icons.videocam),
+                          title: const Text('Grabar Vídeo'),
+                          onTap: () {
+                            Get.back();
+                            controller.uploadMedia(
+                              isVideo: true,
+                              fromCamera: true,
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.videocam),
+              title: const Text('Cámara: Grabar Video'),
+              onTap: () {
+                Get.back();
+                controller.uploadMedia(isVideo: true, fromCamera: true);
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _viewMedia(BuildContext context, EventoPhoto media) {
     final fullUrl =
-        '${Get.find<EventosServices>().baseUrl.replaceAll('/api/event', '')}${photo.url}';
+        '${Get.find<EventosServices>().baseUrl.replaceAll('/api/event', '')}${media.url}';
     Get.to(
       Scaffold(
         backgroundColor: Colors.black,
         appBar: AppBar(
           backgroundColor: Colors.black,
           iconTheme: const IconThemeData(color: Colors.white),
+          title: Text(
+            media.type == 'video' ? 'Video' : 'Foto',
+            style: const TextStyle(color: Colors.white),
+          ),
           actions: [
             IconButton(
               icon: const Icon(Icons.download),
-              onPressed: () => controller.downloadPhoto(photo.url),
+              onPressed: () => controller.downloadMedia(media.url, media.type),
             ),
           ],
         ),
         body: Center(
-          child: InteractiveViewer(
-            child: Image.network(
-              fullUrl,
-              headers: {
-                'Authorization':
-                    'Bearer ${Get.find<AuthController>().token ?? ''}',
-              },
-            ),
-          ),
+          child: media.type == 'video'
+              ? _VideoPlayerWidget(url: fullUrl)
+              : InteractiveViewer(
+                  child: Image.network(
+                    fullUrl,
+                    headers: {
+                      'Authorization':
+                          'Bearer ${Get.find<AuthController>().token ?? ''}',
+                    },
+                  ),
+                ),
         ),
       ),
+    );
+  }
+}
+
+class _VideoPlayerWidget extends StatefulWidget {
+  final String url;
+  const _VideoPlayerWidget({required this.url});
+
+  @override
+  State<_VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
+}
+
+class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
+  late VideoPlayerController _controller;
+  bool _isError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        VideoPlayerController.networkUrl(
+            Uri.parse(widget.url),
+            httpHeaders: {
+              'Authorization':
+                  'Bearer ${Get.find<AuthController>().token ?? ''}',
+            },
+          )
+          ..initialize()
+              .then((_) {
+                setState(() {});
+                _controller.play();
+              })
+              .catchError((e) {
+                setState(() {
+                  _isError = true;
+                });
+              });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isError) {
+      return const Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.error_outline, color: Colors.white, size: 48),
+          SizedBox(height: 16),
+          Text(
+            'Error al cargar el video',
+            style: TextStyle(color: Colors.white),
+          ),
+        ],
+      );
+    }
+
+    if (!_controller.value.isInitialized) {
+      return const CircularProgressIndicator(color: Colors.white);
+    }
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Flexible(
+          child: AspectRatio(
+            aspectRatio: _controller.value.aspectRatio,
+            child: VideoPlayer(_controller),
+          ),
+        ),
+        const SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              icon: Icon(
+                _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+                color: Colors.white,
+                size: 32,
+              ),
+              onPressed: () {
+                setState(() {
+                  _controller.value.isPlaying
+                      ? _controller.pause()
+                      : _controller.play();
+                });
+              },
+            ),
+            Text(
+              "${_controller.value.position.inMinutes}:${(_controller.value.position.inSeconds % 60).toString().padLeft(2, '0')} / "
+              "${_controller.value.duration.inMinutes}:${(_controller.value.duration.inSeconds % 60).toString().padLeft(2, '0')}",
+              style: const TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
