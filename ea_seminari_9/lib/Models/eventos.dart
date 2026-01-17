@@ -1,3 +1,5 @@
+import 'user.dart';
+
 const List<String> listaCategorias = [
   'Fútbol',
   'Baloncesto',
@@ -113,6 +115,7 @@ class Evento {
   final bool isPrivate;
   final List<String> invitados;
   final List<String> invitacionesPendientes;
+  final List<User>? participantesFull;
   final String? creadorName;
   final String? creadorEmail;
 
@@ -130,6 +133,7 @@ class Evento {
     this.isPrivate = false,
     this.invitados = const [],
     this.invitacionesPendientes = const [],
+    this.participantesFull,
     this.creadorName,
     this.creadorEmail,
   });
@@ -153,6 +157,10 @@ class Evento {
       participantes: (json['participantes'] as List? ?? [])
           .map((p) => extractId(p))
           .where((id) => id.isNotEmpty)
+          .toList(),
+      participantesFull: (json['participantes'] as List? ?? [])
+          .where((p) => p is Map)
+          .map((p) => User.fromJson(p as Map<String, dynamic>))
           .toList(),
       listaEspera: (json['listaEspera'] as List? ?? [])
           .map((p) => extractId(p))

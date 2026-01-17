@@ -156,7 +156,8 @@
     "categories": "Categories",
     "filters": "Filters",
     "popular_week": "Popular this week",
-    "at_time": "at"
+    "at_time": "at",
+    "chat_participants": "Chat Participants"
   },
   "calendar": {
     "title": "Calendar",

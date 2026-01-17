@@ -6,6 +6,7 @@ import '../Models/event_chat.dart';
 import '../Models/evento_photo.dart';
 import '../Services/eventos_services.dart';
 import '../Controllers/auth_controller.dart';
+import '../Widgets/user_card.dart';
 import 'package:video_player/video_player.dart';
 
 class EventChatScreen extends GetView<EventChatController> {
@@ -41,7 +42,11 @@ class EventChatScreen extends GetView<EventChatController> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.photo_library),
+            icon: const Icon(Icons.people_outline),
+            onPressed: () => _showParticipants(context),
+          ),
+          IconButton(
+            icon: const Icon(Icons.photo_library_outlined),
             onPressed: () => _showPhotoGallery(context),
           ),
         ],
@@ -126,6 +131,82 @@ class EventChatScreen extends GetView<EventChatController> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showParticipants(BuildContext context) {
+    Get.bottomSheet(
+      Container(
+        height: Get.height * 0.7,
+        decoration: BoxDecoration(
+          color: context.theme.scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: context.theme.dividerColor.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Row(
+                children: [
+                  Text(
+                    translate('events.chat_participants'),
+                    style: context.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Obx(() {
+                // Filtramos para no mostrarnos a nosotros mismos en la lista
+                final participants = controller.event.value?.participantesFull
+                    ?.where((u) => u.id != controller.myUserId)
+                    .toList();
+
+                if (participants == null || participants.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.people_outline,
+                          size: 64,
+                          color: context.theme.hintColor.withValues(alpha: 0.3),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          translate('home.friends_section.empty_msg'),
+                          style: TextStyle(color: context.theme.hintColor),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: participants.length,
+                  itemBuilder: (context, index) {
+                    final user = participants[index];
+                    return UserCard(user: user);
+                  },
+                );
+              }),
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
     );
   }
 

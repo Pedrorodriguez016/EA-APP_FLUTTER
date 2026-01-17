@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:gal/gal.dart';
 import 'package:dio/dio.dart';
+import '../Models/eventos.dart';
 
 class EventChatController extends GetxController {
   final SocketService _socketService;
@@ -24,6 +25,7 @@ class EventChatController extends GetxController {
 
   var messages = <EventChatMessage>[].obs;
   var isLoading = false.obs;
+  var event = Rxn<Evento>();
 
   var photos = <EventoPhoto>[].obs;
   var isPhotosLoading = false.obs;
@@ -56,9 +58,22 @@ class EventChatController extends GetxController {
       '🏟️ EventChatController: Inicializando chat para el evento $eventName ($eventId)',
     );
     fetchEventHistory();
+    fetchEventDetails();
     _socketService.joinEventChatRoom(eventId);
     _socketService.listenToEventChatMessages(_handleNewMessage);
     _socketService.listenToChatErrors(_handleChatError);
+  }
+
+  Future<void> fetchEventDetails() async {
+    try {
+      final fetchedEvent = await _eventosServices.fetchEventById(eventId);
+      event.value = fetchedEvent;
+      logger.i(
+        '✅ Detalles del evento cargados con ${fetchedEvent.participantesFull?.length ?? 0} participantes detallados',
+      );
+    } catch (e) {
+      logger.e('❌ Error al cargar detalles del evento para el chat', error: e);
+    }
   }
 
   void _handleChatError(dynamic data) {
