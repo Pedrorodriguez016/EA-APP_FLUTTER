@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../Models/eventos.dart';
 import '../Controllers/eventos_controller.dart';
 import '../utils/app_theme.dart';
+import '../Widgets/address_autocomplete_field.dart';
 
 class CrearEventoScreen extends GetView<EventoController> {
   const CrearEventoScreen({super.key});
@@ -92,11 +93,13 @@ class CrearEventoScreen extends GetView<EventoController> {
             // --- ADDRESS ---
             _buildSectionTitle(context, translate('events.field_address')),
             const SizedBox(height: 12),
-            _buildTextField(
-              context,
-              controller.direccionController,
-              maxLines: 3,
-              icon: Icons.location_on_rounded,
+            AddressAutocompleteField(
+              controller: controller.direccionController,
+              countryCode: 'es', // Puedes cambiar esto según el país
+              onLocationSelected: (lat, lon) {
+                controller.selectedLat.value = lat;
+                controller.selectedLon.value = lon;
+              },
             ),
             const SizedBox(height: 24),
 

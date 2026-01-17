@@ -61,6 +61,8 @@ class EventoController extends GetxController {
   late TextEditingController capacidadMaximaController;
   var selectedSchedule = Rxn<DateTime>();
   var selectedCategoria = Rxn<String>(); // Añadido para categoría
+  var selectedLat = Rxn<double>(); // Coordenadas de la dirección seleccionada
+  var selectedLon = Rxn<double>();
   var isPrivate = false.obs;
   var friendsList = <User>[].obs;
   var selectedInvitedUsers = <String>[].obs;
@@ -296,6 +298,8 @@ class EventoController extends GetxController {
     capacidadMaximaController.clear();
     selectedSchedule.value = null;
     selectedCategoria.value = null;
+    selectedLat.value = null;
+    selectedLon.value = null;
     isPrivate.value = false;
     selectedInvitedUsers.clear();
   }
@@ -444,6 +448,12 @@ class EventoController extends GetxController {
         'isPrivate': isPrivate.value,
         'invitados': selectedInvitedUsers.toList(),
       };
+
+      // Agregar coordenadas si están disponibles
+      if (selectedLat.value != null && selectedLon.value != null) {
+        nuevoEventoData['lat'] = selectedLat.value;
+        nuevoEventoData['lng'] = selectedLon.value;
+      }
 
       // Agregar capacidad máxima solo si el usuario ingresó un valor
       if (capacidadText.isNotEmpty) {
