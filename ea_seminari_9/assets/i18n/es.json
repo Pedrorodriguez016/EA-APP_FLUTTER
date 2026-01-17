@@ -107,6 +107,7 @@
     "search_hint": "Buscar evento...",
     "empty_search": "No se encontraron eventos",
     "create_title": "Crear Evento",
+    "edit_title": "Editar Evento",
     "save_btn": "Guardar evento",
     "field_title": "Título del evento",
     "field_address": "Dirección",
@@ -141,7 +142,9 @@
       "load_error_title": "Error de Carga",
       "load_error_msg": "No se pudieron cargar los eventos",
       "login_to_participate": "Debes iniciar sesión para participar",
-      "load_my_events": "No se pudieron cargar tus eventos"
+      "load_my_events": "No se pudieron cargar tus eventos",
+      "confirm_delete_title": "Eliminar Evento",
+      "confirm_delete_msg": "¿Estás seguro de que quieres eliminar \"{name}\"?"
     },
     "chat_btn": "Chat del evento",
     "chat_subtitle": "Conversación grupal",
@@ -250,7 +253,10 @@
     },
     "gallery": "Galería",
     "camera": "Cámara",
-    "delete_photo": "Eliminar foto"
+    "delete_photo": "Eliminar foto",
+    "created_events": "Eventos que he creado",
+    "no_created_events": "Aún no has creado ningún evento",
+    "edit": "Editar"
   },
   "chatbot": {
     "title": "Asistente Virtual",

@@ -380,4 +380,27 @@ class EventosServices {
       return [];
     }
   }
+
+  Future<Evento> updateEvento(String id, Map<String, dynamic> data) async {
+    try {
+      logger.i('🔄 Actualizando evento: $id');
+      final response = await _client.put('/$id', data: data);
+      logger.i('✅ Evento actualizado exitosamente');
+      return Evento.fromJson(response.data);
+    } catch (e) {
+      logger.e('❌ Error al actualizar evento', error: e);
+      throw Exception('Error al actualizar el evento: $e');
+    }
+  }
+
+  Future<void> deleteEvento(String id) async {
+    try {
+      logger.i('🗑️ Eliminando evento: $id');
+      await _client.delete('/$id');
+      logger.i('✅ Evento eliminado exitosamente');
+    } catch (e) {
+      logger.e('❌ Error al eliminar evento', error: e);
+      throw Exception('Error al eliminar el evento: $e');
+    }
+  }
 }

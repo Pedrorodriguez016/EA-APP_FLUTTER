@@ -13,10 +13,14 @@ class CrearEventoScreen extends GetView<EventoController> {
     return Scaffold(
       backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(
-          translate('events.create_title'),
-          style: context.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
+        title: Obx(
+          () => Text(
+            controller.isEditing.value
+                ? translate('events.edit_title')
+                : translate('events.create_title'),
+            style: context.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         backgroundColor: Colors.transparent,
@@ -30,6 +34,8 @@ class CrearEventoScreen extends GetView<EventoController> {
           ),
           onPressed: () {
             controller.limpiarFormularioCrear();
+            controller.isEditing.value = false;
+            controller.editingEventoId.value = null;
             Get.back();
           },
         ),
@@ -230,7 +236,11 @@ class CrearEventoScreen extends GetView<EventoController> {
                     ),
                   ),
                   onPressed: () {
-                    controller.crearEvento();
+                    if (controller.isEditing.value) {
+                      controller.actualizarEvento();
+                    } else {
+                      controller.crearEvento();
+                    }
                   },
                 ),
               ),

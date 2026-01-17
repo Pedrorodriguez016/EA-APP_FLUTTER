@@ -105,6 +105,7 @@
     "search_hint": "Search event...",
     "empty_search": "No events found",
     "create_title": "Create Event",
+    "edit_title": "Edit Event",
     "save_btn": "Save event",
     "field_title": "Event title",
     "field_address": "Address",
@@ -139,7 +140,9 @@
       "load_error_title": "Load Error",
       "load_error_msg": "Could not load events. Please check your connection or server.",
       "login_to_participate": "You must log in to participate",
-      "load_my_events": "Could not load your events"
+      "load_my_events": "Could not load your events",
+      "confirm_delete_title": "Delete Event",
+      "confirm_delete_msg": "Are you sure you want to delete \"{name}\"?"
     },
     "chat_btn": "Enter chat",
     "chat_subtitle": "Event chat",
@@ -246,7 +249,10 @@
     },
     "gallery": "Gallery",
     "camera": "Camera",
-    "delete_photo": "Delete photo"
+    "delete_photo": "Delete photo",
+    "created_events": "Events I've created",
+    "no_created_events": "You haven't created any events yet",
+    "edit": "Edit"
   },
   "chatbot": {
     "title": "Virtual Assistant",

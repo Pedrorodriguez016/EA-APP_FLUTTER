@@ -65,6 +65,10 @@ class EventoController extends GetxController {
   var friendsList = <User>[].obs;
   var selectedInvitedUsers = <String>[].obs;
   var isLoadingFriends = false.obs;
+
+  // --- MODO EDICIÓN ---
+  var isEditing = false.obs;
+  var editingEventoId = Rxn<String>();
   final UserServices _userServices = UserServices();
   var userLocation = Rxn<LatLng>();
   var isLoadingLocation = false.obs;
@@ -448,6 +452,109 @@ class EventoController extends GetxController {
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
+    }
+  }
+
+  void cargarEventoParaEditar(Evento evento) {
+    isEditing.value = true;
+    editingEventoId.value = evento.id;
+
+    tituloController.text = evento.name;
+    direccionController.text = evento.address;
+    capacidadMaximaController.text = evento.capacidadMaxima != null
+        ? evento.capacidadMaxima.toString()
+        : '';
+
+    if (evento.schedule.isNotEmpty) {
+      try {
+        selectedSchedule.value = DateTime.parse(evento.schedule);
+      } catch (e) {
+        logger.w('Error al parsear fecha del evento: ${evento.schedule}');
+      }
+    }
+
+    selectedCategoria.value = evento.categoria;
+    isPrivate.value = evento.isPrivate;
+
+    // Poblar usuarios invitados si es privado
+    selectedInvitedUsers.assignAll(evento.invitacionesPendientes);
+
+    Get.toNamed('/crear_evento');
+  }
+
+  Future<void> actualizarEvento() async {
+    final String id = editingEventoId.value!;
+    final String titulo = tituloController.text;
+    final String direccion = direccionController.text;
+    final capacidadText = capacidadMaximaController.text.trim();
+
+    if (titulo.isEmpty ||
+        selectedSchedule.value == null ||
+        selectedCategoria.value == null) {
+      Get.snackbar(
+        translate('common.error'),
+        'Por favor, completa los campos obligatorios.',
+        backgroundColor: Colors.orange,
+      );
+      return;
+    }
+
+    try {
+      final Map<String, dynamic> updateData = {
+        'name': titulo,
+        'address': direccion,
+        'schedule': selectedSchedule.value!.toIso8601String(),
+        'categoria': selectedCategoria.value!,
+        'isPrivate': isPrivate.value,
+        'invitados': selectedInvitedUsers.toList(),
+      };
+
+      if (capacidadText.isNotEmpty) {
+        updateData['maxParticipantes'] = int.parse(capacidadText);
+      } else {
+        updateData['maxParticipantes'] = null;
+      }
+
+      final updatedEvento = await _eventosServices.updateEvento(id, updateData);
+
+      Get.back();
+      limpiarFormularioCrear();
+      isEditing.value = false;
+      editingEventoId.value = null;
+
+      Get.snackbar(
+        translate('common.success'),
+        'Evento actualizado correctamente',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+
+      _updateEventInLists(updatedEvento);
+      fetchMisEventosEspecificos(); // Recargar mis eventos creados
+    } catch (e) {
+      Get.snackbar(
+        translate('common.error'),
+        e.toString(),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  Future<void> eliminarEvento(String id) async {
+    try {
+      await _eventosServices.deleteEvento(id);
+      eventosList.removeWhere((e) => e.id == id);
+      misEventosCreados.removeWhere((e) => e.id == id);
+
+      Get.snackbar(
+        'Eliminado',
+        'El evento ha sido eliminado',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      Get.snackbar('Error', 'No se pudo eliminar el evento');
     }
   }
 

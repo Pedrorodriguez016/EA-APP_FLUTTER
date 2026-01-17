@@ -10,11 +10,14 @@ import '../Controllers/gamificacion_controller.dart';
 import '../utils/app_theme.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import '../Models/eventos.dart';
+import '../Controllers/eventos_controller.dart';
 
 class ProfileScreen extends GetView<UserController> {
   ProfileScreen({super.key});
   final authController = Get.find<AuthController>();
   final gamificacionController = Get.put(GamificacionController());
+  final eventoController = Get.find<EventoController>();
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +27,11 @@ class ProfileScreen extends GetView<UserController> {
     final birthdayController = TextEditingController(
       text: user?.birthday ?? '',
     );
+
+    // Cargar mis eventos al entrar
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      eventoController.fetchMisEventosEspecificos();
+    });
 
     return Scaffold(
       backgroundColor: context.theme.scaffoldBackgroundColor,
@@ -76,6 +84,9 @@ class ProfileScreen extends GetView<UserController> {
                   ),
                   const SizedBox(height: 16),
                   const GamificacionCard(),
+
+                  const SizedBox(height: 32),
+                  _buildMyEventsSection(context),
 
                   const SizedBox(height: 32),
                   Text(
@@ -537,6 +548,282 @@ class ProfileScreen extends GetView<UserController> {
             vertical: 16,
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildMyEventsSection(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: context.theme.cardColor,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _showMyEventsBottomSheet(context),
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: context.theme.colorScheme.primary.withValues(
+                      alpha: 0.1,
+                    ),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.event_note_rounded,
+                    color: context.theme.colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        translate('profile.created_events'),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      Obx(
+                        () => Text(
+                          '${eventoController.misEventosCreados.length} ${translate('events.list_title').toLowerCase()}',
+                          style: TextStyle(
+                            color: context.theme.hintColor,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 16,
+                  color: context.theme.hintColor,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showMyEventsBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: context.height * 0.85,
+        decoration: BoxDecoration(
+          color: context.theme.scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: context.theme.dividerColor.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Row(
+                children: [
+                  Text(
+                    translate('profile.created_events'),
+                    style: context.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Obx(() {
+                if (eventoController.isLoading.value &&
+                    eventoController.misEventosCreados.isEmpty) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (eventoController.misEventosCreados.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.event_note_rounded,
+                          size: 60,
+                          color: context.theme.hintColor.withValues(alpha: 0.3),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          translate('profile.no_created_events'),
+                          style: TextStyle(
+                            color: context.theme.hintColor,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  itemCount: eventoController.misEventosCreados.length,
+                  itemBuilder: (context, index) {
+                    final evento = eventoController.misEventosCreados[index];
+                    return _buildEventManagementCard(context, evento);
+                  },
+                );
+              }),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEventManagementCard(BuildContext context, Evento evento) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: context.theme.cardColor,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: context.theme.colorScheme.primary.withValues(
+                    alpha: 0.1,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.event_available_rounded,
+                  color: context.theme.colorScheme.primary,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      evento.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      evento.categoria,
+                      style: TextStyle(
+                        color: context.theme.hintColor,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () =>
+                      eventoController.cargarEventoParaEditar(evento),
+                  icon: const Icon(Icons.edit_rounded, size: 18),
+                  label: Text(translate('profile.edit')),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              IconButton(
+                onPressed: () {
+                  Get.dialog(
+                    AlertDialog(
+                      title: Text(
+                        translate('events.errors.confirm_delete_title'),
+                      ),
+                      content: Text(
+                        translate(
+                          'events.errors.confirm_delete_msg',
+                          args: {'name': evento.name},
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Get.back(),
+                          child: Text(translate('common.cancel')),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Get.back();
+                            eventoController.eliminarEvento(evento.id);
+                          },
+                          child: Text(
+                            translate('common.delete'),
+                            style: const TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                icon: const Icon(
+                  Icons.delete_outline_rounded,
+                  color: Colors.red,
+                ),
+                tooltip: 'Eliminar',
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
