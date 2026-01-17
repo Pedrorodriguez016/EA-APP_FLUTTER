@@ -62,7 +62,6 @@
       "password_mismatch": "Las contraseñas no coinciden",
       "birthday_empty": "Por favor ingresa tu fecha de nacimiento",
       "birthday_invalid": "Fecha inválida",
-      "age_restriction": "Debes ser mayor de 13 años",
       "not_authenticated": "Usuario no autenticado",
       "password_weak": "La contraseña es débil",
       "password_medium": "Contraseña media",
@@ -296,5 +295,12 @@
     "titulo": "Notificaciones",
     "vacia": "No tienes notificaciones",
     "marcar_todas_leidas": "Marcar todas como leídas"
+  },
+  "invitations": {
+    "title": "Invitaciones a Eventos",
+    "pending": "Invitaciones Pendientes",
+    "empty_msg": "No tienes invitaciones por ahora",
+    "accept": "Aceptar",
+    "reject": "Rechazar"
   }
 }

@@ -212,7 +212,7 @@ class EventosDetailScreen extends GetView<EventoController> {
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () =>
-                              controller.respondToInvitation(false),
+                              controller.respondToInvitation(null, false),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.redAccent,
                             foregroundColor: Colors.white,
@@ -233,7 +233,7 @@ class EventosDetailScreen extends GetView<EventoController> {
                           ),
                           child: ElevatedButton(
                             onPressed: () =>
-                                controller.respondToInvitation(true),
+                                controller.respondToInvitation(null, true),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
                               foregroundColor: Colors.white,

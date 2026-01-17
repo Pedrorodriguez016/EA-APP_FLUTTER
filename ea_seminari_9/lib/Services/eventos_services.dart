@@ -367,4 +367,17 @@ class EventosServices {
       return [];
     }
   }
+
+  Future<List<Evento>> fetchPendingInvitations() async {
+    try {
+      logger.d('📩 Obteniendo invitaciones pendientes');
+      final response = await _client.get('/invitations/pending');
+      final List<dynamic> data = response.data['invitaciones'] ?? [];
+      logger.i('✅ Invitaciones pendientes obtenidas: ${data.length}');
+      return data.map((json) => Evento.fromJson(json)).toList();
+    } catch (e) {
+      logger.e('❌ Error en fetchPendingInvitations', error: e);
+      return [];
+    }
+  }
 }

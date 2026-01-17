@@ -291,5 +291,12 @@
     "titulo": "Notifications",
     "vacia": "You have no notifications",
     "marcar_todas_leidas": "Mark all as read"
+  },
+  "invitations": {
+    "title": "Event Invitations",
+    "pending": "Pending Invitations",
+    "empty_msg": "No invitations for now",
+    "accept": "Accept",
+    "reject": "Reject"
   }
 }

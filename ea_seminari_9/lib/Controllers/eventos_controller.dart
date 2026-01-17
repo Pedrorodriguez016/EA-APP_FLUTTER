@@ -31,6 +31,7 @@ class EventoController extends GetxController {
   var totalPages = 1.obs;
   var totalEventos = 0.obs;
   var isSearching = false.obs;
+  var misInvitaciones = <Evento>[].obs;
 
   // Fotos del evento
   var eventoPhotos = <EventoPhoto>[].obs;
@@ -82,6 +83,7 @@ class EventoController extends GetxController {
     selectedSchedule.value = null;
     fetchEventos(1);
     fetchRecommended();
+    fetchPendingInvitations();
     _getUserLocation();
     scrollController.addListener(_scrollListener);
     ever(_authController.currentUser, (user) {
@@ -655,16 +657,16 @@ class EventoController extends GetxController {
     }
   }
 
-  Future<void> respondToInvitation(bool accept) async {
-    final event = selectedEvento.value;
-    if (event == null) return;
+  Future<void> respondToInvitation(Evento? event, bool accept) async {
+    final eventToUse = event ?? selectedEvento.value;
+    if (eventToUse == null) return;
 
     try {
       isLoading(true);
       Evento updatedEvento;
 
       if (accept) {
-        updatedEvento = await _eventosServices.acceptInvitation(event.id);
+        updatedEvento = await _eventosServices.acceptInvitation(eventToUse.id);
         Get.snackbar(
           'Éxito',
           'Invitación aceptada',
@@ -672,7 +674,7 @@ class EventoController extends GetxController {
           colorText: Colors.white,
         );
       } else {
-        updatedEvento = await _eventosServices.rejectInvitation(event.id);
+        updatedEvento = await _eventosServices.rejectInvitation(eventToUse.id);
         Get.snackbar(
           'Información',
           'Invitación rechazada',
@@ -681,8 +683,15 @@ class EventoController extends GetxController {
         );
       }
 
-      selectedEvento.value = updatedEvento;
+      if (event == null) {
+        selectedEvento.value = updatedEvento;
+      }
+
+      // Quitar de la lista de invitaciones si estaba allí
+      misInvitaciones.removeWhere((e) => e.id == eventToUse.id);
+
       _updateEventInLists(updatedEvento);
+      fetchPendingInvitations(); // Recargar para estar seguros
     } catch (e) {
       Get.snackbar(
         'Error',
@@ -692,6 +701,15 @@ class EventoController extends GetxController {
       );
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> fetchPendingInvitations() async {
+    try {
+      final invitaciones = await _eventosServices.fetchPendingInvitations();
+      misInvitaciones.assignAll(invitaciones);
+    } catch (e) {
+      logger.e('Error fetching pending invitations: $e');
     }
   }
 

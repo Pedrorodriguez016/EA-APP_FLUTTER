@@ -113,6 +113,8 @@ class Evento {
   final bool isPrivate;
   final List<String> invitados;
   final List<String> invitacionesPendientes;
+  final String? creadorName;
+  final String? creadorEmail;
 
   Evento({
     required this.id,
@@ -128,6 +130,8 @@ class Evento {
     this.isPrivate = false,
     this.invitados = const [],
     this.invitacionesPendientes = const [],
+    this.creadorName,
+    this.creadorEmail,
   });
 
   factory Evento.fromJson(Map<String, dynamic> json) {
@@ -164,6 +168,12 @@ class Evento {
           .map((i) => extractId(i))
           .where((id) => id.isNotEmpty)
           .toList(),
+      creadorName: json['creador'] is Map
+          ? (json['creador']['username'] ?? '').toString()
+          : null,
+      creadorEmail: json['creador'] is Map
+          ? (json['creador']['gmail'] ?? '').toString()
+          : null,
     );
   }
   Map<String, dynamic> toJson() {
