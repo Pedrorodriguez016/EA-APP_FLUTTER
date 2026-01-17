@@ -135,6 +135,17 @@ class SocketService extends GetxService {
     _socket.off('notification:new');
   }
 
+  void listenToFriendRequests(Function(dynamic) onRequestReceived) {
+    _socket.on('friendRequest:received', (data) {
+      logger.d('🔍 [SocketService] RAW friendRequest:received: $data');
+      onRequestReceived(data);
+    });
+  }
+
+  void stopListeningToFriendRequests() {
+    _socket.off('friendRequest:received');
+  }
+
   void disconnect() {
     try {
       if (_socket.connected) {

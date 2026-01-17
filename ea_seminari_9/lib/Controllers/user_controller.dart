@@ -326,6 +326,27 @@ class UserController extends GetxController {
     try {
       final userId = authController.currentUser.value!.id;
       await _userServices.sendFriendRequest(userId, targetUserId);
+
+      // Update local user state
+      final currentUser = authController.currentUser.value!;
+      final updatedSentRequests = List<String>.from(
+        currentUser.sentRequests ?? [],
+      );
+      updatedSentRequests.add(targetUserId);
+
+      authController.currentUser.value = User(
+        id: currentUser.id,
+        username: currentUser.username,
+        gmail: currentUser.gmail,
+        birthday: currentUser.birthday,
+        profilePhoto: currentUser.profilePhoto, // Keep existing photo
+        token: currentUser.token,
+        refreshToken: currentUser.refreshToken,
+        online: currentUser.online,
+        blockedUsers: currentUser.blockedUsers,
+        sentRequests: updatedSentRequests,
+        interests: currentUser.interests,
+      );
       Get.snackbar(
         translate('common.success'),
         translate('users.req_sent'), // 'Solicitud de amistad enviada'
@@ -351,11 +372,43 @@ class UserController extends GetxController {
     if (userId != null && userId.isNotEmpty) {
       logger.i('🔌 Inicializando conexión Socket para $userId');
       _socketService.connectWithUserId(userId);
+
+      // Escuchar solicitudes de amistad en tiempo real
+      _socketService.listenToFriendRequests((data) {
+        logger.i('📨 Solicitud de amistad recibida por socket: $data');
+        try {
+          final newUser = User(
+            id: data['fromUserId'],
+            username: data['fromUsername'],
+            gmail: data['fromGmail'],
+            birthday:
+                '', // No viene en el socket, pero no es crítico para la card
+          );
+
+          // Evitar duplicados
+          if (!friendsRequests.any((u) => u.id == newUser.id)) {
+            friendsRequests.add(newUser);
+            Get.snackbar(
+              translate('common.new_notification'),
+              '${newUser.username} ${translate('notifications.friend_req')}',
+              backgroundColor: Colors.blue,
+              colorText: Colors.white,
+              snackPosition: SnackPosition.TOP,
+            );
+          }
+        } catch (e) {
+          logger.e(
+            'Error procesando solicitud de amistad por socket',
+            error: e,
+          );
+        }
+      });
     }
   }
 
   @override
   void onClose() {
+    _socketService.stopListeningToFriendRequests();
     // No desconectamos el socket aquí porque es un servicio global
     // que necesitamos para las notificaciones en segundo plano.
     super.onClose();

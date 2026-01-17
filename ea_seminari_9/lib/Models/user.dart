@@ -9,6 +9,7 @@ class User {
   final String? refreshToken;
   final bool? online;
   final List<String>? blockedUsers;
+  final List<String>? sentRequests;
   final List<String>? interests;
 
   User({
@@ -22,6 +23,7 @@ class User {
     this.token,
     this.refreshToken,
     this.blockedUsers,
+    this.sentRequests,
     this.interests,
   });
 
@@ -37,6 +39,9 @@ class User {
       online: json['online'],
       blockedUsers: json['blockedUsers'] != null
           ? List<String>.from(json['blockedUsers'])
+          : null,
+      sentRequests: json['sentRequests'] != null
+          ? List<String>.from(json['sentRequests'])
           : null,
       interests: json['interests'] != null
           ? List<String>.from(json['interests'])
@@ -54,6 +59,7 @@ class User {
       'profilePhoto': profilePhoto,
       'online': online,
       'blockedUsers': blockedUsers,
+      'sentRequests': sentRequests,
       'interests': interests,
     };
   }

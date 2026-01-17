@@ -141,6 +141,19 @@ class UserCard extends GetView<UserController> {
                       color: context.theme.hintColor,
                     );
                   }
+
+                  final bool isRequestSent =
+                      controller.authController.currentUser.value?.sentRequests
+                          ?.contains(user.id) ??
+                      false;
+
+                  if (isRequestSent) {
+                    return Icon(
+                      Icons.access_time_filled_rounded,
+                      size: 24,
+                      color: context.theme.disabledColor,
+                    );
+                  }
                   return Container(
                     decoration: BoxDecoration(
                       color: context.theme.colorScheme.primary.withValues(
