@@ -6,6 +6,7 @@ import '../Controllers/user_controller.dart';
 import '../Controllers/eventos_controller.dart';
 import '../Widgets/user_card.dart';
 import '../Widgets/solicitudes.dart';
+import '../Widgets/event_invitations_dialog.dart';
 import 'friends_bottomsheet.dart';
 import '../utils/app_theme.dart';
 
@@ -337,143 +338,19 @@ class GlobalDrawer extends StatelessWidget {
             ],
           ),
         ),
-        Obx(() {
-          if (eventoController.isLoading.value &&
-              eventoController.misInvitaciones.isEmpty) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: CircularProgressIndicator(strokeWidth: 2),
-              ),
+        _buildDrawerItem(
+          context,
+          icon: Icons.event_note_rounded,
+          title: translate('invitations.pending'),
+          onTap: () {
+            EventInvitationsDialog.show(
+              context,
+              invitations: eventoController.misInvitaciones,
+              onRespond: (evento, accept) =>
+                  eventoController.respondToInvitation(evento, accept),
             );
-          }
-
-          if (eventoController.misInvitaciones.isEmpty) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Text(
-                translate('invitations.empty_msg'),
-                style: context.textTheme.bodySmall,
-              ),
-            );
-          }
-
-          return ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            itemCount: eventoController.misInvitaciones.length,
-            itemBuilder: (context, index) {
-              final evento = eventoController.misInvitaciones[index];
-              return Card(
-                elevation: 0,
-                color: context.theme.cardColor.withValues(alpha: 0.5),
-                margin: const EdgeInsets.only(bottom: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(
-                    color: context.theme.dividerColor.withValues(alpha: 0.05),
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: context.theme.colorScheme.primary
-                                  .withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Icon(
-                              Icons.event_note_rounded,
-                              color: context.theme.colorScheme.primary,
-                              size: 20,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  evento.name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                Text(
-                                  'De: ${evento.creadorName ?? "Invitado"}',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: context.theme.hintColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TextButton(
-                              onPressed: () => eventoController
-                                  .respondToInvitation(evento, false),
-                              style: TextButton.styleFrom(
-                                foregroundColor:
-                                    context.theme.colorScheme.error,
-                                padding: EdgeInsets.zero,
-                                minimumSize: const Size(0, 32),
-                              ),
-                              child: Text(
-                                translate('invitations.reject'),
-                                style: const TextStyle(fontSize: 13),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () => eventoController
-                                  .respondToInvitation(evento, true),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    context.theme.colorScheme.primary,
-                                foregroundColor: Colors.white,
-                                elevation: 0,
-                                padding: EdgeInsets.zero,
-                                minimumSize: const Size(0, 32),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: Text(
-                                translate('invitations.accept'),
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          );
-        }),
+          },
+        ),
       ],
     );
   }

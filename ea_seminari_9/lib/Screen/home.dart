@@ -19,9 +19,7 @@ class HomeScreen extends GetView<UserController> {
   HomeScreen({super.key});
 
   final AuthController authController = Get.find<AuthController>();
-  final EventoController eventoController = Get.put(
-    EventoController(EventosServices()),
-  );
+  final EventoController eventoController = Get.find<EventoController>();
   final NotificacionController notifController =
       Get.find<NotificacionController>();
 

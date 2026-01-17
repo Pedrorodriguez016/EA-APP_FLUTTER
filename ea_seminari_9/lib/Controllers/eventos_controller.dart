@@ -9,6 +9,7 @@ import 'auth_controller.dart';
 import '../utils/logger.dart';
 import 'package:ea_seminari_9/Models/user.dart';
 import 'package:ea_seminari_9/Services/user_services.dart';
+import 'package:ea_seminari_9/Services/socket_services.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ea_seminari_9/Models/evento_photo.dart';
@@ -72,12 +73,13 @@ class EventoController extends GetxController {
   var isEditing = false.obs;
   var editingEventoId = Rxn<String>();
   final UserServices _userServices = UserServices();
+  final SocketService _socketService;
   var userLocation = Rxn<LatLng>();
   var isLoadingLocation = false.obs;
   // Barcelona como ubicación por defecto
   final LatLng defaultLocation = const LatLng(41.3851, 2.1734);
 
-  EventoController(this._eventosServices);
+  EventoController(this._eventosServices, this._socketService);
   final ScrollController scrollController = ScrollController();
 
   @override
@@ -92,11 +94,82 @@ class EventoController extends GetxController {
     fetchPendingInvitations();
     _getUserLocation();
     scrollController.addListener(_scrollListener);
+
+    // Registrar listener de invitaciones después de un pequeño delay
+    // para asegurar que el socket esté conectado
+    Future.delayed(const Duration(milliseconds: 500), () {
+      _initSocketConnection();
+    });
+
     ever(_authController.currentUser, (user) {
       if (user != null) {
         refreshEventos();
+        // Re-inicializar socket cuando cambia el usuario
+        Future.delayed(const Duration(milliseconds: 500), () {
+          _initSocketConnection();
+        });
       }
     });
+  }
+
+  void _initSocketConnection() {
+    final userId = _authController.currentUser.value?.id;
+
+    if (userId != null && userId.isNotEmpty) {
+      logger.i(
+        '🔌 [EventoController] Inicializando conexión Socket para invitaciones de eventos - User: $userId',
+      );
+
+      // Detener cualquier listener anterior para evitar duplicados
+      _socketService.stopListeningToEventInvitations();
+
+      // Escuchar invitaciones a eventos en tiempo real
+      _socketService.listenToEventInvitations((data) {
+        logger.i(
+          '📨 [EventoController] Invitación a evento recibida por socket: $data',
+        );
+        try {
+          final eventId = data['eventId'] as String?;
+          final eventName = data['eventName'] as String?;
+          final fromUsername = data['fromUsername'] as String?;
+
+          if (eventName == null || fromUsername == null) {
+            logger.w('⚠️ [EventoController] Datos incompletos en invitación');
+            return;
+          }
+
+          logger.i(
+            '✅ [EventoController] Procesando invitación: $fromUsername invitó a "$eventName"',
+          );
+
+          // Refrescar la lista de invitaciones
+          fetchPendingInvitations();
+
+          // Mostrar notificación al usuario
+          Get.snackbar(
+            translate('common.new_notification'),
+            '$fromUsername ${translate('events.invited_you_to')} "$eventName"',
+            backgroundColor: Colors.blue,
+            colorText: Colors.white,
+            snackPosition: SnackPosition.TOP,
+            duration: const Duration(seconds: 4),
+          );
+        } catch (e) {
+          logger.e(
+            '[EventoController] Error procesando invitación a evento por socket',
+            error: e,
+          );
+        }
+      });
+
+      logger.i(
+        '✅ [EventoController] Listener de invitaciones registrado correctamente',
+      );
+    } else {
+      logger.w(
+        '⚠️ [EventoController] No se puede inicializar socket: userId no disponible',
+      );
+    }
   }
 
   @override
@@ -106,6 +179,7 @@ class EventoController extends GetxController {
     capacidadMaximaController.dispose();
     _debounce?.cancel();
     scrollController.removeListener(_scrollListener);
+    _socketService.stopListeningToEventInvitations();
     super.onClose();
   }
 
@@ -847,10 +921,27 @@ class EventoController extends GetxController {
 
   Future<void> fetchPendingInvitations() async {
     try {
+      logger.i('📥 [EventoController] Obteniendo invitaciones pendientes...');
       final invitaciones = await _eventosServices.fetchPendingInvitations();
+      logger.i(
+        '✅ [EventoController] Invitaciones recibidas: ${invitaciones.length}',
+      );
+
+      if (invitaciones.isNotEmpty) {
+        for (var inv in invitaciones) {
+          logger.d('   - ${inv.name} (ID: ${inv.id})');
+        }
+      }
+
       misInvitaciones.assignAll(invitaciones);
+      logger.i(
+        '✅ [EventoController] misInvitaciones actualizado: ${misInvitaciones.length}',
+      );
     } catch (e) {
-      logger.e('Error fetching pending invitations: $e');
+      logger.e(
+        '❌ [EventoController] Error fetching pending invitations',
+        error: e,
+      );
     }
   }
 

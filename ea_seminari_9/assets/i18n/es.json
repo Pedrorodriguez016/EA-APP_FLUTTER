@@ -16,7 +16,8 @@
     "no": "No",
     "fix_errors": "Por favor corrige los errores",
     "user": "Usuario",
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "new_notification": "Nueva notificación"
   },
   "auth": {
     "login": {
@@ -159,7 +160,8 @@
     "filters": "Filtros",
     "popular_week": "Populares esta semana",
     "at_time": "a las",
-    "chat_participants": "Participantes del chat"
+    "chat_participants": "Participantes del chat",
+    "invited_you_to": "te ha invitado a"
   },
   "calendar": {
     "title": "Calendario",
