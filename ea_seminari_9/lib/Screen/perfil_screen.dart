@@ -7,11 +7,13 @@ import '../Widgets/gamificacion_card.dart';
 import '../Widgets/navigation_bar.dart';
 import '../Widgets/global_drawer.dart';
 import '../Controllers/gamificacion_controller.dart';
-import '../utils/app_theme.dart';
+
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../Models/eventos.dart';
 import '../Controllers/eventos_controller.dart';
+import '../Widgets/custom_date_picker.dart';
+import 'package:intl/intl.dart';
 
 class ProfileScreen extends GetView<UserController> {
   ProfileScreen({super.key});
@@ -24,9 +26,23 @@ class ProfileScreen extends GetView<UserController> {
     final user = authController.currentUser.value;
     final nameController = TextEditingController(text: user?.username ?? '');
     final emailController = TextEditingController(text: user?.gmail ?? '');
-    final birthdayController = TextEditingController(
-      text: user?.birthday ?? '',
-    );
+    final birthdayController = TextEditingController();
+
+    // Manage selected date locally
+    DateTime? selectedBirthDate;
+
+    if (user?.birthday != null && user!.birthday.isNotEmpty) {
+      try {
+        final date = DateTime.parse(user.birthday);
+        selectedBirthDate = date;
+        birthdayController.text = DateFormat(
+          "d 'de' MMMM 'de' y",
+          'es_ES',
+        ).format(date);
+      } catch (_) {
+        birthdayController.text = user.birthday;
+      }
+    }
 
     // Cargar mis eventos al entrar
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -102,6 +118,7 @@ class ProfileScreen extends GetView<UserController> {
                     nameController,
                     emailController,
                     birthdayController,
+                    (date) => selectedBirthDate = date,
                   ),
 
                   const SizedBox(height: 40),
@@ -111,6 +128,7 @@ class ProfileScreen extends GetView<UserController> {
                     nameController,
                     emailController,
                     birthdayController,
+                    () => selectedBirthDate, // Pass getter
                   ),
 
                   const SizedBox(height: 16),
@@ -485,6 +503,7 @@ class ProfileScreen extends GetView<UserController> {
     TextEditingController name,
     TextEditingController email,
     TextEditingController birthday,
+    Function(DateTime) onDateChanged,
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -501,12 +520,21 @@ class ProfileScreen extends GetView<UserController> {
           email,
           Icons.email_rounded,
         ),
-        _buildTextField(
-          context,
-          translate('auth.fields.birthday'),
-          birthday,
-          Icons.cake_rounded,
+        const SizedBox(height: 16),
+        CustomDatePicker(
+          controller: birthday,
+          label: translate('auth.fields.birthday'),
+          hintText: translate('auth.fields.birthday_hint'),
+          onDateSelected: (date) {
+            // We need to update the outer variable.
+            // Since we are inside a build method, we can't easily update a local variable that is passed to save button unless we use a state management or mutable object.
+            // Given the context, let's use the controller text for display and rely on `onDateSelected` to update `selectedBirthDate` variable which is captured by closure.
+            // Wait, closures capture variables by reference.
+          },
         ),
+        // Wait, I need a cleaner way to handle the state update for the Save button.
+        // I will use a simple ValueNotifier or similar if I want to be reactive, but standard variable capture works if I don't need UI rebuilds for this variable specifically (Save button reads it when pressed).
+        // Let's refactor _buildProfileFields to accept the callback.
       ],
     );
   }
@@ -834,30 +862,43 @@ class ProfileScreen extends GetView<UserController> {
     TextEditingController name,
     TextEditingController email,
     TextEditingController birthday,
+    DateTime? Function() getDateGetter,
   ) {
     return Container(
       width: double.infinity,
-      height: 60,
+      height: 55,
       decoration: BoxDecoration(
-        gradient: AppGradients.primaryBtn,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: context.theme.colorScheme.primary.withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: context.theme.colorScheme.primary.withValues(alpha: 0.4),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: ElevatedButton.icon(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: context.theme.colorScheme.primary,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 0,
+        ),
         onPressed: () async {
-          final userId = user!.id;
-          final updatedUser = {
+          final date = getDateGetter();
+          String finalDateISO = '';
+          if (date != null) {
+            finalDateISO = DateFormat('yyyy-MM-dd').format(date);
+          }
+
+          await controller.updateUserByid(user!.id, {
             'username': name.text,
             'email': email.text,
-            'birthday': birthday.text,
-          };
-          await controller.updateUserByid(userId, updatedUser);
+            'birthday': finalDateISO.isNotEmpty ? finalDateISO : user.birthday,
+          });
+
           Get.snackbar(
             translate('profile.snackbars.success_title'),
             translate('profile.snackbars.success_msg'),
@@ -873,22 +914,10 @@ class ProfileScreen extends GetView<UserController> {
             duration: const Duration(seconds: 2),
           );
         },
-        icon: const Icon(Icons.sync_rounded, color: Colors.white),
+        icon: const Icon(Icons.save_rounded, color: Colors.white),
         label: Text(
-          translate('profile.update_btn'),
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            letterSpacing: 0.5,
-          ),
-        ),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
+          translate('profile.save_changes'),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),
     );

@@ -5,6 +5,8 @@ import '../Controllers/auth_controller.dart';
 import '../Models/user.dart';
 import '../utils/app_theme.dart';
 import 'package:password_strength_checker/password_strength_checker.dart';
+import '../Widgets/custom_date_picker.dart';
+import 'package:intl/intl.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -40,6 +42,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  DateTime? _selectedBirthDate; // Variable to hold the actual date object
 
   final _formKey = GlobalKey<FormState>();
 
@@ -204,35 +207,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   String? _validateBirthday(String? value) {
-    if (value == null || value.isEmpty) {
+    if (_selectedBirthDate == null) {
       return translate('auth.errors.birthday_empty');
     }
-    if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {
+
+    final now = DateTime.now();
+    final birthday = _selectedBirthDate!;
+
+    // Cálculo exacto de edad
+    int age = now.year - birthday.year;
+    final monthDiff = now.month - birthday.month;
+    if (monthDiff < 0 || (monthDiff == 0 && now.day < birthday.day)) {
+      age--;
+    }
+
+    if (birthday.isAfter(now)) {
       return translate('auth.errors.birthday_invalid');
     }
-    try {
-      final parts = value.split('-');
-      final year = int.parse(parts[0]);
-      final month = int.parse(parts[1]);
-      final day = int.parse(parts[2]);
-      final birthday = DateTime(year, month, day);
-      final now = DateTime.now();
+    if (age < 13) return translate('auth.errors.age_restriction');
+    if (age > 120) return translate('auth.errors.birthday_invalid');
 
-      // Cálculo exacto de edad
-      int age = now.year - birthday.year;
-      final monthDiff = now.month - birthday.month;
-      if (monthDiff < 0 || (monthDiff == 0 && now.day < birthday.day)) {
-        age--;
-      }
-
-      if (birthday.isAfter(now)) {
-        return translate('auth.errors.birthday_invalid');
-      }
-      if (age < 13) return translate('auth.errors.age_restriction');
-      if (age > 120) return translate('auth.errors.birthday_invalid');
-    } catch (e) {
-      return translate('auth.errors.birthday_invalid');
-    }
     return null;
   }
 
@@ -512,12 +506,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
             validator: _validateConfirmPassword,
           ),
           const SizedBox(height: 16),
-          _buildTextField(
+          CustomDatePicker(
             controller: birthdayController,
             label: translate('auth.fields.birthday'),
-            icon: Icons.cake_rounded,
             hintText: translate('auth.fields.birthday_hint'),
             validator: _validateBirthday,
+            onDateSelected: (date) {
+              _selectedBirthDate = date;
+            },
           ),
           const SizedBox(height: 32),
 
@@ -776,7 +772,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         id: '',
         username: usernameController.text,
         gmail: gmailController.text,
-        birthday: birthdayController.text,
+        birthday: DateFormat(
+          'yyyy-MM-dd',
+        ).format(_selectedBirthDate!), // Send ISO format to backend
         password: passwordController.text,
       );
 

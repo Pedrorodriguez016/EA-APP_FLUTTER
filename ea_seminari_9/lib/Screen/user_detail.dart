@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import '../Models/user.dart';
 import '../Controllers/user_controller.dart';
+import 'package:intl/intl.dart';
 
 class UserDetailScreen extends GetView<UserController> {
   final String userId;
@@ -213,7 +214,7 @@ class UserDetailScreen extends GetView<UserController> {
             context,
             Icons.cake,
             '${translate("auth.fields.birthday")}:',
-            user.birthday,
+            _formatDate(user.birthday),
           ),
         ],
       ),
@@ -352,5 +353,15 @@ class UserDetailScreen extends GetView<UserController> {
         ],
       ),
     );
+  }
+
+  String _formatDate(String dateStr) {
+    if (dateStr.isEmpty) return 'No especificada';
+    try {
+      final date = DateTime.parse(dateStr);
+      return DateFormat("d 'de' MMMM 'de' y", 'es_ES').format(date);
+    } catch (_) {
+      return dateStr;
+    }
   }
 }

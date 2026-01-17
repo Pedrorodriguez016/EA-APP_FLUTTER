@@ -9,6 +9,7 @@ import '../Services/storage_service.dart';
 import '../utils/logger.dart';
 import '../Services/user_services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import '../Widgets/custom_date_picker.dart';
 
 class AuthController extends GetxController {
   // Dependencias
@@ -256,7 +257,6 @@ class AuthController extends GetxController {
     bool needsBirthday = true,
   }) async {
     final DateTime now = DateTime.now();
-    final DateTime initialDate = now.subtract(const Duration(days: 18 * 365));
 
     final TextEditingController userCtrl = TextEditingController(
       text: suggestedUsername,
@@ -302,30 +302,10 @@ class AuthController extends GetxController {
                     ),
                   if (needsBirthday) ...[
                     if (needsUsername) const SizedBox(height: 16),
-                    TextFormField(
+                    CustomDatePicker(
                       controller: birthCtrl,
-                      readOnly: true,
-                      decoration: InputDecoration(
-                        labelText: translate('auth.fields.birthday'),
-                        hintText: translate('auth.fields.birthday_hint'),
-                        prefixIcon: const Icon(Icons.cake),
-                        suffixIcon: const Icon(Icons.calendar_today),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onTap: () async {
-                        final DateTime? picked = await showDatePicker(
-                          context: Get.context!,
-                          initialDate: initialDate,
-                          firstDate: DateTime(1900),
-                          lastDate: now,
-                        );
-                        if (picked != null) {
-                          birthCtrl.text =
-                              "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
-                        }
-                      },
+                      label: translate('auth.fields.birthday'),
+                      hintText: translate('auth.fields.birthday_hint'),
                       validator: (v) {
                         if (v == null || v.isEmpty) {
                           return translate('auth.errors.birthday_empty');
