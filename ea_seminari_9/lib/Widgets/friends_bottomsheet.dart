@@ -33,7 +33,7 @@ class FriendsBottomSheet extends StatelessWidget {
             height: 4,
             width: 40,
             decoration: BoxDecoration(
-              color: context.theme.dividerColor.withOpacity(0.3),
+              color: context.theme.dividerColor.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -108,7 +108,7 @@ class FriendsBottomSheet extends StatelessWidget {
                                       .theme
                                       .colorScheme
                                       .primary
-                                      .withOpacity(0.1),
+                                      .withValues(alpha: 0.1),
                                   foregroundColor:
                                       context.theme.colorScheme.primary,
                                   elevation: 0,

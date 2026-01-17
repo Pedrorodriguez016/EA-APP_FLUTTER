@@ -8,7 +8,7 @@ import '../Services/storage_service.dart';
 import '../utils/logger.dart';
 
 class SettingsScreen extends GetView<UserController> {
-  SettingsScreen({super.key});
+  const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -146,7 +146,7 @@ class SettingsScreen extends GetView<UserController> {
       ),
       trailing: Switch(
         value: isDark,
-        activeColor: const Color(0xFF667EEA),
+        activeThumbColor: const Color(0xFF667EEA),
         onChanged: (val) {
           Get.changeThemeMode(val ? ThemeMode.dark : ThemeMode.light);
 

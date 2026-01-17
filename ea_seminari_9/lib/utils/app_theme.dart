@@ -79,8 +79,6 @@ class AppTheme {
       primary: _lightPrimaryColor,
       onPrimary: Colors.white,
       secondary: _lightSecondaryColor,
-      background: _lightBackgroundColor,
-      onBackground: _lightOnBackground,
       surface: _lightSurfaceCard,
       onSurface: _lightOnBackground,
       outline: _lightBorderColor,
@@ -171,8 +169,6 @@ class AppTheme {
       primary: _darkPrimaryColor,
       onPrimary: Colors.black, // Contrast on light purple
       secondary: _darkSecondaryColor,
-      background: _darkBackgroundColor,
-      onBackground: _darkOnBackground,
       surface: _darkSurfaceCard,
       onSurface: _darkOnBackground,
       outline: _darkBorderColor,
@@ -198,7 +194,9 @@ class AppTheme {
 
     // Card (Glassy Dark)
     cardTheme: CardThemeData(
-      color: _darkSurfaceCard.withOpacity(0.6), // Simulating glass transparency
+      color: _darkSurfaceCard.withValues(
+        alpha: 0.6,
+      ), // Simulating glass transparency
       elevation:
           0, // CSS uses shadows differently, but flutter needs 0 for glass
       margin: const EdgeInsets.all(12),
@@ -245,7 +243,7 @@ class AppTheme {
         backgroundColor: _darkPrimaryColor,
         foregroundColor: Colors.black,
         elevation: 8,
-        shadowColor: _darkPrimaryColor.withOpacity(0.5), // Glow effect
+        shadowColor: _darkPrimaryColor.withValues(alpha: 0.5), // Glow effect
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         textStyle: const TextStyle(fontWeight: FontWeight.w700),

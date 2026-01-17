@@ -57,8 +57,9 @@ class StorageService extends GetxService {
   ThemeMode getThemeMode() {
     final bool? isDark = _prefs.getBool('is_dark_mode');
 
-    if (isDark == null)
+    if (isDark == null) {
       return ThemeMode.system; // Si nunca eligió, usar el del móvil
+    }
     return isDark ? ThemeMode.dark : ThemeMode.light;
   }
 }

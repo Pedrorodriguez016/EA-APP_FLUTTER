@@ -13,14 +13,14 @@ class CustomMap extends StatelessWidget {
   final void Function(MapPosition position, bool hasGesture)? onPositionChanged;
 
   const CustomMap({
-    Key? key,
+    super.key,
     this.center = const LatLng(41.3851, 2.1734),
     this.zoom = 13.0,
     this.height,
     this.enableExpansion = false,
     this.markers = const [],
     this.onPositionChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

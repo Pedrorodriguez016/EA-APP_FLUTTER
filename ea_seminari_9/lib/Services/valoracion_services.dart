@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import '../Models/valoracion.dart';
 import '../Interceptor/auth_interceptor.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../utils/logger.dart';
 
 class ValoracionServices {
   final String baseUrl = '${dotenv.env['BASE_URL']}/api/ratings';
@@ -45,7 +46,7 @@ class ValoracionServices {
       return [];
     } catch (e) {
       // It's often better to log or return empty lists rather than crashing entire flows
-      print('Error getting ratings: $e');
+      logger.e('Error getting ratings: $e');
       return [];
     }
   }
@@ -62,10 +63,10 @@ class ValoracionServices {
         return null;
       }
       // Re-throw or handle other errors
-      print('Error getting user rating: $e');
+      logger.e('Error getting user rating: $e');
       return null;
     } catch (e) {
-      print('Unknown error getting user rating: $e');
+      logger.e('Unknown error getting user rating: $e');
       return null;
     }
   }

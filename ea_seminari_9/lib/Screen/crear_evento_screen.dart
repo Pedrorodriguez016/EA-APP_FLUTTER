@@ -44,7 +44,7 @@ class CrearEventoScreen extends GetView<EventoController> {
             const SizedBox(height: 12),
             Obx(
               () => DropdownButtonFormField<String>(
-                value: controller.selectedCategoria.value,
+                initialValue: controller.selectedCategoria.value,
                 hint: Text(translate('events.select_category_hint')),
                 isExpanded: true,
                 items: listaCategorias.map((String categoria) {
@@ -246,7 +246,7 @@ class CrearEventoScreen extends GetView<EventoController> {
       title,
       style: context.textTheme.bodyLarge?.copyWith(
         fontWeight: FontWeight.bold,
-        color: context.theme.colorScheme.onBackground.withValues(alpha: 0.8),
+        color: context.theme.colorScheme.onSurface.withValues(alpha: 0.8),
       ),
     );
   }

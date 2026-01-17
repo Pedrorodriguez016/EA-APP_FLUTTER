@@ -6,7 +6,7 @@ import '../Controllers/eventos_controller.dart';
 import '../Controllers/auth_controller.dart';
 
 class QuestionnaireScreen extends StatefulWidget {
-  const QuestionnaireScreen({Key? key}) : super(key: key);
+  const QuestionnaireScreen({super.key});
 
   @override
   State<QuestionnaireScreen> createState() => _QuestionnaireScreenState();
@@ -169,8 +169,8 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              context.theme.colorScheme.primary.withOpacity(0.8),
-              context.theme.colorScheme.secondary.withOpacity(0.9),
+              context.theme.colorScheme.primary.withValues(alpha: 0.8),
+              context.theme.colorScheme.secondary.withValues(alpha: 0.9),
             ],
           ),
         ),
@@ -234,7 +234,7 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
           Text(
             'Dinos qué te apasiona para ofrecerte los mejores eventos.',
             style: context.textTheme.bodyMedium?.copyWith(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
             ),
           ),
         ],
@@ -249,7 +249,7 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: context.theme.colorScheme.primary.withOpacity(0.1),
+          color: context.theme.colorScheme.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
@@ -276,13 +276,13 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
           margin: const EdgeInsets.symmetric(vertical: 4),
           decoration: BoxDecoration(
             color: isExpanded
-                ? context.theme.colorScheme.primary.withOpacity(0.05)
+                ? context.theme.colorScheme.primary.withValues(alpha: 0.05)
                 : context.theme.cardColor,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isExpanded
                   ? context.theme.colorScheme.primary
-                  : context.theme.dividerColor.withOpacity(0.5),
+                  : context.theme.dividerColor.withValues(alpha: 0.5),
             ),
           ),
           child: Row(
@@ -296,9 +296,9 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
                       : Icons.radio_button_unchecked_rounded,
                   color: _selectedInterests.contains(category)
                       ? context.theme.colorScheme.primary
-                      : context.theme.hintColor.withOpacity(0.5),
+                      : context.theme.hintColor.withValues(alpha: 0.5),
                 ),
-                tooltip: 'Seleccionar todo ${category}',
+                tooltip: 'Seleccionar todo $category',
               ),
               Expanded(
                 child: InkWell(
@@ -355,8 +355,8 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
                   label: Text(interest),
                   selected: isSelected,
                   onSelected: (_) => _toggleInterest(interest),
-                  selectedColor: context.theme.colorScheme.primary.withOpacity(
-                    0.2,
+                  selectedColor: context.theme.colorScheme.primary.withValues(
+                    alpha: 0.2,
                   ),
                   checkmarkColor: context.theme.colorScheme.primary,
                   backgroundColor: context.theme.cardColor,

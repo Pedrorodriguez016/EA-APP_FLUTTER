@@ -16,7 +16,7 @@ import '../Widgets/notifications_popup.dart';
 import '../Widgets/recommended_section.dart';
 
 class HomeScreen extends GetView<UserController> {
-  HomeScreen({Key? key}) : super(key: key);
+  HomeScreen({super.key});
 
   final AuthController authController = Get.find<AuthController>();
   final EventoController eventoController = Get.put(
@@ -293,7 +293,7 @@ class HomeScreen extends GetView<UserController> {
                   if (eventoController.isLoadingLocation.value) {
                     return Container(
                       decoration: BoxDecoration(
-                        color: context.theme.colorScheme.surfaceVariant
+                        color: context.theme.colorScheme.surfaceContainerHighest
                             .withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(12),
                       ),

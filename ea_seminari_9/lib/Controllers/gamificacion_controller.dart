@@ -3,11 +3,10 @@ import 'package:logger/logger.dart';
 import '../Models/usuario_progreso.dart';
 import '../Models/insignia.dart';
 import '../Services/gamificacion_services.dart';
-import '../Services/storage_service.dart';
 
 class GamificacionController extends GetxController {
   final _gamificacionServices = GamificacionServices();
-  late final StorageService _storageServices;
+
   final logger = Logger();
 
   // Estado
@@ -19,7 +18,7 @@ class GamificacionController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _storageServices = Get.find<StorageService>();
+
     cargarMiProgreso();
     cargarInsignias();
   }
@@ -28,13 +27,7 @@ class GamificacionController extends GetxController {
   Future<void> cargarMiProgreso() async {
     try {
       isLoading(true);
-      final token = _storageServices.token;
-      if (token == null) {
-        logger.w('No hay token disponible');
-        return;
-      }
-
-      final progreso = await _gamificacionServices.getMiProgreso(token);
+      final progreso = await _gamificacionServices.getMiProgreso();
       miProgreso.value = progreso;
       logger.d('Progreso cargado: ${progreso.puntos} puntos');
     } catch (e) {

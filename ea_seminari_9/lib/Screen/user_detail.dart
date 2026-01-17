@@ -6,7 +6,7 @@ import '../Controllers/user_controller.dart';
 
 class UserDetailScreen extends GetView<UserController> {
   final String userId;
-  UserDetailScreen({super.key, required this.userId});
+  const UserDetailScreen({super.key, required this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +34,9 @@ class UserDetailScreen extends GetView<UserController> {
           Obx(() {
             final user = controller.selectedUser.value;
             final currentUser = controller.authController.currentUser.value;
-            if (user == null || currentUser == null)
+            if (user == null || currentUser == null) {
               return const SizedBox.shrink();
+            }
 
             final isBlocked =
                 currentUser.blockedUsers?.contains(user.id) ?? false;

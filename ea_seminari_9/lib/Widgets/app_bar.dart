@@ -5,8 +5,7 @@ class StandardAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final VoidCallback? onSearchPressed;
 
-  const StandardAppBar({Key? key, required this.title, this.onSearchPressed})
-    : super(key: key);
+  const StandardAppBar({super.key, required this.title, this.onSearchPressed});
 
   @override
   Widget build(BuildContext context) {

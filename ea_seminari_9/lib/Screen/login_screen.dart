@@ -5,18 +5,20 @@ import '../Controllers/auth_controller.dart';
 import '../utils/app_theme.dart';
 
 class LoginScreen extends GetView<AuthController> {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   String? _validateUsername(String? value) {
-    if (value == null || value.isEmpty)
+    if (value == null || value.isEmpty) {
       return translate('auth.errors.username_empty');
+    }
     if (value.length < 3) return translate('auth.errors.username_short');
     return null;
   }
 
   String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty)
+    if (value == null || value.isEmpty) {
       return translate('auth.errors.password_empty');
+    }
     if (value.length < 6) return translate('auth.errors.password_short');
     return null;
   }
@@ -81,7 +83,7 @@ class LoginScreen extends GetView<AuthController> {
           textAlign: TextAlign.center,
           style: context.textTheme.displaySmall?.copyWith(
             fontWeight: FontWeight.w900,
-            color: context.theme.colorScheme.onBackground,
+            color: context.theme.colorScheme.onSurface,
             letterSpacing: -0.5,
           ),
         ),
@@ -90,9 +92,7 @@ class LoginScreen extends GetView<AuthController> {
           translate('auth.login.subtitle'),
           textAlign: TextAlign.center,
           style: context.textTheme.bodyLarge?.copyWith(
-            color: context.theme.colorScheme.onBackground.withValues(
-              alpha: 0.7,
-            ),
+            color: context.theme.colorScheme.onSurface.withValues(alpha: 0.7),
             fontSize: 18,
           ),
         ),
@@ -269,7 +269,7 @@ class LoginScreen extends GetView<AuthController> {
                 child: Text(
                   translate('auth.login.or_continue_with'),
                   style: TextStyle(
-                    color: context.theme.colorScheme.onBackground.withValues(
+                    color: context.theme.colorScheme.onSurface.withValues(
                       alpha: 0.5,
                     ),
                     fontSize: 14,
@@ -352,11 +352,9 @@ class LoginScreen extends GetView<AuthController> {
     return Center(
       child: RichText(
         text: TextSpan(
-          text: translate('auth.login.no_account') + ' ',
+          text: '${translate('auth.login.no_account')} ',
           style: context.textTheme.bodyMedium?.copyWith(
-            color: context.theme.colorScheme.onBackground.withValues(
-              alpha: 0.6,
-            ),
+            color: context.theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
           children: [
             WidgetSpan(

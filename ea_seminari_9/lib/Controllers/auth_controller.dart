@@ -3,7 +3,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import '../Models/user.dart';
 import '../Services/auth_service.dart';
 import '../Services/storage_service.dart';
@@ -158,7 +157,7 @@ class AuthController extends GetxController {
 
   Future<void> _handleGoogleSignInSuccess(GoogleSignInAccount user) async {
     try {
-      final GoogleSignInAuthentication googleAuth = await user.authentication;
+      final GoogleSignInAuthentication googleAuth = user.authentication;
       final String? idToken = googleAuth.idToken;
 
       if (idToken == null) {
@@ -273,71 +272,78 @@ class AuthController extends GetxController {
           style: TextStyle(fontWeight: FontWeight.bold),
           textAlign: TextAlign.center,
         ),
-        content: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                translate('auth.google_data_subtitle'),
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+        content: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: Get.height * 0.6),
+          child: SingleChildScrollView(
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    translate('auth.google_data_subtitle'),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  ),
+                  const SizedBox(height: 20),
+                  if (needsUsername)
+                    TextFormField(
+                      controller: userCtrl,
+                      decoration: InputDecoration(
+                        labelText: translate('auth.fields.username'),
+                        prefixIcon: const Icon(Icons.person),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      validator: (v) => (v == null || v.isEmpty)
+                          ? translate('auth.errors.username_empty')
+                          : null,
+                    ),
+                  if (needsBirthday) ...[
+                    if (needsUsername) const SizedBox(height: 16),
+                    TextFormField(
+                      controller: birthCtrl,
+                      readOnly: true,
+                      decoration: InputDecoration(
+                        labelText: translate('auth.fields.birthday'),
+                        hintText: translate('auth.fields.birthday_hint'),
+                        prefixIcon: const Icon(Icons.cake),
+                        suffixIcon: const Icon(Icons.calendar_today),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onTap: () async {
+                        final DateTime? picked = await showDatePicker(
+                          context: Get.context!,
+                          initialDate: initialDate,
+                          firstDate: DateTime(1900),
+                          lastDate: now,
+                        );
+                        if (picked != null) {
+                          birthCtrl.text =
+                              "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+                        }
+                      },
+                      validator: (v) {
+                        if (v == null || v.isEmpty) {
+                          return translate('auth.errors.birthday_empty');
+                        }
+                        final birth = DateTime.tryParse(v);
+                        if (birth != null) {
+                          final age = now.year - birth.year;
+                          if (age < 13) {
+                            return translate('auth.errors.age_restriction');
+                          }
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
+                ],
               ),
-              const SizedBox(height: 20),
-              if (needsUsername)
-                TextFormField(
-                  controller: userCtrl,
-                  decoration: InputDecoration(
-                    labelText: translate('auth.fields.username'),
-                    prefixIcon: Icon(Icons.person),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  validator: (v) => (v == null || v.isEmpty)
-                      ? translate('auth.errors.username_empty')
-                      : null,
-                ),
-              if (needsBirthday) ...[
-                if (needsUsername) const SizedBox(height: 16),
-                TextFormField(
-                  controller: birthCtrl,
-                  readOnly: true,
-                  decoration: InputDecoration(
-                    labelText: translate('auth.fields.birthday'),
-                    hintText: translate('auth.fields.birthday_hint'),
-                    prefixIcon: Icon(Icons.cake),
-                    suffixIcon: Icon(Icons.calendar_today),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onTap: () async {
-                    final DateTime? picked = await showDatePicker(
-                      context: Get.context!,
-                      initialDate: initialDate,
-                      firstDate: DateTime(1900),
-                      lastDate: now,
-                    );
-                    if (picked != null) {
-                      birthCtrl.text =
-                          "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
-                    }
-                  },
-                  validator: (v) {
-                    if (v == null || v.isEmpty)
-                      return translate('auth.errors.birthday_empty');
-                    final birth = DateTime.tryParse(v);
-                    if (birth != null) {
-                      final age = now.year - birth.year;
-                      if (age < 13)
-                        return translate('auth.errors.age_restriction');
-                    }
-                    return null;
-                  },
-                ),
-              ],
-            ],
+            ),
           ),
         ),
         actions: [

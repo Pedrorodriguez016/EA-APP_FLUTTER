@@ -219,7 +219,7 @@ class EventoController extends GetxController {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        print('Servicio de ubicación deshabilitado');
+        logger.w('Servicio de ubicación deshabilitado');
         userLocation.value = defaultLocation;
         isLoadingLocation.value = false;
         return;
@@ -230,7 +230,7 @@ class EventoController extends GetxController {
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          print('Permisos de ubicación denegados');
+          logger.w('Permisos de ubicación denegados');
           userLocation.value = defaultLocation;
           isLoadingLocation.value = false;
           return;
@@ -238,7 +238,7 @@ class EventoController extends GetxController {
       }
 
       if (permission == LocationPermission.deniedForever) {
-        print('Permisos de ubicación denegados permanentemente');
+        logger.w('Permisos de ubicación denegados permanentemente');
         userLocation.value = defaultLocation;
         isLoadingLocation.value = false;
         return;
@@ -253,11 +253,11 @@ class EventoController extends GetxController {
       );
 
       userLocation.value = LatLng(position.latitude, position.longitude);
-      print(
+      logger.i(
         'Ubicación del usuario: ${position.latitude}, ${position.longitude}',
       );
     } catch (e) {
-      print('Error obteniendo ubicación: $e');
+      logger.e('Error obteniendo ubicación: $e');
       userLocation.value = defaultLocation;
     } finally {
       isLoadingLocation.value = false;
@@ -284,6 +284,7 @@ class EventoController extends GetxController {
     );
 
     if (date == null) return;
+    if (!context.mounted) return;
 
     final TimeOfDay? time = await showTimePicker(
       context: context,
@@ -518,7 +519,7 @@ class EventoController extends GetxController {
 
         // Mostrar el mensaje del backend
         Get.snackbar(
-          enListaEspera ? "En lista de espera" : "Éxito!",
+          enListaEspera ? 'En lista de espera' : 'Éxito!',
           mensaje,
           backgroundColor: enListaEspera ? Colors.orange : Colors.green,
           colorText: Colors.white,
@@ -595,7 +596,7 @@ class EventoController extends GetxController {
       final List<User> friends = friendsData['friends'];
       friendsList.assignAll(friends);
     } catch (e) {
-      print("Error fetching friends: $e");
+      logger.e('Error fetching friends: $e');
     } finally {
       isLoadingFriends(false);
     }
@@ -665,16 +666,16 @@ class EventoController extends GetxController {
       if (accept) {
         updatedEvento = await _eventosServices.acceptInvitation(event.id);
         Get.snackbar(
-          "Éxito",
-          "Invitación aceptada",
+          'Éxito',
+          'Invitación aceptada',
           backgroundColor: Colors.green,
           colorText: Colors.white,
         );
       } else {
         updatedEvento = await _eventosServices.rejectInvitation(event.id);
         Get.snackbar(
-          "Información",
-          "Invitación rechazada",
+          'Información',
+          'Invitación rechazada',
           backgroundColor: Colors.orange,
           colorText: Colors.white,
         );
@@ -684,7 +685,7 @@ class EventoController extends GetxController {
       _updateEventInLists(updatedEvento);
     } catch (e) {
       Get.snackbar(
-        "Error",
+        'Error',
         e.toString(),
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -860,7 +861,7 @@ class EventoController extends GetxController {
                           filterCategory.value = val ? cat : null;
                         },
                         selectedColor: context.theme.colorScheme.primary
-                            .withOpacity(0.2),
+                            .withValues(alpha: 0.2),
                         labelStyle: TextStyle(
                           color: isSelected
                               ? context.theme.colorScheme.primary
@@ -1002,7 +1003,7 @@ class EventoController extends GetxController {
             Obx(
               () => Text(
                 dateObs.value != null
-                    ? "${dateObs.value!.day}/${dateObs.value!.month}/${dateObs.value!.year}"
+                    ? '${dateObs.value!.day}/${dateObs.value!.month}/${dateObs.value!.year}'
                     : 'Seleccionar',
                 style: context.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.bold,

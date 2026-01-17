@@ -67,60 +67,59 @@ class FriendRequestsDialog {
                 ),
               ],
             ),
-            content: ConstrainedBox(
-              constraints: BoxConstraints(
-                minWidth: double.maxFinite,
-                maxHeight: Get.height * 0.5,
+            content: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.9,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: Get.height * 0.5),
+                child: requests.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.all(32.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.mark_email_read_rounded,
+                              size: 48,
+                              color: context.theme.disabledColor.withValues(
+                                alpha: 0.3,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              translate('users.no_requests'),
+                              textAlign: TextAlign.center,
+                              style: context.textTheme.bodyMedium?.copyWith(
+                                color: context.theme.hintColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 8,
+                        ),
+                        itemCount: requests.length,
+                        itemBuilder: (ctx, index) {
+                          final user = requests[index];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: FriendRequestCard(
+                              user: user,
+                              onAccept: () {
+                                onAccept(user);
+                                if (requests.length == 1) Get.back();
+                              },
+                              onReject: () {
+                                onReject(user);
+                                if (requests.length == 1) Get.back();
+                              },
+                            ),
+                          );
+                        },
+                      ),
               ),
-              child: requests.isEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.all(32.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.mark_email_read_rounded,
-                            size: 48,
-                            color: context.theme.disabledColor.withValues(
-                              alpha: 0.3,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            translate('users.no_requests'),
-                            textAlign: TextAlign.center,
-                            style: context.textTheme.bodyMedium?.copyWith(
-                              color: context.theme.hintColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 8,
-                      ),
-                      itemCount: requests.length,
-                      itemBuilder: (ctx, index) {
-                        final user = requests[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: FriendRequestCard(
-                            user: user,
-                            onAccept: () {
-                              onAccept(user);
-                              if (requests.length == 1) Get.back();
-                            },
-                            onReject: () {
-                              onReject(user);
-                              if (requests.length == 1) Get.back();
-                            },
-                          ),
-                        );
-                      },
-                    ),
             ),
             actionsPadding: const EdgeInsets.all(24),
             actions: [

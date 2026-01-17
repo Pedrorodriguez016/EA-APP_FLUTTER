@@ -7,7 +7,7 @@ import '../utils/app_theme.dart';
 class ValoracionDialog extends StatelessWidget {
   final String eventId;
 
-  const ValoracionDialog({Key? key, required this.eventId}) : super(key: key);
+  const ValoracionDialog({super.key, required this.eventId});
 
   @override
   Widget build(BuildContext context) {

@@ -29,11 +29,10 @@ class AuthService {
       return response.data;
     } catch (e) {
       logger.e('❌ Error en login HTTP para usuario: $username', error: e);
-      throw e;
+      rethrow;
     }
   }
 
-  
   Future<dynamic> register(User newUser) async {
     try {
       logger.d('📡 POST /user - registrando usuario: ${newUser.username}');
@@ -53,9 +52,10 @@ class AuthService {
         '❌ Error en registro HTTP para usuario: ${newUser.username}',
         error: e,
       );
-      throw e;
+      rethrow;
     }
   }
+
   // Google Login: Envía el idToken al backend para validación
   Future<Map<String, dynamic>> loginWithGoogle(
     String idToken, {
@@ -73,7 +73,7 @@ class AuthService {
       return response.data;
     } catch (e) {
       logger.e('❌ Error en Google login HTTP', error: e);
-      throw e;
+      rethrow;
     }
   }
 
@@ -88,7 +88,7 @@ class AuthService {
       return response.data;
     } catch (e) {
       logger.e('❌ Error en check Google User HTTP', error: e);
-      throw e;
+      rethrow;
     }
   }
 }

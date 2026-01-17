@@ -8,7 +8,7 @@ import '../Models/eventos.dart';
 import '../Widgets/global_drawer.dart';
 
 class ChatListScreen extends GetView<ChatListController> {
-  const ChatListScreen({Key? key}) : super(key: key);
+  const ChatListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -64,12 +64,9 @@ class ChatListScreen extends GetView<ChatListController> {
                         context,
                         translate('chat.events_section'),
                       ),
-                      ...controller.eventsList
-                          .map(
-                            (event) =>
-                                _buildEventTile(context, event, controller),
-                          )
-                          .toList(),
+                      ...controller.eventsList.map(
+                        (event) => _buildEventTile(context, event, controller),
+                      ),
                       const SizedBox(height: 20),
                     ],
                   if (controller.selectedFilter.value == ChatFilter.all ||
@@ -79,12 +76,10 @@ class ChatListScreen extends GetView<ChatListController> {
                         context,
                         translate('chat.friends_section'),
                       ),
-                      ...controller.friendsList
-                          .map(
-                            (friend) =>
-                                _buildFriendTile(context, friend, controller),
-                          )
-                          .toList(),
+                      ...controller.friendsList.map(
+                        (friend) =>
+                            _buildFriendTile(context, friend, controller),
+                      ),
                     ],
                 ],
               ),

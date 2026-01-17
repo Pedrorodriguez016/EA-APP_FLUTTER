@@ -9,7 +9,7 @@ import '../Controllers/auth_controller.dart';
 import 'package:video_player/video_player.dart';
 
 class EventChatScreen extends GetView<EventChatController> {
-  const EventChatScreen({Key? key}) : super(key: key);
+  const EventChatScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -325,14 +325,6 @@ class EventChatScreen extends GetView<EventChatController> {
                 );
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.videocam),
-              title: const Text('Cámara: Grabar Video'),
-              onTap: () {
-                Get.back();
-                controller.uploadMedia(isVideo: true, fromCamera: true);
-              },
-            ),
             const SizedBox(height: 16),
           ],
         ),
@@ -467,8 +459,8 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
               },
             ),
             Text(
-              "${_controller.value.position.inMinutes}:${(_controller.value.position.inSeconds % 60).toString().padLeft(2, '0')} / "
-              "${_controller.value.duration.inMinutes}:${(_controller.value.duration.inSeconds % 60).toString().padLeft(2, '0')}",
+              '${_controller.value.position.inMinutes}:${(_controller.value.position.inSeconds % 60).toString().padLeft(2, '0')} / '
+              '${_controller.value.duration.inMinutes}:${(_controller.value.duration.inSeconds % 60).toString().padLeft(2, '0')}',
               style: const TextStyle(color: Colors.white),
             ),
           ],

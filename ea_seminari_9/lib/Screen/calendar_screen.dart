@@ -10,7 +10,7 @@ import '../Widgets/app_bar.dart';
 import '../Widgets/global_drawer.dart';
 
 class CalendarScreen extends GetView<EventoController> {
-  CalendarScreen({super.key});
+  const CalendarScreen({super.key});
 
   void _fetchEventsForMonth(DateTime date) {
     final firstDay = DateTime(date.year, date.month, 1);

@@ -34,7 +34,7 @@ class GlobalDrawer extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 30,
-                  backgroundColor: Colors.white.withOpacity(0.2),
+                  backgroundColor: Colors.white.withValues(alpha: 0.2),
                   child: const Icon(
                     Icons.person_rounded,
                     color: Colors.white,
@@ -58,7 +58,7 @@ class GlobalDrawer extends StatelessWidget {
                       Text(
                         user?.gmail ?? '',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withValues(alpha: 0.8),
                           fontSize: 13,
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -94,7 +94,7 @@ class GlobalDrawer extends StatelessWidget {
                       : translate('settings.theme_mode'),
                   trailing: Switch(
                     value: isDark,
-                    activeColor: context.theme.colorScheme.primary,
+                    activeThumbColor: context.theme.colorScheme.primary,
                     onChanged: (val) {
                       Get.changeThemeMode(
                         val ? ThemeMode.dark : ThemeMode.light,
@@ -134,7 +134,7 @@ class GlobalDrawer extends StatelessWidget {
             child: Text(
               'v1.0.0',
               style: TextStyle(
-                color: context.theme.hintColor.withOpacity(0.5),
+                color: context.theme.hintColor.withValues(alpha: 0.5),
                 fontSize: 12,
               ),
             ),
@@ -169,7 +169,9 @@ class GlobalDrawer extends StatelessWidget {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: context.theme.colorScheme.primary.withOpacity(0.1),
+                    color: context.theme.colorScheme.primary.withValues(
+                      alpha: 0.1,
+                    ),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(

@@ -9,7 +9,7 @@ import '../utils/app_theme.dart';
 class ValoracionList extends StatelessWidget {
   final String eventId;
 
-  const ValoracionList({Key? key, required this.eventId}) : super(key: key);
+  const ValoracionList({super.key, required this.eventId});
 
   @override
   Widget build(BuildContext context) {

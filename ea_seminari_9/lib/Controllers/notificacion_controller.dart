@@ -74,7 +74,7 @@ class NotificacionController extends GetxController
           newNotif.title,
           newNotif.message,
           snackPosition: SnackPosition.TOP,
-          backgroundColor: Get.theme.colorScheme.primary.withOpacity(0.9),
+          backgroundColor: Get.theme.colorScheme.primary.withValues(alpha: 0.9),
           colorText: Colors.white,
           onTap: (_) {
             markAsRead(newNotif.id);

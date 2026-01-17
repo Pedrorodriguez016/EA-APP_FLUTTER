@@ -1,18 +1,18 @@
 import 'package:get/get.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../utils/logger.dart';
 
 class SocketService extends GetxService {
-  late IO.Socket _socket;
+  late io.Socket _socket;
   String get _url => dotenv.env['BASE_URL'] ?? 'http://localhost:3000';
 
   @override
   void onInit() {
     super.onInit();
-    _socket = IO.io(
+    _socket = io.io(
       _url,
-      IO.OptionBuilder()
+      io.OptionBuilder()
           .setTransports(['websocket'])
           .enableAutoConnect() // Changed from disable to enable for better stability
           .build(),

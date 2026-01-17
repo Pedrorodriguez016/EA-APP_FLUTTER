@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import '../utils/logger.dart';
 import '../Models/valoracion.dart';
 import '../Services/valoracion_services.dart';
 import '../Controllers/auth_controller.dart';
@@ -34,7 +35,7 @@ class ValoracionController extends GetxController {
         }
       }
     } catch (e) {
-      print('Error cargando valoraciones: $e');
+      logger.e('Error cargando valoraciones: $e');
     } finally {
       isLoading.value = false;
     }

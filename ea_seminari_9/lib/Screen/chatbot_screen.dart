@@ -4,9 +4,8 @@ import 'package:flutter_translate/flutter_translate.dart';
 import '../Controllers/chatbot_controller.dart';
 
 class ChatBotScreen extends GetView<ChatBotController> {
-  const ChatBotScreen({Key? key}) : super(key: key);
+  const ChatBotScreen({super.key});
 
-  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(

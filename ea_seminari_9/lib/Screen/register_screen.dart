@@ -7,10 +7,10 @@ import '../utils/app_theme.dart';
 import 'package:password_strength_checker/password_strength_checker.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+  const RegisterScreen({super.key});
 
   @override
-  _RegisterScreenState createState() => _RegisterScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
@@ -175,14 +175,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   String? _validateGmail(String? value) {
-    if (value == null || value.isEmpty)
+    if (value == null || value.isEmpty) {
       return translate('auth.errors.email_empty');
+    }
     final email = value.trim();
     final emailRegex = RegExp(
       r'^[a-zA-Z0-9]([a-zA-Z0-9._-]*[a-zA-Z0-9])?@[a-zA-Z0-9]([a-zA-Z0-9.-]*[a-zA-Z0-9])?\.[a-zA-Z]{2,}$',
     );
-    if (!emailRegex.hasMatch(email))
+    if (!emailRegex.hasMatch(email)) {
       return translate('auth.errors.email_invalid');
+    }
 
     final domain = email.split('@').last.toLowerCase();
     if (_temporaryDomains.contains(domain)) {
@@ -192,18 +194,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   String? _validateConfirmPassword(String? value) {
-    if (value == null || value.isEmpty)
+    if (value == null || value.isEmpty) {
       return translate('auth.errors.password_empty');
-    if (value != passwordController.text)
+    }
+    if (value != passwordController.text) {
       return translate('auth.errors.password_mismatch');
+    }
     return null;
   }
 
   String? _validateBirthday(String? value) {
-    if (value == null || value.isEmpty)
+    if (value == null || value.isEmpty) {
       return translate('auth.errors.birthday_empty');
-    if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value))
+    }
+    if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {
       return translate('auth.errors.birthday_invalid');
+    }
     try {
       final parts = value.split('-');
       final year = int.parse(parts[0]);
@@ -219,8 +225,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         age--;
       }
 
-      if (birthday.isAfter(now))
+      if (birthday.isAfter(now)) {
         return translate('auth.errors.birthday_invalid');
+      }
       if (age < 13) return translate('auth.errors.age_restriction');
       if (age > 120) return translate('auth.errors.birthday_invalid');
     } catch (e) {
@@ -235,8 +242,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (RegExp(r'[a-z]').hasMatch(password)) count++;
     if (RegExp(r'[A-Z]').hasMatch(password)) count++;
     if (RegExp(r'[0-9]').hasMatch(password)) count++;
-    if (RegExp(r'''[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]''').hasMatch(password))
+    if (RegExp(
+      r'''[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]''',
+    ).hasMatch(password)) {
       count++;
+    }
     switch (count) {
       case 5:
         return PasswordStrength.secure;
@@ -266,7 +276,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 backgroundColor: Colors.transparent,
-                foregroundColor: context.theme.colorScheme.onBackground,
+                foregroundColor: context.theme.colorScheme.onSurface,
                 elevation: 0,
                 centerTitle: true,
               ),
@@ -328,9 +338,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             textAlign: TextAlign.center,
             style: context.textTheme.bodyLarge?.copyWith(
               fontSize: 16,
-              color: context.theme.colorScheme.onBackground.withValues(
-                alpha: 0.7,
-              ),
+              color: context.theme.colorScheme.onSurface.withValues(alpha: 0.7),
             ),
           ),
         ],
@@ -431,8 +439,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             builder: (context, strength, _) {
               String label = '';
               Color color = _getPasswordBorderColor(strength);
-              if (strength == PasswordStrength.secure)
+              if (strength == PasswordStrength.secure) {
                 color = const Color(0xFF0B6C0E);
+              }
 
               switch (strength) {
                 case PasswordStrength.weak:
@@ -739,11 +748,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          translate('auth.register.has_account') + ' ',
+          '${translate('auth.register.has_account')} ',
           style: TextStyle(
-            color: context.theme.colorScheme.onBackground.withValues(
-              alpha: 0.6,
-            ),
+            color: context.theme.colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
         GestureDetector(

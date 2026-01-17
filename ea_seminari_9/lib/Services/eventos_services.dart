@@ -14,7 +14,6 @@ class EventosServices {
   final User currentUser = Get.find<StorageService>().getUser()!;
 
   EventosServices() {
-    print('🚀 [EventosServices] Constructor iniciado');
     logger.i('🚀 [EventosServices] Constructor iniciado');
     _client = Dio(BaseOptions(baseUrl: baseUrl));
     _client.interceptors.add(AuthInterceptor());
@@ -220,7 +219,7 @@ class EventosServices {
 
       return Evento.fromJson(response.data['evento']);
     } catch (e) {
-      print('Error in leaveWaitlist: $e');
+      logger.e('Error in leaveWaitlist: $e');
       throw Exception('Error al salir de la lista de espera: $e');
     }
   }
@@ -234,7 +233,7 @@ class EventosServices {
         'enListaEspera': response.data['enListaEspera'] ?? false,
       };
     } catch (e) {
-      print('Error in getWaitlistPosition: $e');
+      logger.e('Error in getWaitlistPosition: $e');
       throw Exception('Error al obtener posición en lista: $e');
     }
   }
@@ -248,7 +247,7 @@ class EventosServices {
       }
       return Evento.fromJson(data);
     } catch (e) {
-      print('Error in acceptInvitation: $e');
+      logger.e('Error in acceptInvitation: $e');
       throw Exception('Error al aceptar invitación: $e');
     }
   }
@@ -262,7 +261,7 @@ class EventosServices {
       }
       return Evento.fromJson(data);
     } catch (e) {
-      print('Error in rejectInvitation: $e');
+      logger.e('Error in rejectInvitation: $e');
       throw Exception('Error al rechazar invitación: $e');
     }
   }
@@ -342,7 +341,7 @@ class EventosServices {
       String fileName = filePath.split('/').last;
 
       FormData formData = FormData.fromMap({
-        "photo": await MultipartFile.fromFile(filePath, filename: fileName),
+        'photo': await MultipartFile.fromFile(filePath, filename: fileName),
       });
 
       final response = await _client.post('/$eventId/photos', data: formData);

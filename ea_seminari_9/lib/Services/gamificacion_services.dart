@@ -1,114 +1,130 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import '../Models/usuario_progreso.dart';
 import '../Models/insignia.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../Interceptor/auth_interceptor.dart';
+import '../utils/logger.dart';
 
 class GamificacionServices {
   final String baseUrl = '${dotenv.env['BASE_URL']}/api/gamificacion';
+  late final Dio _client;
+
+  GamificacionServices() {
+    _client = Dio(
+      BaseOptions(
+        baseUrl: baseUrl,
+        connectTimeout: const Duration(seconds: 5),
+        receiveTimeout: const Duration(seconds: 5),
+      ),
+    );
+    _client.interceptors.add(AuthInterceptor());
+  }
 
   // Obtener mi progreso (usuario autenticado)
-  Future<UsuarioProgreso> getMiProgreso(String token) async {
+  Future<UsuarioProgreso> getMiProgreso() async {
     try {
-      final url = Uri.parse('$baseUrl/mi-progreso');
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
+      final response = await _client.get('/mi-progreso');
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        return UsuarioProgreso.fromJson(data);
-      } else if (response.statusCode == 404) {
-        throw Exception('Endpoint de gamificación no disponible');
+        return UsuarioProgreso.fromJson(response.data);
       } else {
         throw Exception('Error al obtener progreso: ${response.statusCode}');
       }
-    } catch (e) {
-      if (e is FormatException) {
-        throw Exception('El servidor no devolvió datos válidos');
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        throw Exception('Endpoint de gamificación no disponible');
       }
+      logger.e('❌ Error en getMiProgreso', error: e);
+      rethrow;
+    } catch (e) {
+      logger.e('❌ Error inesperado en getMiProgreso', error: e);
       rethrow;
     }
   }
 
   // Obtener progreso de un usuario específico
   Future<UsuarioProgreso> getProgresoUsuario(String usuarioId) async {
-    final url = Uri.parse('$baseUrl/progreso/$usuarioId');
-    final response = await http.get(
-      url,
-      headers: {'Content-Type': 'application/json'},
-    );
+    try {
+      final response = await _client.get('/progreso/$usuarioId');
 
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      return UsuarioProgreso.fromJson(data);
-    } else {
-      throw Exception(
-        'Error al obtener progreso del usuario: ${response.statusCode}',
-      );
+      if (response.statusCode == 200) {
+        return UsuarioProgreso.fromJson(response.data);
+      } else {
+        throw Exception(
+          'Error al obtener progreso del usuario: ${response.statusCode}',
+        );
+      }
+    } on DioException catch (e) {
+      logger.e('❌ Error en getProgresoUsuario', error: e);
+      rethrow;
+    } catch (e) {
+      logger.e('❌ Error inesperado en getProgresoUsuario', error: e);
+      rethrow;
     }
   }
 
   // Obtener ranking de usuarios
   Future<List<RankingUsuario>> getRanking({int limite = 10}) async {
-    final url = Uri.parse('$baseUrl/ranking?limite=$limite');
-    final response = await http.get(
-      url,
-      headers: {'Content-Type': 'application/json'},
-    );
+    try {
+      final response = await _client.get(
+        '/ranking',
+        queryParameters: {'limite': limite},
+      );
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      return data.map((json) => RankingUsuario.fromJson(json)).toList();
-    } else {
-      throw Exception('Error al obtener ranking: ${response.statusCode}');
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        return data.map((json) => RankingUsuario.fromJson(json)).toList();
+      } else {
+        throw Exception('Error al obtener ranking: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      logger.e('❌ Error en getRanking', error: e);
+      rethrow;
+    } catch (e) {
+      logger.e('❌ Error inesperado en getRanking', error: e);
+      rethrow;
     }
   }
 
   // Obtener todas las insignias
   Future<List<Insignia>> getInsignias() async {
     try {
-      final url = Uri.parse('$baseUrl/insignias');
-      final response = await http.get(
-        url,
-        headers: {'Content-Type': 'application/json'},
-      );
+      final response = await _client.get('/insignias');
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+        final List<dynamic> data = response.data;
         return data.map((json) => Insignia.fromJson(json)).toList();
-      } else if (response.statusCode == 404) {
-        // Endpoint no existe, retornar lista vacía
-        return [];
       } else {
-        throw Exception('Error al obtener insignias: ${response.statusCode}');
-      }
-    } catch (e) {
-      // Si hay error de parsing JSON (respuesta HTML), retornar lista vacía
-      if (e is FormatException) {
         return [];
       }
-      rethrow;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 404) {
+        return [];
+      }
+      logger.e('❌ Error en getInsignias', error: e);
+      return [];
+    } catch (e) {
+      logger.e('❌ Error inesperado en getInsignias', error: e);
+      return [];
     }
   }
 
   // Inicializar insignias (solo admin)
-  Future<void> inicializarInsignias(String token) async {
-    final url = Uri.parse('$baseUrl/inicializar-insignias');
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
+  Future<void> inicializarInsignias() async {
+    try {
+      final response = await _client.post('/inicializar-insignias');
 
-    if (response.statusCode != 200) {
-      throw Exception('Error al inicializar insignias: ${response.statusCode}');
+      if (response.statusCode != 200) {
+        throw Exception(
+          'Error al inicializar insignias: ${response.statusCode}',
+        );
+      }
+    } on DioException catch (e) {
+      logger.e('❌ Error en inicializarInsignias', error: e);
+      rethrow;
+    } catch (e) {
+      logger.e('❌ Error inesperado en inicializarInsignias', error: e);
+      rethrow;
     }
   }
 }

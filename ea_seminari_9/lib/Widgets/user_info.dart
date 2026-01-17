@@ -9,12 +9,12 @@ class UserInfoBasic extends StatelessWidget {
   final String? imageUrl;
 
   const UserInfoBasic({
-    Key? key,
+    super.key,
     required this.name,
     required this.email,
     this.birthday,
     this.imageUrl,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

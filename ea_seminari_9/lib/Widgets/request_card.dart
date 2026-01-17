@@ -9,11 +9,11 @@ class FriendRequestCard extends StatelessWidget {
   final VoidCallback onReject;
 
   const FriendRequestCard({
-    Key? key,
+    super.key,
     required this.user,
     required this.onAccept,
     required this.onReject,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
