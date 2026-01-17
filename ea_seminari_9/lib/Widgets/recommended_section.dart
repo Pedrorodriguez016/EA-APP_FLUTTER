@@ -278,96 +278,250 @@ class _RecommendedSectionState extends State<RecommendedSection> {
   }
 
   LinearGradient _getCategoryGradient(String category) {
-    switch (category.toLowerCase()) {
-      case 'deportes':
-        return const LinearGradient(
-          colors: [Color(0xFF10B981), Color(0xFF059669)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'música':
-        return const LinearGradient(
-          colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'cultura':
-        return const LinearGradient(
-          colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'tecnología':
-        return const LinearGradient(
-          colors: [Color(0xFF3B82F6), Color(0xFF2563EB)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'gastronomía':
-        return const LinearGradient(
-          colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'aire libre':
-        return const LinearGradient(
-          colors: [Color(0xFF059669), Color(0xFF065F46)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'arte':
-        return const LinearGradient(
-          colors: [Color(0xFFEC4899), Color(0xFFDB2777)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'educación':
-        return const LinearGradient(
-          colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'social':
-        return const LinearGradient(
-          colors: [Color(0xFF14B8A6), Color(0xFF0D9488)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      case 'salud':
-        return const LinearGradient(
-          colors: [Color(0xFFF43F5E), Color(0xFFE11D48)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        );
-      default:
-        return AppGradients.primaryBtn;
+    final cat = category.toLowerCase();
+
+    if (cat.contains('fútbol') ||
+        cat.contains('baloncesto') ||
+        cat.contains('tenis') ||
+        cat.contains('pádel') ||
+        cat.contains('running') ||
+        cat.contains('ciclismo') ||
+        cat.contains('natación') ||
+        cat.contains('senderismo') ||
+        cat.contains('escalada') ||
+        cat.contains('artes marciales') ||
+        cat.contains('bolos') ||
+        cat.contains('paintball') ||
+        cat.contains('laser tag') ||
+        cat.contains('deporte')) {
+      return const LinearGradient(
+        colors: [Color(0xFF10B981), Color(0xFF059669)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
     }
+
+    if (cat.contains('concierto') ||
+        cat.contains('jazz') ||
+        cat.contains('electrónica') ||
+        cat.contains('hip hop') ||
+        cat.contains('karaoke') ||
+        cat.contains('discoteca') ||
+        cat.contains('festival') ||
+        cat.contains('ópera') ||
+        cat.contains('música')) {
+      return const LinearGradient(
+        colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+    }
+
+    if (cat.contains('teatro') ||
+        cat.contains('cine') ||
+        cat.contains('literatura') ||
+        cat.contains('danza') ||
+        cat.contains('turismo') ||
+        cat.contains('excursión') ||
+        cat.contains('cultura')) {
+      return const LinearGradient(
+        colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+    }
+
+    if (cat.contains('gaming') ||
+        cat.contains('esports') ||
+        cat.contains('programación') ||
+        cat.contains('inteligencia artificial') ||
+        cat.contains('blockchain') ||
+        cat.contains('startups') ||
+        cat.contains('hackathon') ||
+        cat.contains('meetup tech') ||
+        cat.contains('tecnología')) {
+      return const LinearGradient(
+        colors: [Color(0xFF3B82F6), Color(0xFF2563EB)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+    }
+
+    if (cat.contains('restaurante') ||
+        cat.contains('tapas') ||
+        cat.contains('cocina') ||
+        cat.contains('vinos') ||
+        cat.contains('cerveza') ||
+        cat.contains('repostería') ||
+        cat.contains('brunch') ||
+        cat.contains('food truck') ||
+        cat.contains('barbacoa') ||
+        cat.contains('picnic') ||
+        cat.contains('gastronomía')) {
+      return const LinearGradient(
+        colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+    }
+
+    if (cat.contains('arte') ||
+        cat.contains('museo') ||
+        cat.contains('fotografía') ||
+        cat.contains('pintura') ||
+        cat.contains('escultura')) {
+      return const LinearGradient(
+        colors: [Color(0xFFEC4899), Color(0xFFDB2777)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+    }
+
+    if (cat.contains('yoga') ||
+        cat.contains('gimnasio') ||
+        cat.contains('meditación') ||
+        cat.contains('spa') ||
+        cat.contains('wellness') ||
+        cat.contains('mindfulness') ||
+        cat.contains('salud')) {
+      return const LinearGradient(
+        colors: [Color(0xFFF43F5E), Color(0xFFE11D48)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+    }
+
+    if (cat.contains('taller') ||
+        cat.contains('curso') ||
+        cat.contains('conferencia') ||
+        cat.contains('seminario') ||
+        cat.contains('workshop') ||
+        cat.contains('idiomas') ||
+        cat.contains('masterclass') ||
+        cat.contains('educación')) {
+      return const LinearGradient(
+        colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+    }
+
+    if (cat.contains('fiesta') ||
+        cat.contains('cumpleaños') ||
+        cat.contains('boda') ||
+        cat.contains('despedida') ||
+        cat.contains('after work') ||
+        cat.contains('networking') ||
+        cat.contains('speed dating') ||
+        cat.contains('evento familiar') ||
+        cat.contains('social')) {
+      return const LinearGradient(
+        colors: [Color(0xFF14B8A6), Color(0xFF0D9488)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+    }
+
+    if (cat.contains('aire libre')) {
+      return const LinearGradient(
+        colors: [Color(0xFF059669), Color(0xFF065F46)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+    }
+
+    return AppGradients.primaryBtn;
   }
 
   IconData _getCategoryIcon(String category) {
-    switch (category.toLowerCase()) {
-      case 'deportes':
-        return Icons.sports_soccer_rounded;
-      case 'música':
-        return Icons.music_note_rounded;
-      case 'cultura':
-        return Icons.museum_rounded;
-      case 'tecnología':
-        return Icons.biotech_rounded;
-      case 'gastronomía':
-        return Icons.restaurant_rounded;
-      case 'aire libre':
-        return Icons.nature_people_rounded;
-      case 'arte':
-        return Icons.palette_rounded;
-      case 'educación':
-        return Icons.school_rounded;
-      case 'social':
-        return Icons.groups_rounded;
-      case 'salud':
-        return Icons.favorite_rounded;
-      default:
-        return Icons.event_rounded;
-    }
+    final cat = category.toLowerCase();
+
+    if (cat.contains('fútbol')) return Icons.sports_soccer_rounded;
+    if (cat.contains('baloncesto')) return Icons.sports_basketball_rounded;
+    if (cat.contains('tenis')) return Icons.sports_tennis_rounded;
+    if (cat.contains('pádel')) return Icons.sports_tennis_rounded;
+    if (cat.contains('running')) return Icons.directions_run_rounded;
+    if (cat.contains('ciclismo')) return Icons.directions_bike_rounded;
+    if (cat.contains('natación')) return Icons.pool_rounded;
+    if (cat.contains('gimnasio') || cat.contains('yoga'))
+      return Icons.fitness_center_rounded;
+    if (cat.contains('senderismo') || cat.contains('montañismo'))
+      return Icons.hiking_rounded;
+    if (cat.contains('escalada')) return Icons.terrain_rounded;
+    if (cat.contains('deporte')) return Icons.sports_rounded;
+
+    if (cat.contains('concierto') || cat.contains('festival'))
+      return Icons.music_note_rounded;
+    if (cat.contains('jazz') || cat.contains('electrónica'))
+      return Icons.speaker_group_rounded;
+    if (cat.contains('karaoke')) return Icons.mic_rounded;
+    if (cat.contains('discoteca')) return Icons.nightlife_rounded;
+    if (cat.contains('música')) return Icons.music_note_rounded;
+
+    if (cat.contains('teatro') || cat.contains('cine'))
+      return Icons.theater_comedy_rounded;
+    if (cat.contains('literatura')) return Icons.auto_stories_rounded;
+    if (cat.contains('fotografía')) return Icons.camera_alt_rounded;
+    if (cat.contains('pintura') ||
+        cat.contains('arte') ||
+        cat.contains('museo'))
+      return Icons.palette_rounded;
+    if (cat.contains('cultura')) return Icons.museum_rounded;
+
+    if (cat.contains('gaming') || cat.contains('esports'))
+      return Icons.sports_esports_rounded;
+    if (cat.contains('programación') ||
+        cat.contains('hackathon') ||
+        cat.contains('tech'))
+      return Icons.computer_rounded;
+    if (cat.contains('tecnología')) return Icons.biotech_rounded;
+
+    if (cat.contains('restaurante') ||
+        cat.contains('tapas') ||
+        cat.contains('cocina'))
+      return Icons.restaurant_rounded;
+    if (cat.contains('vinos') || cat.contains('cerveza') || cat.contains('bar'))
+      return Icons.local_bar_rounded;
+    if (cat.contains('café') ||
+        cat.contains('brunch') ||
+        cat.contains('repostería'))
+      return Icons.local_cafe_rounded;
+    if (cat.contains('barbacoa') || cat.contains('picnic'))
+      return Icons.outdoor_grill_rounded;
+    if (cat.contains('gastronomía')) return Icons.restaurant_rounded;
+
+    if (cat.contains('curso') ||
+        cat.contains('taller') ||
+        cat.contains('clase'))
+      return Icons.school_rounded;
+    if (cat.contains('conferencia') || cat.contains('seminario'))
+      return Icons.campaign_rounded;
+    if (cat.contains('educación')) return Icons.school_rounded;
+
+    if (cat.contains('fiesta') || cat.contains('cumpleaños'))
+      return Icons.celebration_rounded;
+    if (cat.contains('boda')) return Icons.favorite_rounded;
+    if (cat.contains('viaje') ||
+        cat.contains('turismo') ||
+        cat.contains('excursión'))
+      return Icons.flight_rounded;
+    if (cat.contains('camping')) return Icons.cabin_rounded;
+    if (cat.contains('playa')) return Icons.beach_access_rounded;
+    if (cat.contains('safari') || cat.contains('animal'))
+      return Icons.pets_rounded;
+
+    if (cat.contains('social')) return Icons.groups_rounded;
+
+    if (cat.contains('juegos de mesa') ||
+        cat.contains('ajedrez') ||
+        cat.contains('poker'))
+      return Icons.casino_rounded;
+    if (cat.contains('compras') || cat.contains('mercadillo'))
+      return Icons.shopping_bag_rounded;
+
+    if (cat.contains('aire libre')) return Icons.nature_people_rounded;
+    if (cat.contains('salud')) return Icons.favorite_rounded;
+
+    return Icons.event_rounded;
   }
 }

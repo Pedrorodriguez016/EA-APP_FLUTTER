@@ -120,10 +120,7 @@ class EventosListScreen extends GetView<EventoController> {
           IconButton(
             icon: const Icon(Icons.arrow_back_rounded),
             onPressed: () {
-              controller.isSearching.value = false;
-              controller.searchEditingController.clear();
-              controller.filterCategory.value = null;
-              controller.fetchEventos(1);
+              controller.clearFilters();
             },
           ),
         Builder(

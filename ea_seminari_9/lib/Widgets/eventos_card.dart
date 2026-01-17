@@ -52,7 +52,7 @@ class EventosCard extends StatelessWidget {
     final authController = Get.find<AuthController>();
     final currentUserId = authController.currentUser.value?.id;
 
-    // Comparación robusta: eliminamos espacios y comparamos
+    // Comparación robusta
     final bool isParticipant = evento.participantes.any((p) {
       if (currentUserId == null || currentUserId.isEmpty) return false;
       return p.trim() == currentUserId.trim();
@@ -61,10 +61,20 @@ class EventosCard extends StatelessWidget {
     final bool effectiveIsParticipant =
         showParticipationStatus && isParticipant;
 
+    // Check waitlist status
+    final bool isInWaitlist = evento.listaEspera.any((p) {
+      if (currentUserId == null || currentUserId.isEmpty) return false;
+      return p.trim() == currentUserId.trim();
+    });
+
+    // Check if event is full
+    final bool isFull =
+        evento.capacidadMaxima != null &&
+        evento.participantes.length >= evento.capacidadMaxima!;
+
     // Colores inspirados en la web
     final Color greenBase = const Color(0xFF10B981);
     final Color blueBase = const Color(0xFF3B82F6);
-    // El color activo depende de si participa o no, pero solo si estamos en vista calendario
     final Color statusColor = effectiveIsParticipant ? greenBase : blueBase;
 
     return Container(
@@ -194,6 +204,90 @@ class EventosCard extends StatelessWidget {
                             ],
                           ),
                           const SizedBox(height: 4),
+                          // Badges Row
+                          if (isInWaitlist || isFull)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 6),
+                              child: Wrap(
+                                spacing: 6,
+                                children: [
+                                  if (isFull && !isInWaitlist)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.orange.withValues(
+                                          alpha: 0.1,
+                                        ),
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(
+                                          color: Colors.orange.withValues(
+                                            alpha: 0.5,
+                                          ),
+                                        ),
+                                      ),
+                                      child: const Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            Icons.lock_clock,
+                                            size: 10,
+                                            color: Colors.orange,
+                                          ),
+                                          SizedBox(width: 4),
+                                          Text(
+                                            'Lleno',
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.orange,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  if (isInWaitlist)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 2,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.purple.withValues(
+                                          alpha: 0.1,
+                                        ),
+                                        borderRadius: BorderRadius.circular(4),
+                                        border: Border.all(
+                                          color: Colors.purple.withValues(
+                                            alpha: 0.5,
+                                          ),
+                                        ),
+                                      ),
+                                      child: const Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            Icons.hourglass_empty_rounded,
+                                            size: 10,
+                                            color: Colors.purple,
+                                          ),
+                                          SizedBox(width: 4),
+                                          Text(
+                                            'Lista espera',
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.purple,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
                           Text(
                             displayTime,
                             style: context.textTheme.bodySmall?.copyWith(

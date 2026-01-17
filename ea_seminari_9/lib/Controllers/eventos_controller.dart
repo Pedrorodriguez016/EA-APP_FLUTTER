@@ -14,7 +14,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:ea_seminari_9/Models/evento_photo.dart';
 import 'package:image_picker/image_picker.dart';
 
-enum EventFilter { all, myEvents }
+enum EventFilter { all, myEvents, recommended }
 
 class EventoController extends GetxController {
   var isLoading = true.obs;
@@ -126,6 +126,10 @@ class EventoController extends GetxController {
       if (filter == EventFilter.myEvents) {
         eventosList.clear();
         fetchMisEventosEspecificos();
+      } else if (filter == EventFilter.recommended) {
+        // Clear list and show recommended
+        fetchRecommended(isRefresh: true);
+        eventosList.assignAll(recommendedEventos);
       } else {
         currentPage.value = 1;
         fetchEventos(1);
@@ -147,8 +151,22 @@ class EventoController extends GetxController {
       // La categoría puede venir del parámetro o del estado reactivo del filtro
       final String? selectedCat = category ?? filterCategory.value;
 
+      // Si estamos en modo recomendados, cargamos recomendaciones
+      if (currentFilter.value == EventFilter.recommended) {
+        final recEvents = await _eventosServices.fetchRecommendedEvents(
+          page: page,
+          limit: limit,
+        );
+        data = {
+          'eventos': recEvents,
+          'currentPage': page,
+          'totalPages':
+              1, // Recomendaciones suelen ser limitadas o paginadas distinto
+          'total': recEvents.length,
+        };
+      }
       // Si hay búsqueda por texto, categoría o fechas, usamos el endpoint /search
-      if (searchText.isNotEmpty ||
+      else if (searchText.isNotEmpty ||
           (selectedCat != null && selectedCat.isNotEmpty) ||
           filterDateFrom.value != null ||
           filterDateTo.value != null) {
@@ -197,6 +215,7 @@ class EventoController extends GetxController {
     filterDateFrom.value = null;
     filterDateTo.value = null;
     filterCategory.value = null;
+    currentFilter.value = EventFilter.all;
     searchEditingController.clear();
     isSearching.value = false;
     fetchEventos(1);
@@ -337,6 +356,7 @@ class EventoController extends GetxController {
   Future<void> refreshEventos() async {
     searchEditingController.clear();
     await fetchEventos(1);
+    await fetchRecommended(isRefresh: true);
   }
 
   void nextPage() {
@@ -672,6 +692,10 @@ class EventoController extends GetxController {
     updateSpecificList(calendarEvents, 'calendarEvents');
     updateSpecificList(selectedDayEvents, 'selectedDayEvents');
     updateSpecificList(mapEventosList, 'mapEventosList');
+    updateSpecificList(recommendedEventos, 'recommendedEventos');
+    updateSpecificList(misEventosCreados, 'misEventosCreados');
+    updateSpecificList(misEventosInscritos, 'misEventosInscritos');
+    updateSpecificList(misInvitaciones, 'misInvitaciones');
 
     if (selectedEvento.value?.id.trim() == updatedId) {
       selectedEvento.value = updatedEvento;
@@ -1158,6 +1182,11 @@ class EventoController extends GetxController {
       '🌟 [EventoController] fetchRecommended INICIAL - isRefresh: $isRefresh, hasMore: ${hasMoreRecommended.value}, isLoadingMore: ${isRecommendedLoadingMore.value}',
     );
 
+    if (isRefresh) {
+      currentRecommendedPage.value = 1;
+      hasMoreRecommended.value = true;
+    }
+
     if (!hasMoreRecommended.value || isRecommendedLoadingMore.value) return;
 
     try {
@@ -1202,10 +1231,16 @@ class EventoController extends GetxController {
   }
 
   void showRecommendedOnly() {
-    searchEditingController.text = 'Recomendado';
+    searchEditingController.text = 'Recomendado'; // Visual feedback only
     filterCategory.value = null;
+    currentFilter.value = EventFilter.recommended; // Use the new filter state
     isSearching.value = true;
-    isLoading.value = false; // Asegurar que no se quede el spinner
-    eventosList.assignAll(recommendedEventos);
+
+    // Assign immediately if we have them, otherwise fetch
+    if (recommendedEventos.isNotEmpty) {
+      eventosList.assignAll(recommendedEventos);
+    } else {
+      fetchEventos(1);
+    }
   }
 }

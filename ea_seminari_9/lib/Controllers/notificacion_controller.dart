@@ -204,6 +204,39 @@ class NotificacionController extends GetxController
     }
   }
 
+  Future<void> deleteAllNotificaciones() async {
+    try {
+      // Opción 1: Loop simple (similar a web)
+      // Usamos toList() para evitar problemas de concurrencia si modificamos la lista mientras iteramos
+      final listToDelete = notificaciones.toList();
+
+      // Ejecutamos las eliminaciones en paralelo para mayor velocidad
+      await Future.wait(
+        listToDelete.map((n) => _services.deleteNotificacion(n.id)),
+      );
+
+      // Limpiamos la lista local
+      notificaciones.clear();
+      _updateUnreadCount();
+
+      Get.snackbar(
+        'Éxito',
+        'Todas las notificaciones han sido eliminadas',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      logger.e('Error eliminando todas las notificaciones', error: e);
+      Get.snackbar(
+        'Error',
+        'No se pudieron eliminar algunas notificaciones',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
   void _handleNotificationClick(Notificacion notif) {
     if (notif.type == 'new_message' && notif.relatedUserId != null) {
       Get.toNamed(

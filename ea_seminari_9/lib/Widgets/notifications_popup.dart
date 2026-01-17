@@ -42,10 +42,46 @@ class NotificationsPopup extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.done_all),
-                  tooltip: translate('notificaciones.marcar_todas_leidas'),
-                  onPressed: () => controller.markAllAsRead(),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.delete_sweep_rounded),
+                      tooltip: 'Borrar todas',
+                      onPressed: () {
+                        if (controller.notificaciones.isEmpty) return;
+                        Get.dialog(
+                          AlertDialog(
+                            title: const Text('Borrar todas'),
+                            content: const Text(
+                              '¿Estás seguro de que quieres eliminar todas las notificaciones?',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Get.back(),
+                                child: const Text('Cancelar'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Get.back();
+                                  controller.deleteAllNotificaciones();
+                                },
+                                style: TextButton.styleFrom(
+                                  foregroundColor: Colors.red,
+                                ),
+                                child: const Text('Borrar'),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.done_all),
+                      tooltip: translate('notificaciones.marcar_todas_leidas'),
+                      onPressed: () => controller.markAllAsRead(),
+                    ),
+                  ],
                 ),
               ],
             ),
