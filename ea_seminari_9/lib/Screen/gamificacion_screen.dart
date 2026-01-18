@@ -6,7 +6,6 @@ import '../Widgets/app_bar.dart';
 import '../Widgets/mi_progreso_card.dart';
 import '../Widgets/mis_insignias_section.dart';
 import '../Widgets/estadisticas_section.dart';
-import '../Widgets/ranking_section.dart';
 
 class GamificacionScreen extends GetView<GamificacionController> {
   const GamificacionScreen({super.key});
@@ -97,19 +96,7 @@ class GamificacionScreen extends GetView<GamificacionController> {
 
               const SizedBox(height: 24),
 
-              // Ranking
-              Text(
-                translate('gamification.ranking_title'),
-                style: context.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Obx(() {
-                // Acceder al valor de la lista observable
-                final rankingList = controller.ranking.toList();
-                return RankingSection(ranking: rankingList);
-              }),
+              // Ranking (Eliminado a petición del usuario)
             ],
           ),
         ),

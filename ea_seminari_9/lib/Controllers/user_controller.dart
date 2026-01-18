@@ -25,6 +25,7 @@ class UserController extends GetxController {
   var currentPage = 1.obs;
   var totalPages = 1.obs;
   var totalUsers = 0.obs;
+  var currentSearchQuery = ''.obs; // Search query state
   final int limit = 20;
   final int friendsLimit = 20;
 
@@ -82,6 +83,7 @@ class UserController extends GetxController {
       final data = await _userServices.fetchVisibleUsers(
         page: page,
         limit: limit,
+        query: currentSearchQuery.value,
       );
 
       final List<User> newUsers = data['users'];
@@ -115,48 +117,13 @@ class UserController extends GetxController {
   }
 
   void searchUsers(String query) async {
-    if (query.isEmpty) {
-      refreshUsers();
-      return;
-    }
-
-    try {
-      logger.i('🔍 Búsqueda de usuario: $query');
-      isLoading(true);
-
-      final User? user = await _userServices.getUserByUsername(query);
-
-      if (user != null) {
-        logger.i('✅ Usuario encontrado: ${user.username}');
-        userList.assignAll([user]);
-      } else {
-        logger.w('⚠️ No se encontró usuario con el nombre: $query');
-        userList.clear();
-        Get.snackbar(
-          translate('common.search'),
-          translate('users.empty_search'), // 'No se encontró ningún usuario'
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.orange,
-          colorText: Colors.white,
-          duration: const Duration(seconds: 2),
-        );
-      }
-    } catch (e) {
-      logger.e('❌ Error en búsqueda de usuario', error: e);
-      Get.snackbar(
-        translate('common.error'),
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-    } finally {
-      isLoading(false);
-    }
+    currentSearchQuery.value = query;
+    await fetchUsers(1);
   }
 
   Future<void> refreshUsers() async {
     searchEditingController.clear();
+    currentSearchQuery.value = '';
     await fetchUsers(1);
   }
 

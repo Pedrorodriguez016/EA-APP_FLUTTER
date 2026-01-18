@@ -21,14 +21,20 @@ class UserServices {
   Future<Map<String, dynamic>> fetchVisibleUsers({
     int page = 1,
     int limit = 20,
+    String? query,
   }) async {
     try {
       logger.d(
-        '📑 Obteniendo usuarios visibles - Página: $page, Límite: $limit',
+        '📑 Obteniendo usuarios visibles - Página: $page, Límite: $limit${query != null ? ", Búsqueda: $query" : ""}',
       );
+      final Map<String, dynamic> queryParams = {'page': page, 'limit': limit};
+      if (query != null && query.isNotEmpty) {
+        queryParams['q'] = query;
+      }
+
       final response = await _client.get(
         '/visibleusers',
-        queryParameters: {'page': page, 'limit': limit},
+        queryParameters: queryParams,
       );
 
       final responseData = response.data;
