@@ -12,82 +12,88 @@ class ChatListScreen extends GetView<ChatListController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: Text(
-          translate('chat.list_title'),
-          style: context.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+    return WillPopScope(
+      onWillPop: () async {
+        return true; // Permitir volver atrás
+      },
+      child: Scaffold(
         backgroundColor: context.theme.scaffoldBackgroundColor,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.refresh, color: context.theme.iconTheme.color),
-            onPressed: controller.loadData,
-          ),
-          Builder(
-            builder: (scaffoldContext) => IconButton(
-              icon: Icon(
-                Icons.menu_rounded,
-                color: context.theme.colorScheme.primary,
-              ),
-              onPressed: () => Scaffold.of(scaffoldContext).openEndDrawer(),
+        appBar: AppBar(
+          title: Text(
+            translate('chat.list_title'),
+            style: context.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.bold,
             ),
           ),
-        ],
-      ),
-      endDrawer: const GlobalDrawer(),
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (controller.friendsList.isEmpty && controller.eventsList.isEmpty) {
-          return _buildEmptyState(context);
-        }
-
-        return Column(
-          children: [
-            _buildFilterBar(context),
-            Divider(height: 1, color: context.theme.dividerColor),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                children: [
-                  if (controller.selectedFilter.value == ChatFilter.all ||
-                      controller.selectedFilter.value == ChatFilter.events)
-                    if (controller.eventsList.isNotEmpty) ...[
-                      _buildSectionHeader(
-                        context,
-                        translate('chat.events_section'),
-                      ),
-                      ...controller.eventsList.map(
-                        (event) => _buildEventTile(context, event, controller),
-                      ),
-                      const SizedBox(height: 20),
-                    ],
-                  if (controller.selectedFilter.value == ChatFilter.all ||
-                      controller.selectedFilter.value == ChatFilter.friends)
-                    if (controller.friendsList.isNotEmpty) ...[
-                      _buildSectionHeader(
-                        context,
-                        translate('chat.friends_section'),
-                      ),
-                      ...controller.friendsList.map(
-                        (friend) =>
-                            _buildFriendTile(context, friend, controller),
-                      ),
-                    ],
-                ],
+          backgroundColor: context.theme.scaffoldBackgroundColor,
+          elevation: 0,
+          actions: [
+            IconButton(
+              icon: Icon(Icons.refresh, color: context.theme.iconTheme.color),
+              onPressed: controller.loadData,
+            ),
+            Builder(
+              builder: (scaffoldContext) => IconButton(
+                icon: Icon(
+                  Icons.menu_rounded,
+                  color: context.theme.colorScheme.primary,
+                ),
+                onPressed: () => Scaffold.of(scaffoldContext).openEndDrawer(),
               ),
             ),
           ],
-        );
-      }),
-      bottomNavigationBar: CustomNavBar(currentIndex: 2),
+        ),
+        endDrawer: const GlobalDrawer(),
+        body: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (controller.friendsList.isEmpty && controller.eventsList.isEmpty) {
+            return _buildEmptyState(context);
+          }
+
+          return Column(
+            children: [
+              _buildFilterBar(context),
+              Divider(height: 1, color: context.theme.dividerColor),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  children: [
+                    if (controller.selectedFilter.value == ChatFilter.all ||
+                        controller.selectedFilter.value == ChatFilter.events)
+                      if (controller.eventsList.isNotEmpty) ...[
+                        _buildSectionHeader(
+                          context,
+                          translate('chat.events_section'),
+                        ),
+                        ...controller.eventsList.map(
+                          (event) =>
+                              _buildEventTile(context, event, controller),
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    if (controller.selectedFilter.value == ChatFilter.all ||
+                        controller.selectedFilter.value == ChatFilter.friends)
+                      if (controller.friendsList.isNotEmpty) ...[
+                        _buildSectionHeader(
+                          context,
+                          translate('chat.friends_section'),
+                        ),
+                        ...controller.friendsList.map(
+                          (friend) =>
+                              _buildFriendTile(context, friend, controller),
+                        ),
+                      ],
+                  ],
+                ),
+              ),
+            ],
+          );
+        }),
+        bottomNavigationBar: CustomNavBar(currentIndex: 2),
+      ),
     );
   }
 

@@ -32,11 +32,8 @@ class HomeScreen extends GetView<UserController> {
       }
     });
 
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (bool didPop) async {
-        if (didPop) return;
-
+    return WillPopScope(
+      onWillPop: () async {
         final shouldExit = await Get.dialog<bool>(
           AlertDialog(
             title: Text(translate('home.exit_dialog.title')),
@@ -55,14 +52,7 @@ class HomeScreen extends GetView<UserController> {
           ),
         );
 
-        if (shouldExit == true) {
-          // Cerrar la aplicación
-          Get.closeAllSnackbars();
-          // En Android, esto cerrará la app
-          if (Get.key.currentState?.mounted ?? false) {
-            Get.key.currentState?.pop();
-          }
-        }
+        return shouldExit ?? false;
       },
       child: Scaffold(
         backgroundColor: context.theme.scaffoldBackgroundColor,

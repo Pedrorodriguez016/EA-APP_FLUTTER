@@ -49,99 +49,104 @@ class ProfileScreen extends GetView<UserController> {
       eventoController.fetchMisEventosEspecificos();
     });
 
-    return Scaffold(
-      backgroundColor: context.theme.scaffoldBackgroundColor,
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        actions: [
-          Builder(
-            builder: (scaffoldContext) => IconButton(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: context.theme.scaffoldBackgroundColor.withValues(
-                    alpha: 0.8,
-                  ),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.menu_rounded,
-                  color: context.theme.colorScheme.primary,
-                  size: 20,
-                ),
-              ),
-              onPressed: () => Scaffold.of(scaffoldContext).openEndDrawer(),
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      endDrawer: const GlobalDrawer(),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildProfileHeader(context),
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildStatsBar(context),
-                  const SizedBox(height: 32),
-
-                  Text(
-                    translate('events.progress_achievements'),
-                    style: context.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
+    return WillPopScope(
+      onWillPop: () async {
+        return true; // Permitir volver atrás
+      },
+      child: Scaffold(
+        backgroundColor: context.theme.scaffoldBackgroundColor,
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          actions: [
+            Builder(
+              builder: (scaffoldContext) => IconButton(
+                icon: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: context.theme.scaffoldBackgroundColor.withValues(
+                      alpha: 0.8,
                     ),
+                    shape: BoxShape.circle,
                   ),
-                  const SizedBox(height: 16),
-                  const GamificacionCard(),
-
-                  const SizedBox(height: 32),
-                  _buildMyEventsSection(context),
-
-                  const SizedBox(height: 32),
-                  Text(
-                    translate('events.personal_info'),
-                    style: context.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
+                  child: Icon(
+                    Icons.menu_rounded,
+                    color: context.theme.colorScheme.primary,
+                    size: 20,
                   ),
-                  const SizedBox(height: 16),
-                  _buildProfileFields(
-                    context,
-                    nameController,
-                    emailController,
-                    birthdayController,
-                    (date) => selectedBirthDate = date,
-                  ),
-
-                  const SizedBox(height: 40),
-                  _buildSaveButton(
-                    context,
-                    user,
-                    nameController,
-                    emailController,
-                    birthdayController,
-                    () => selectedBirthDate, // Pass getter
-                  ),
-
-                  const SizedBox(height: 16),
-                  _buildDeleteAccountButton(context),
-                  const SizedBox(height: 40),
-                ],
+                ),
+                onPressed: () => Scaffold.of(scaffoldContext).openEndDrawer(),
               ),
             ),
+            const SizedBox(width: 8),
           ],
         ),
-      ),
-      bottomNavigationBar: const CustomNavBar(currentIndex: 4),
-    );
+        endDrawer: const GlobalDrawer(),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              _buildProfileHeader(context),
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildStatsBar(context),
+                    const SizedBox(height: 32),
+
+                    Text(
+                      translate('events.progress_achievements'),
+                      style: context.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const GamificacionCard(),
+
+                    const SizedBox(height: 32),
+                    _buildMyEventsSection(context),
+
+                    const SizedBox(height: 32),
+                    Text(
+                      translate('events.personal_info'),
+                      style: context.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildProfileFields(
+                      context,
+                      nameController,
+                      emailController,
+                      birthdayController,
+                      (date) => selectedBirthDate = date,
+                    ),
+
+                    const SizedBox(height: 40),
+                    _buildSaveButton(
+                      context,
+                      user,
+                      nameController,
+                      emailController,
+                      birthdayController,
+                      () => selectedBirthDate, // Pass getter
+                    ),
+
+                    const SizedBox(height: 16),
+                    _buildDeleteAccountButton(context),
+                    const SizedBox(height: 40),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        bottomNavigationBar: const CustomNavBar(currentIndex: 4),
+      ), // Cierre del Scaffold
+    ); // Cierre del PopScope
   }
 
   void _showPickerOptions(BuildContext context) {

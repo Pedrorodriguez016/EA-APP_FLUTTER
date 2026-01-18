@@ -12,17 +12,15 @@ class EventosListScreen extends GetView<EventoController> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvoked: (bool didPop) {
-        if (didPop) return;
-
+    return WillPopScope(
+      onWillPop: () async {
         // Si estamos en modo búsqueda/filtros, volver al estado inicial
         if (controller.isSearching.value) {
           controller.clearFilters();
+          return false; // No hacer pop, solo limpiar filtros
         } else {
           // Si estamos en la vista inicial, permitir navegación normal
-          Get.back();
+          return true; // Permitir pop
         }
       },
       child: Scaffold(

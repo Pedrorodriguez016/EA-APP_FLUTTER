@@ -98,19 +98,19 @@ class CustomNavBar extends StatelessWidget {
 
     switch (index) {
       case 0:
-        Get.offNamed('/home');
+        Get.toNamed('/home');
         break;
       case 1:
-        Get.offNamed('/eventos');
+        Get.toNamed('/eventos');
         break;
       case 2:
-        Get.offNamed('/chat-list');
+        Get.toNamed('/chat-list');
         break;
       case 3:
-        Get.offNamed('/calendar');
+        Get.toNamed('/calendar');
         break;
       case 4:
-        Get.offNamed('/profile');
+        Get.toNamed('/profile');
         break;
     }
   }
