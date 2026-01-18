@@ -63,12 +63,6 @@
       "birthday_empty": "Por favor ingresa tu fecha de nacimiento",
       "birthday_invalid": "Fecha inválida",
       "age_restriction": "Debes ser mayor de 13 años",
-      "not_authenticated": "Usuario no autenticado",
-      "password_weak": "La contraseña es débil",
-      "password_medium": "Contraseña media",
-      "password_strong": "Contraseña fuerte",
-      "password_secure": "Contraseña segura",
-      "age_restriction": "Debes tener al menos 13 años",
       "google_unsupported": "Este dispositivo no soporta autenticación de Google",
       "google_token_error": "No se pudo obtener el ID Token de Google",
       "google_failed": "Error al iniciar sesión con Google"
@@ -145,6 +139,7 @@
       "load_my_events": "No se pudieron cargar tus eventos"
     },
     "chat_btn": "Chat del evento",
+    "album_btn": "Álbum del evento",
     "chat_subtitle": "Conversación grupal",
     "chat_hint": "Escribe un mensaje...",
     "reviews_title": "Valoraciones",

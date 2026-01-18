@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:gal/gal.dart';
 import 'package:dio/dio.dart';
+import 'dart:io';
 
 class EventChatController extends GetxController {
   final SocketService _socketService;
@@ -158,6 +159,104 @@ class EventChatController extends GetxController {
     _socketService.sendEventChatMessage(eventId, myUserId, myUsername, text);
   }
 
+  Future<void> sendImageMessage() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 70,
+      );
+
+      if (image == null) return;
+
+      // 1. Mostrar Preview antes de enviar
+      final bool? confirm = await Get.dialog<bool>(
+        Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  '¿Enviar imagen?',
+                  style: Get.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Flexible(
+                child: Container(
+                  constraints: const BoxConstraints(maxHeight: 400),
+                  child: Image.file(File(image.path), fit: BoxFit.contain),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    TextButton(
+                      onPressed: () => Get.back(result: false),
+                      child: Text(
+                        'Cancelar',
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Get.theme.primaryColor,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () => Get.back(result: true),
+                      child: const Text('Enviar'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      if (confirm != true) return;
+
+      isLoading.value = true;
+
+      // 2. Subir la imagen al servidor
+      final String imageUrl = await _eventosServices.uploadEventChatImage(
+        eventId,
+        image.path,
+      );
+
+      // 3. Enviar el mensaje a través del socket
+      _socketService.sendEventChatMessage(
+        eventId,
+        myUserId,
+        myUsername,
+        '', // Texto vacío si solo es imagen
+        imageUrl,
+      );
+
+      logger.i('✅ Imagen enviada al chat del evento');
+    } catch (e) {
+      logger.e('❌ Error al enviar imagen al chat', error: e);
+      Get.snackbar(
+        'Error',
+        'No se pudo enviar la imagen',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   Future<void> fetchPhotos() async {
     isPhotosLoading.value = true;
     try {
@@ -261,6 +360,30 @@ class EventChatController extends GetxController {
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
       );
+    }
+  }
+
+  Future<void> deletePhoto(String photoId) async {
+    try {
+      isLoading.value = true;
+      await _eventosServices.deleteEventoPhoto(eventId, photoId);
+      photos.removeWhere((p) => p.id == photoId);
+      Get.snackbar(
+        '¡Éxito!',
+        'Foto eliminada del álbum',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      logger.e('❌ Error al eliminar foto', error: e);
+      Get.snackbar(
+        'Error',
+        'No se pudo eliminar la foto',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
     }
   }
 

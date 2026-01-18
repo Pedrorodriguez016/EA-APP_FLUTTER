@@ -52,11 +52,21 @@ class SocketService extends GetxService {
     _socket.emit('chat:join', {'userId': myUserId, 'friendId': friendId});
   }
 
-  void sendChatMessage(String from, String to, String text) {
+  void sendChatMessage(
+    String from,
+    String to,
+    String text, [
+    String? imageUrl,
+  ]) {
     logger.d(
       '📤 [SocketService] Enviando mensaje privado de $from a $to: $text',
     );
-    _socket.emit('chat:message', {'from': from, 'to': to, 'text': text});
+    _socket.emit('chat:message', {
+      'from': from,
+      'to': to,
+      'text': text,
+      if (imageUrl != null) 'imageUrl': imageUrl,
+    });
   }
 
   // El controlador pasará una función aquí para saber qué hacer cuando llegue un mensaje
@@ -89,8 +99,9 @@ class SocketService extends GetxService {
     String eventId,
     String userId,
     String username,
-    String text,
-  ) {
+    String text, [
+    String? imageUrl,
+  ]) {
     logger.d(
       '📤 [SocketService] Enviando mensaje al evento $eventId de $username: $text',
     );
@@ -99,6 +110,7 @@ class SocketService extends GetxService {
       'userId': userId,
       'username': username,
       'text': text,
+      if (imageUrl != null) 'imageUrl': imageUrl,
     });
   }
 

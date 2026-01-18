@@ -13,6 +13,9 @@ import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:ea_seminari_9/Models/evento_photo.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:gal/gal.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:dio/dio.dart' as d;
 
 enum EventFilter { all, myEvents }
 
@@ -616,33 +619,187 @@ class EventoController extends GetxController {
   Future<void> uploadEventPhoto(String eventId) async {
     try {
       final ImagePicker picker = ImagePicker();
-      final XFile? image = await picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 70,
+
+      // Mostrar opciones para elegir modo
+      final result = await Get.bottomSheet<Map<String, dynamic>>(
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Get.context!.theme.scaffoldBackgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Compartir contenido',
+                style: Get.context!.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                leading: const Icon(Icons.collections),
+                title: const Text('Galería'),
+                onTap: () => Get.back(result: {'mode': 'gallery'}),
+              ),
+            ],
+          ),
+        ),
       );
 
-      if (image == null) return;
+      if (result == null) return;
+
+      final String mode = result['mode'];
+
+      List<XFile> files = [];
+      if (mode == 'gallery') {
+        // pickMultipleMedia permite seleccionar varios elementos a la vez (fotos y videos)
+        files = await picker.pickMultipleMedia();
+      } else if (mode == 'camera_photo') {
+        final XFile? file = await picker.pickImage(
+          source: ImageSource.camera,
+          imageQuality: 70,
+        );
+        if (file != null) files.add(file);
+      } else if (mode == 'camera_video') {
+        final XFile? file = await picker.pickVideo(
+          source: ImageSource.camera,
+          maxDuration: const Duration(minutes: 5),
+        );
+        if (file != null) files.add(file);
+      }
+
+      if (files.isEmpty) return;
 
       isLoading(true);
-      final newPhoto = await _eventosServices.uploadMedia(eventId, image.path);
-      eventoPhotos.insert(0, newPhoto);
+      int successCount = 0;
 
-      Get.snackbar(
-        '¡Éxito!',
-        'Contenido compartido correctamente',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
+      for (var file in files) {
+        try {
+          final newPhoto = await _eventosServices.uploadMedia(
+            eventId,
+            file.path,
+          );
+          eventoPhotos.insert(0, newPhoto);
+          successCount++;
+        } catch (e) {
+          logger.e('Error subiendo archivo ${file.name}: $e');
+        }
+      }
+
+      if (successCount > 0) {
+        Get.snackbar(
+          '¡Éxito!',
+          successCount == 1
+              ? 'Contenido compartido correctamente'
+              : '$successCount elementos compartidos correctamente',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      } else if (files.isNotEmpty) {
+        Get.snackbar(
+          'Error',
+          'No se pudo compartir el contenido',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
     } catch (e) {
-      logger.e('Error uploading photo: $e');
+      logger.e('Error uploading media: $e');
       Get.snackbar(
         'Error',
-        'No se pudo compartir la foto',
+        'Ocurrió un error al procesar el contenido',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
     } finally {
       isLoading(false);
+    }
+  }
+
+  Future<void> deletePhoto(String eventId, String photoId) async {
+    try {
+      isLoading(true);
+      await _eventosServices.deleteEventoPhoto(eventId, photoId);
+      eventoPhotos.removeWhere((p) => p.id == photoId);
+      Get.snackbar(
+        '¡Éxito!',
+        'Contenido eliminado correctamente',
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      logger.e('Error deleting media: $e');
+      Get.snackbar(
+        'Error',
+        'No se pudo eliminar el contenido',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> downloadMedia(String url) async {
+    try {
+      // Pedir permiso si es necesario
+      bool hasPermission = await Gal.hasAccess();
+      if (!hasPermission) {
+        hasPermission = await Gal.requestAccess();
+      }
+      if (!hasPermission) {
+        Get.snackbar('Permiso denegado', 'Se requiere acceso a la galería');
+        return;
+      }
+
+      Get.snackbar(
+        'Descargando...',
+        'Iniciando descarga de contenido',
+        showProgressIndicator: true,
+      );
+
+      final dio = d.Dio();
+      final tempDir = await getTemporaryDirectory();
+      final fileName = url.split('/').last;
+      // Asegurarse de quitar extensiones raras o parámetros de query si los hubiera
+      final cleanFileName = fileName.split('?').first;
+      final tempPath = '${tempDir.path}/$cleanFileName';
+
+      await dio.download(
+        url,
+        tempPath,
+        options: d.Options(
+          headers: {'Authorization': 'Bearer ${_authController.token ?? ''}'},
+        ),
+      );
+
+      await Gal.putImage(
+        tempPath,
+      ); // Gal.putImage sirve para fotos y videos en versiones recientes o detecta por extensión
+      // En Gal 2.x+, se usa putImage o putVideo.
+      // Si queremos ser precisos:
+      if (tempPath.endsWith('.mp4') || tempPath.endsWith('.mov')) {
+        await Gal.putVideo(tempPath);
+      } else {
+        await Gal.putImage(tempPath);
+      }
+
+      Get.snackbar(
+        '¡Éxito!',
+        'Imagen/Video guardado en la galería',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      logger.e('Error downloading media: $e');
+      Get.snackbar(
+        'Error',
+        'No se pudo descargar el contenido',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     }
   }
 

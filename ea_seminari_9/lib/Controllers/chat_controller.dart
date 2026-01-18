@@ -5,6 +5,7 @@ import '../Controllers/auth_controller.dart';
 import '../Models/chat.dart';
 import '../utils/logger.dart';
 import '../Services/user_services.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ChatController extends GetxController {
   // Dependencias
@@ -140,11 +141,63 @@ class ChatController extends GetxController {
       return;
     }
 
+    // 1. Inserción Optimista
+    final tempMsg = ChatMessage(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      from: myUserId,
+      to: friendId,
+      text: text,
+      createdAt: DateTime.now(),
+      isMine: true,
+    );
+    messages.insert(0, tempMsg);
+
     logger.i('📤 Enviando mensaje a $friendId: $text');
     textController.clear();
     focusNode.requestFocus();
 
     _socketService.sendChatMessage(myUserId, friendId, text);
+  }
+
+  Future<void> sendImageMessage() async {
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 70,
+      );
+
+      if (image == null) return;
+
+      isLoading.value = true;
+
+      // 1. Subir la imagen al servidor
+      final String imageUrl = await _userServices.uploadChatImage(
+        myUserId,
+        friendId,
+        image.path,
+      );
+
+      // 2. Enviar el mensaje a través del socket
+      _socketService.sendChatMessage(
+        myUserId,
+        friendId,
+        '', // Texto vacío si solo es imagen
+        imageUrl,
+      );
+
+      logger.i('✅ Imagen enviada al chat');
+    } catch (e) {
+      logger.e('❌ Error al enviar imagen al chat', error: e);
+      Get.snackbar(
+        'Error',
+        'No se pudo enviar la imagen',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   @override
