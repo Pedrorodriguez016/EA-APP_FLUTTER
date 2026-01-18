@@ -18,31 +18,22 @@ class UserServices {
     _client.interceptors.add(AuthInterceptor());
   }
 
-  Future<Map<String, dynamic>> fetchUsers({
-    int page = 1,
-    int limit = 20,
-    String q = '',
-  }) async {
+  Future<Map<String, dynamic>> fetchVisibleUsers() async {
     try {
-      logger.d('📑 Obteniendo usuarios - Página: $page, Límite: $limit');
-      final response = await _client.get(
-        '/',
-        queryParameters: {'page': page, 'limit': limit},
-      );
+      logger.d('📑 Obteniendo usuarios visibles');
+      final response = await _client.get('/visibleusers');
 
       final responseData = response.data;
       final List<dynamic> userList = responseData['data'];
-      logger.i('✅ Usuarios obtenidos: ${userList.length} usuarios');
+      logger.i('✅ Usuarios visibles obtenidos: ${userList.length} usuarios');
 
       return {
         'users': userList.map((json) => User.fromJson(json)).toList(),
-        'totalPages': responseData['totalPages'] ?? 1,
-        'currentPage': responseData['page'] ?? 1,
         'total': responseData['totalItems'] ?? 0,
       };
     } catch (e) {
-      logger.e('❌ Error al cargar usuarios', error: e);
-      throw Exception('Error al cargar usuarios: $e');
+      logger.e('❌ Error al cargar usuarios visibles', error: e);
+      throw Exception('Error al cargar usuarios visibles: $e');
     }
   }
 
