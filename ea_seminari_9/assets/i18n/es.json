@@ -32,7 +32,20 @@
       "register_link": "Regístrate aquí",
       "success_msg": "Sesión iniciada correctamente",
       "or_continue_with": "O continuar con",
-      "google_btn": "Iniciar sesión con Google"
+      "google_btn": "Iniciar sesión con Google",
+      "forgot_password_link": "¿Olvidaste tu contraseña?"
+    },
+    "forgot_password": {
+      "title": "Recuperar Contraseña",
+      "subtitle": "Ingresa tu email para recibir un código.",
+      "send_btn": "Enviar Código",
+      "email_sent_title": "Código Enviado",
+      "email_sent_msg": "Si el email existe, recibirás un código.",
+      "reset_title": "Restablecer Contraseña",
+      "reset_subtitle": "Ingresa el código y tu nueva contraseña.",
+      "new_password_label": "Nueva contraseña",
+      "reset_btn": "Restablecer",
+      "success_msg": "Contraseña restablecida correctamente"
     },
     "register": {
       "title": "Crear Cuenta",
@@ -105,6 +118,7 @@
       "error_title": "Error de verificación",
       "error_invalid_code": "Código incorrecto",
       "error_expired": "El código ha expirado",
+      "error_not_verified": "Email no verificado. Revisa tu correo.",
       "success_login": "Verificación exitosa, por favor inicia sesión"
     }
   },

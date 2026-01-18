@@ -31,7 +31,20 @@
       "register_link": "Registra't aquí",
       "success_msg": "Sessió iniciada correctament",
       "or_continue_with": "O continua amb",
-      "google_btn": "Inicia sessió amb Google"
+      "google_btn": "Inicia sessió amb Google",
+      "forgot_password_link": "Has oblidat la contrasenya?"
+    },
+    "forgot_password": {
+      "title": "Recuperar Contrasenya",
+      "subtitle": "Introdueix el teu correu per rebre un codi.",
+      "send_btn": "Enviar Codi",
+      "email_sent_title": "Codi Enviat",
+      "email_sent_msg": "Si el correu existeix, rebràs un codi.",
+      "reset_title": "Restablir Contrasenya",
+      "reset_subtitle": "Introdueix el codi i la teva nova contrasenya.",
+      "new_password_label": "Nova contrasenya",
+      "reset_btn": "Restablir",
+      "success_msg": "Contrasenya restablerta correctament"
     },
     "register": {
       "title": "Crear Compte",
@@ -103,6 +116,7 @@
       "error_title": "Error de verificació",
       "error_invalid_code": "Codi incorrecte",
       "error_expired": "El codi ha caducat",
+      "error_not_verified": "Correu no verificat. Revisa la teva safata.",
       "success_login": "Verificació correcta, si us plau inicia sessió"
     }
   },

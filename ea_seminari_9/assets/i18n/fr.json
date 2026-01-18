@@ -31,7 +31,20 @@
       "register_link": "Inscrivez-vous ici",
       "success_msg": "Connexion réussie",
       "or_continue_with": "Ou continuer avec",
-      "google_btn": "Se connecter avec Google"
+      "google_btn": "Se connecter avec Google",
+      "forgot_password_link": "Mot de passe oublié ?"
+    },
+    "forgot_password": {
+      "title": "Récupérer le mot de passe",
+      "subtitle": "Entrez votre e-mail pour recevoir un code.",
+      "send_btn": "Envoyer le code",
+      "email_sent_title": "Code envoyé",
+      "email_sent_msg": "Si l'e-mail existe, vous recevrez un code.",
+      "reset_title": "Réinitialiser le mot de passe",
+      "reset_subtitle": "Entrez le code et votre nouveau mot de passe.",
+      "new_password_label": "Nouveau mot de passe",
+      "reset_btn": "Réinitialiser",
+      "success_msg": "Mot de passe réinitialisé avec succès"
     },
     "register": {
       "title": "Créer un compte",
@@ -103,6 +116,7 @@
       "error_title": "Erreur de vérification",
       "error_invalid_code": "Code invalide",
       "error_expired": "Code expiré",
+      "error_not_verified": "Email non vérifié. Vérifiez votre boîte de réception.",
       "success_login": "Vérification réussie, veuillez vous connecter"
     }
   },

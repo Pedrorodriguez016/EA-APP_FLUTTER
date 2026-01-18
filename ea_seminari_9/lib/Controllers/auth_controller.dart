@@ -118,15 +118,7 @@ class AuthController extends GetxController {
 
       if (e.response?.statusCode == 403 &&
           errorData['error'] == 'EMAIL_NOT_VERIFIED') {
-        if (loginUserCtrl.text.contains('@')) {
-          Get.toNamed('/verify-email', arguments: loginUserCtrl.text);
-          isLoginLoading.value = false;
-          return;
-        } else {
-          // If we don't have the email (user logged in with username), warn them.
-          msg =
-              'Email no verificado. Por favor inicia sesión con tu email para verificarlo.';
-        }
+        msg = translate('auth.verification.error_not_verified');
       }
 
       Get.snackbar(
@@ -512,6 +504,83 @@ class AuthController extends GetxController {
       Get.snackbar(
         translate('common.error'),
         '$e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    }
+  }
+
+  Future<bool> sendForgotPassword(String email) async {
+    try {
+      isLoginLoading.value = true;
+      await _authService.forgotPassword(email);
+      isLoginLoading.value = false;
+
+      Get.snackbar(
+        translate('auth.forgot_password.email_sent_title'),
+        translate('auth.forgot_password.email_sent_msg'),
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return true;
+    } catch (e) {
+      isLoginLoading.value = false;
+      logger.e('Error en forgot password', error: e);
+      String msg = translate('common.error');
+      if (e is DioException) {
+        msg = e.response?.data['error'] ?? msg;
+        if (msg == 'RATE_LIMITED') msg = 'Rate limit exceeded. Wait a bit.';
+      }
+      Get.snackbar(
+        translate('common.error'),
+        msg,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    }
+  }
+
+  Future<bool> resetPassword(
+    String email,
+    String otp,
+    String newPassword,
+  ) async {
+    try {
+      isLoginLoading.value = true;
+      await _authService.resetPassword(
+        email: email,
+        otp: otp,
+        newPassword: newPassword,
+      );
+      isLoginLoading.value = false;
+
+      Get.snackbar(
+        translate('common.success'),
+        translate('auth.forgot_password.success_msg'),
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return true;
+    } catch (e) {
+      isLoginLoading.value = false;
+      logger.e('Error en reset password', error: e);
+      String msg = translate('common.error');
+      if (e is DioException) {
+        msg = e.response?.data['error'] ?? msg;
+        if (msg == 'INVALID_CODE')
+          msg = translate('auth.verification.error_invalid_code');
+        if (msg == 'EXPIRED_CODE')
+          msg = translate('auth.verification.error_expired');
+      }
+      Get.snackbar(
+        translate('common.error'),
+        msg,
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,

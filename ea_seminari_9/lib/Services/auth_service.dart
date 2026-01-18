@@ -124,4 +124,38 @@ class AuthService {
       rethrow;
     }
   }
+
+  Future<Map<String, dynamic>> forgotPassword(String email) async {
+    try {
+      logger.d('📡 POST /auth/forgot-password - email: $email');
+      final response = await _client.post(
+        '/auth/forgot-password',
+        data: {'email': email},
+      );
+      logger.i('✅ Solicitud cambio contraseña enviada a: $email');
+      return response.data;
+    } catch (e) {
+      logger.e('❌ Error solicitando cambio contraseña para: $email', error: e);
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) async {
+    try {
+      logger.d('📡 POST /auth/reset-password - email: $email');
+      final response = await _client.post(
+        '/auth/reset-password',
+        data: {'email': email, 'otp': otp, 'newPassword': newPassword},
+      );
+      logger.i('✅ Contraseña restablecida correctamente para: $email');
+      return response.data;
+    } catch (e) {
+      logger.e('❌ Error restableciendo contraseña para: $email', error: e);
+      rethrow;
+    }
+  }
 }

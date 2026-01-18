@@ -198,6 +198,27 @@ class LoginScreen extends GetView<AuthController> {
               ),
             ),
           ),
+          const SizedBox(height: 12),
+          // FORGOT PASSWORD
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () => _showForgotPasswordDialog(context),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text(
+                translate('auth.login.forgot_password_link'),
+                style: TextStyle(
+                  color: context.theme.colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ),
           const SizedBox(height: 32),
 
           // BUTTON
@@ -421,6 +442,189 @@ class LoginScreen extends GetView<AuthController> {
           }).toList(),
         ),
       ),
+    );
+  }
+
+  void _showForgotPasswordDialog(BuildContext context) {
+    final emailCtrl = TextEditingController();
+    final otpCtrl = TextEditingController();
+    final passCtrl = TextEditingController();
+    final confirmPassCtrl = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    int step = 1; // 1: Email, 2: OTP+Pass
+    bool isLoading = false;
+
+    // Pre-fill email if user typed it in login
+    if (controller.loginUserCtrl.text.contains('@')) {
+      emailCtrl.text = controller.loginUserCtrl.text;
+    }
+
+    Get.dialog(
+      StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Text(
+              step == 1
+                  ? translate('auth.forgot_password.title')
+                  : translate('auth.forgot_password.reset_title'),
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            content: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      step == 1
+                          ? translate('auth.forgot_password.subtitle')
+                          : translate('auth.forgot_password.reset_subtitle'),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.grey[600], fontSize: 14),
+                    ),
+                    const SizedBox(height: 20),
+                    if (step == 1)
+                      TextFormField(
+                        controller: emailCtrl,
+                        decoration: InputDecoration(
+                          labelText: translate('auth.fields.email'),
+                          prefixIcon: const Icon(Icons.email_outlined),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        validator: (v) => GetUtils.isEmail(v ?? '')
+                            ? null
+                            : translate('auth.errors.email_invalid'),
+                      ),
+                    if (step == 2) ...[
+                      TextFormField(
+                        controller: otpCtrl,
+                        decoration: InputDecoration(
+                          labelText: translate('auth.verification.code_label'),
+                          prefixIcon: const Icon(Icons.lock_clock_outlined),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        validator: (v) => (v?.length ?? 0) == 6
+                            ? null
+                            : translate('auth.verification.error_invalid_code'),
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: passCtrl,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: translate(
+                            'auth.forgot_password.new_password_label',
+                          ),
+                          prefixIcon: const Icon(Icons.lock_reset),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        validator: (v) => (v?.length ?? 0) >= 6
+                            ? null
+                            : translate('auth.errors.password_short'),
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: confirmPassCtrl,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: translate('auth.fields.confirm_password'),
+                          prefixIcon: const Icon(Icons.lock_outline),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        validator: (v) {
+                          if ((v?.length ?? 0) < 6)
+                            return translate('auth.errors.password_short');
+                          if (v != passCtrl.text)
+                            return translate('auth.errors.password_mismatch');
+                          return null;
+                        },
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+            actions: [
+              if (!isLoading)
+                TextButton(
+                  onPressed: () => Get.back(),
+                  child: Text(translate('common.cancel')),
+                ),
+              ElevatedButton(
+                onPressed: isLoading
+                    ? null
+                    : () async {
+                        if (!formKey.currentState!.validate()) return;
+
+                        setState(() => isLoading = true);
+
+                        if (step == 1) {
+                          bool sent = await controller.sendForgotPassword(
+                            emailCtrl.text.trim(),
+                          );
+                          setState(() => isLoading = false);
+                          if (sent) {
+                            setState(() => step = 2);
+                          }
+                        } else {
+                          if (passCtrl.text != confirmPassCtrl.text) {
+                            Get.snackbar(
+                              translate('common.error'),
+                              translate('auth.errors.password_mismatch'),
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                              snackPosition: SnackPosition.BOTTOM,
+                            );
+                            setState(() => isLoading = false);
+                            return;
+                          }
+
+                          bool reset = await controller.resetPassword(
+                            emailCtrl.text.trim(),
+                            otpCtrl.text.trim(),
+                            passCtrl.text.trim(),
+                          );
+                          setState(() => isLoading = false);
+                          // Close dialog on success is handled inside this if block by Get.back() if logic is right,
+                          // OR we can rely on controller to manage it. But controller just returns bool.
+                          // The previous code had Get.back() here.
+                          if (reset) {
+                            Navigator.of(
+                              context,
+                            ).pop(); // Force close dialog using Navigator to be safe
+                          }
+                        }
+                      },
+                child: isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : Text(
+                        step == 1
+                            ? translate('auth.forgot_password.send_btn')
+                            : translate('auth.forgot_password.reset_btn'),
+                      ),
+              ),
+            ],
+          );
+        },
+      ),
+      barrierDismissible: false,
     );
   }
 }

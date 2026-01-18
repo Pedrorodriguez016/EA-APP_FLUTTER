@@ -31,7 +31,20 @@
       "register_link": "Sign up here",
       "success_msg": "Logged in successfully",
       "or_continue_with": "Or continue with",
-      "google_btn": "Sign in with Google"
+      "google_btn": "Sign in with Google",
+      "forgot_password_link": "Forgot password?"
+    },
+    "forgot_password": {
+      "title": "Recover Password",
+      "subtitle": "Enter your email to receive a code.",
+      "send_btn": "Send Code",
+      "email_sent_title": "Code Sent",
+      "email_sent_msg": "If the email exists, you will receive a code.",
+      "reset_title": "Reset Password",
+      "reset_subtitle": "Enter the code and your new password.",
+      "new_password_label": "New password",
+      "reset_btn": "Reset",
+      "success_msg": "Password reset successfully"
     },
     "register": {
       "title": "Create Account",
@@ -102,6 +115,7 @@
       "error_title": "Verification Error",
       "error_invalid_code": "Invalid code",
       "error_expired": "Code expired",
+      "error_not_verified": "Email not verified. Check your inbox.",
       "success_login": "Verification successful, please log in"
     }
   },
