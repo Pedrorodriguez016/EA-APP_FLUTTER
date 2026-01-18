@@ -85,7 +85,11 @@
       "weak": "Faible"
     },
     "password_requirements": {
-      "chars": "12 caractères minimum"
+      "min_8_chars": "Min. 8 caractères",
+      "lowercase": "a-z",
+      "uppercase": "A-Z",
+      "numbers": "0-9",
+      "special_chars": "!@#$"
     }
   },
   "home": {
@@ -107,7 +111,12 @@
       "empty_msg": "Pas encore d'amis à afficher.",
       "view_all": "Voir tous mes amis"
     },
-    "loading_location": "Obtention de l'emplacement..."
+    "loading_location": "Obtention de l'emplacement...",
+    "exit_dialog": {
+      "title": "Quitter l'application ?",
+      "message": "Êtes-vous sûr de vouloir quitter ?",
+      "confirm": "Quitter"
+    }
   },
   "events": {
     "list_title": "Événements",

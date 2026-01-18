@@ -85,7 +85,11 @@
       "weak": "La contrasenya és feble"
     },
     "password_requirements": {
-      "chars": "Mínim 12 caràcters"
+      "min_8_chars": "Mín. 8 caràcters",
+      "lowercase": "a-z",
+      "uppercase": "A-Z",
+      "numbers": "0-9",
+      "special_chars": "!@#$"
     }
   },
   "home": {
@@ -107,7 +111,12 @@
       "empty_msg": "Encara no tens amics per mostrar.",
       "view_all": "Veure tots els meus amics"
     },
-    "loading_location": "Obtenint ubicació..."
+    "loading_location": "Obtenint ubicació...",
+    "exit_dialog": {
+      "title": "Sortir de l'aplicació?",
+      "message": "Estàs segur que vols sortir?",
+      "confirm": "Sortir"
+    }
   },
   "events": {
     "list_title": "Esdeveniments",

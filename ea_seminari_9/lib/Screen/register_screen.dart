@@ -126,12 +126,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   Widget _buildPasswordRequirements(String password) {
     final requirements = [
-      {'label': 'Min. 8 caracteres', 'valid': password.length >= 8},
-      {'label': 'a-z', 'valid': RegExp(r'[a-z]').hasMatch(password)},
-      {'label': 'A-Z', 'valid': RegExp(r'[A-Z]').hasMatch(password)},
-      {'label': '0-9', 'valid': RegExp(r'[0-9]').hasMatch(password)},
       {
-        'label': r'!@#$',
+        'label': translate('auth.password_requirements.min_8_chars'),
+        'valid': password.length >= 8,
+      },
+      {
+        'label': translate('auth.password_requirements.lowercase'),
+        'valid': RegExp(r'[a-z]').hasMatch(password),
+      },
+      {
+        'label': translate('auth.password_requirements.uppercase'),
+        'valid': RegExp(r'[A-Z]').hasMatch(password),
+      },
+      {
+        'label': translate('auth.password_requirements.numbers'),
+        'valid': RegExp(r'[0-9]').hasMatch(password),
+      },
+      {
+        'label': translate('auth.password_requirements.special_chars'),
         'valid': RegExp(
           r'''[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]''',
         ).hasMatch(password),

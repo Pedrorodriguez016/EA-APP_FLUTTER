@@ -32,44 +32,77 @@ class HomeScreen extends GetView<UserController> {
       }
     });
 
-    return Scaffold(
-      backgroundColor: context.theme.scaffoldBackgroundColor,
-      appBar: _buildAppBar(context),
-      endDrawer: const GlobalDrawer(),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await controller.fetchFriends();
-          await controller.fetchRequest();
-          await authController.fetchCurrentUser();
-          await notifController.fetchNotificaciones();
-          await eventoController.fetchRecommended();
-        },
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              _buildWelcomeCard(authController, context),
-              const SizedBox(height: 24),
-              RecommendedSection(controller: eventoController),
-              const SizedBox(height: 24),
-              _buildEventsCard(context),
-              const SizedBox(height: 24),
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) async {
+        if (didPop) return;
+
+        final shouldExit = await Get.dialog<bool>(
+          AlertDialog(
+            title: Text(translate('home.exit_dialog.title')),
+            content: Text(translate('home.exit_dialog.message')),
+            actions: [
+              TextButton(
+                onPressed: () => Get.back(result: false),
+                child: Text(translate('common.cancel')),
+              ),
+              TextButton(
+                onPressed: () => Get.back(result: true),
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: Text(translate('home.exit_dialog.confirm')),
+              ),
             ],
           ),
+        );
+
+        if (shouldExit == true) {
+          // Cerrar la aplicación
+          Get.closeAllSnackbars();
+          // En Android, esto cerrará la app
+          if (Get.key.currentState?.mounted ?? false) {
+            Get.key.currentState?.pop();
+          }
+        }
+      },
+      child: Scaffold(
+        backgroundColor: context.theme.scaffoldBackgroundColor,
+        appBar: _buildAppBar(context),
+        endDrawer: const GlobalDrawer(),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            await controller.fetchFriends();
+            await controller.fetchRequest();
+            await authController.fetchCurrentUser();
+            await notifController.fetchNotificaciones();
+            await eventoController.fetchRecommended();
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                _buildWelcomeCard(authController, context),
+                const SizedBox(height: 24),
+                RecommendedSection(controller: eventoController),
+                const SizedBox(height: 24),
+                _buildEventsCard(context),
+                const SizedBox(height: 24),
+              ],
+            ),
+          ),
         ),
-      ),
-      bottomNavigationBar: const CustomNavBar(currentIndex: 0),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Get.toNamed('/chatbot'),
-        backgroundColor: context.theme.colorScheme.primary,
-        heroTag: 'chatbotFab',
-        child: Icon(
-          Icons.smart_toy_rounded,
-          color: context.theme.colorScheme.onPrimary,
+        bottomNavigationBar: const CustomNavBar(currentIndex: 0),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => Get.toNamed('/chatbot'),
+          backgroundColor: context.theme.colorScheme.primary,
+          heroTag: 'chatbotFab',
+          child: Icon(
+            Icons.smart_toy_rounded,
+            color: context.theme.colorScheme.onPrimary,
+          ),
         ),
-      ),
-    );
+      ), // Cierre del Scaffold
+    ); // Cierre del PopScope
   }
 
   AppBar _buildAppBar(BuildContext context) {

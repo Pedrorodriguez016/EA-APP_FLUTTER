@@ -84,7 +84,11 @@
       "weak": "Weak"
     },
     "password_requirements": {
-      "chars": "Minimum 12 characters"
+      "min_8_chars": "Min. 8 characters",
+      "lowercase": "a-z",
+      "uppercase": "A-Z",
+      "numbers": "0-9",
+      "special_chars": "!@#$"
     }
   },
   "home": {
@@ -106,7 +110,12 @@
       "empty_msg": "No friends to show yet.",
       "view_all": "See all my friends"
     },
-    "loading_location": "Obtaining location..."
+    "loading_location": "Obtaining location...",
+    "exit_dialog": {
+      "title": "Exit app?",
+      "message": "Are you sure you want to exit?",
+      "confirm": "Exit"
+    }
   },
   "events": {
     "list_title": "Events",

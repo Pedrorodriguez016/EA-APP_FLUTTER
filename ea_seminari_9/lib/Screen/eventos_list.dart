@@ -12,23 +12,37 @@ class EventosListScreen extends GetView<EventoController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.theme.scaffoldBackgroundColor,
-      endDrawer: const GlobalDrawer(),
-      body: SafeArea(
-        child: Obx(() {
-          if (controller.isSearching.value) {
-            return _buildSearchResultsView(context);
-          }
-          return _buildInitialView(context);
-        }),
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (bool didPop) {
+        if (didPop) return;
+
+        // Si estamos en modo búsqueda/filtros, volver al estado inicial
+        if (controller.isSearching.value) {
+          controller.clearFilters();
+        } else {
+          // Si estamos en la vista inicial, permitir navegación normal
+          Get.back();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: context.theme.scaffoldBackgroundColor,
+        endDrawer: const GlobalDrawer(),
+        body: SafeArea(
+          child: Obx(() {
+            if (controller.isSearching.value) {
+              return _buildSearchResultsView(context);
+            }
+            return _buildInitialView(context);
+          }),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => Get.toNamed('/crear_evento'),
+          backgroundColor: context.theme.colorScheme.primary,
+          child: const Icon(Icons.add_rounded, color: Colors.white, size: 30),
+        ),
+        bottomNavigationBar: const CustomNavBar(currentIndex: 1),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Get.toNamed('/crear_evento'),
-        backgroundColor: context.theme.colorScheme.primary,
-        child: const Icon(Icons.add_rounded, color: Colors.white, size: 30),
-      ),
-      bottomNavigationBar: const CustomNavBar(currentIndex: 1),
     );
   }
 

@@ -86,7 +86,11 @@
       "weak": "La contraseña es débil"
     },
     "password_requirements": {
-      "chars": "Mínimo 12 caracteres"
+      "min_8_chars": "Min. 8 caracteres",
+      "lowercase": "a-z",
+      "uppercase": "A-Z",
+      "numbers": "0-9",
+      "special_chars": "!@#$"
     }
   },
   "home": {
@@ -108,7 +112,12 @@
       "empty_msg": "Aún no tienes amigos para mostrar.",
       "view_all": "Ver todos mis amigos"
     },
-    "loading_location": "Obteniendo ubicación..."
+    "loading_location": "Obteniendo ubicación...",
+    "exit_dialog": {
+      "title": "¿Salir de la aplicación?",
+      "message": "¿Estás seguro de que quieres salir?",
+      "confirm": "Salir"
+    }
   },
   "events": {
     "list_title": "Eventos",
