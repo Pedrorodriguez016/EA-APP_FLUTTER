@@ -366,6 +366,32 @@ class UserServices {
     }
   }
 
+  Future<String> uploadChatImage(
+    String userId,
+    String friendId,
+    String filePath,
+  ) async {
+    try {
+      logger.i('📤 Subiendo imagen al chat con: $friendId');
+      String fileName = filePath.split('/').last;
+
+      d.FormData formData = d.FormData.fromMap({
+        "image": await d.MultipartFile.fromFile(filePath, filename: fileName),
+      });
+
+      final response = await _client.post(
+        '/$userId/chat/$friendId/image',
+        data: formData,
+      );
+
+      logger.i('✅ Imagen de chat subida exitosamente');
+      return response.data['imageUrl'];
+    } catch (e) {
+      logger.e('❌ Error al subir imagen al chat', error: e);
+      throw Exception('Error al subir la imagen del chat: $e');
+    }
+  }
+
   Future<bool> updateInterests(List<String> interests) async {
     try {
       logger.i('🌟 Actualizando intereses del usuario');

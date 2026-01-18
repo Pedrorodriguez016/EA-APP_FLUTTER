@@ -24,21 +24,31 @@ class EventChatScreen extends GetView<EventChatController> {
           icon: Icon(Icons.arrow_back, color: context.theme.iconTheme.color),
           onPressed: () => Get.back(),
         ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              controller.eventName,
-              style: context.textTheme.titleMedium?.copyWith(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+        title: InkWell(
+          onTap: () => Get.toNamed('/evento/${controller.eventId}'),
+          borderRadius: BorderRadius.circular(8),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  controller.eventName,
+                  style: context.textTheme.titleMedium?.copyWith(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  translate('events.chat_subtitle'),
+                  style: TextStyle(
+                    color: context.theme.hintColor,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
             ),
-            Text(
-              translate('events.chat_subtitle'),
-              style: TextStyle(color: context.theme.hintColor, fontSize: 12),
-            ),
-          ],
+          ),
         ),
         actions: [
           IconButton(
@@ -343,6 +353,16 @@ class EventChatScreen extends GetView<EventChatController> {
             ),
             const SizedBox(height: 16),
             ListTile(
+              leading: const Icon(Icons.image_outlined),
+              title: const Text('Enviar imagen al chat'),
+              subtitle: const Text('Solo para esta conversación'),
+              onTap: () {
+                Get.back();
+                controller.sendImageMessage();
+              },
+            ),
+            const Divider(),
+            ListTile(
               leading: const Icon(Icons.photo_library),
               title: Text(translate('events_extra.open_gallery')),
               subtitle: Text(translate('events_extra.photos_videos')),
@@ -416,6 +436,8 @@ class EventChatScreen extends GetView<EventChatController> {
   void _viewMedia(BuildContext context, EventoPhoto media) {
     final fullUrl =
         '${Get.find<EventosServices>().baseUrl.replaceAll('/api/event', '')}${media.url}';
+    final isOwner = media.userId == controller.myUserId;
+
     Get.to(
       Scaffold(
         backgroundColor: Colors.black,
@@ -429,6 +451,25 @@ class EventChatScreen extends GetView<EventChatController> {
             style: const TextStyle(color: Colors.white),
           ),
           actions: [
+            if (isOwner)
+              IconButton(
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed: () {
+                  Get.defaultDialog(
+                    title: 'Eliminar',
+                    middleText:
+                        '¿Estás seguro de que quieres eliminar este contenido?',
+                    textConfirm: 'Eliminar',
+                    textCancel: 'Cancelar',
+                    confirmTextColor: Colors.white,
+                    onConfirm: () {
+                      Get.back(); // Cierra el dialogo
+                      Get.back(); // Cierra el visor de fotos
+                      controller.deletePhoto(media.id);
+                    },
+                  );
+                },
+              ),
             IconButton(
               icon: const Icon(Icons.download),
               onPressed: () => controller.downloadMedia(media.url, media.type),
@@ -606,13 +647,55 @@ class _EventChatBubble extends StatelessWidget {
                   ),
                 ),
               ),
-            Text(
-              message.text,
-              style: TextStyle(
-                color: message.isMine ? myTextColor : otherTextColor,
-                fontSize: 15,
+            if (message.imageUrl != null && message.imageUrl!.isNotEmpty)
+              GestureDetector(
+                onTap: () {
+                  final fullUrl =
+                      '${Get.find<EventosServices>().baseUrl.replaceAll('/api/event', '')}${message.imageUrl}';
+                  Get.to(
+                    Scaffold(
+                      backgroundColor: Colors.black,
+                      appBar: AppBar(
+                        backgroundColor: Colors.black,
+                        iconTheme: const IconThemeData(color: Colors.white),
+                      ),
+                      body: Center(
+                        child: InteractiveViewer(
+                          child: Image.network(
+                            fullUrl,
+                            headers: {
+                              'Authorization':
+                                  'Bearer ${Get.find<AuthController>().token ?? ''}',
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      '${Get.find<EventosServices>().baseUrl.replaceAll('/api/event', '')}${message.imageUrl}',
+                      headers: {
+                        'Authorization':
+                            'Bearer ${Get.find<AuthController>().token ?? ''}',
+                      },
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
               ),
-            ),
+            if (message.text.isNotEmpty)
+              Text(
+                message.text,
+                style: TextStyle(
+                  color: message.isMine ? myTextColor : otherTextColor,
+                  fontSize: 15,
+                ),
+              ),
             const SizedBox(height: 2),
             Text(
               time,

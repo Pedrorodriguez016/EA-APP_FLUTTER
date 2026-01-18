@@ -363,6 +363,39 @@ class EventosServices {
     }
   }
 
+  Future<void> deleteEventoPhoto(String eventId, String photoId) async {
+    try {
+      logger.i('🗑️ Eliminando foto $photoId del evento $eventId');
+      await _client.delete('/$eventId/photos/$photoId');
+      logger.i('✅ Foto eliminada exitosamente');
+    } catch (e) {
+      logger.e('❌ Error al eliminar foto del evento', error: e);
+      throw Exception('Error al eliminar la foto: $e');
+    }
+  }
+
+  Future<String> uploadEventChatImage(String eventId, String filePath) async {
+    try {
+      logger.i('📤 Subiendo imagen al chat del evento: $eventId');
+      String fileName = filePath.split('/').last;
+
+      FormData formData = FormData.fromMap({
+        "image": await MultipartFile.fromFile(filePath, filename: fileName),
+      });
+
+      final response = await _client.post(
+        '/$eventId/chat-image',
+        data: formData,
+      );
+
+      logger.i('✅ Imagen de chat subida exitosamente');
+      return response.data['imageUrl'];
+    } catch (e) {
+      logger.e('❌ Error al subir imagen al chat del evento', error: e);
+      throw Exception('Error al subir la imagen del chat: $e');
+    }
+  }
+
   Future<List<EventoPhoto>> fetchEventPhotos(String eventId) async {
     try {
       logger.d('🖼️ Obteniendo fotos del evento: $eventId');

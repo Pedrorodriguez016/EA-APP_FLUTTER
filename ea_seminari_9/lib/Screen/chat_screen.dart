@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:get/get.dart';
 import '../Controllers/chat_controller.dart';
+import '../Controllers/auth_controller.dart';
+import '../Services/user_services.dart';
 import '../Models/chat.dart';
 import '../Widgets/user_avatar.dart';
 
@@ -11,15 +13,12 @@ class ChatScreen extends GetView<ChatController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // CAMBIO: Fondo dinámico
       backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        // CAMBIO: Fondo y elevación adaptativos
         backgroundColor: context.theme.scaffoldBackgroundColor,
         elevation: 1,
         shadowColor: context.theme.shadowColor.withValues(alpha: 0.2),
         leading: IconButton(
-          // CAMBIO: Icono dinámico
           icon: Icon(Icons.arrow_back, color: context.theme.iconTheme.color),
           onPressed: () => Get.back(),
         ),
@@ -35,7 +34,6 @@ class ChatScreen extends GetView<ChatController> {
               onTap: () => Get.toNamed('/user/${controller.friendId}'),
               child: Text(
                 controller.friendName,
-                // CAMBIO: Texto título dinámico
                 style: context.textTheme.titleMedium?.copyWith(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -47,7 +45,6 @@ class ChatScreen extends GetView<ChatController> {
       ),
       body: Column(
         children: [
-          // LISTA DE MENSAJES
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value) {
@@ -64,10 +61,7 @@ class ChatScreen extends GetView<ChatController> {
               );
             }),
           ),
-
           Divider(height: 1, color: context.theme.dividerColor),
-
-          // INPUT AREA
           _buildInputArea(context),
         ],
       ),
@@ -76,17 +70,22 @@ class ChatScreen extends GetView<ChatController> {
 
   Widget _buildInputArea(BuildContext context) {
     return Container(
-      // CAMBIO: Fondo de la barra de input (blanco en light, gris oscuro en dark)
       color: context.theme.cardColor,
       padding: const EdgeInsets.all(8),
       child: SafeArea(
         child: Row(
           children: [
+            IconButton(
+              icon: Icon(
+                Icons.image_outlined,
+                color: context.theme.colorScheme.primary,
+              ),
+              onPressed: () => controller.sendImageMessage(),
+            ),
             Expanded(
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  // CAMBIO: Fondo del input text field
                   color: context.isDarkMode
                       ? Colors.grey.shade800
                       : Colors.grey.shade100,
@@ -95,36 +94,20 @@ class ChatScreen extends GetView<ChatController> {
                 child: TextField(
                   controller: controller.textController,
                   focusNode: controller.focusNode,
-                  // CAMBIO: Color del texto input
                   style: context.textTheme.bodyLarge,
                   decoration: InputDecoration(
                     hintText: translate('chat.input_hint'),
-                    // CAMBIO: Color del hint
                     hintStyle: TextStyle(color: context.theme.hintColor),
                     border: InputBorder.none,
                   ),
                   onSubmitted: (_) {
-                    final text = controller.textController.text.trim();
-                    if (text.isNotEmpty) {
-                      // Optimistic Update
-                      final myMsg = ChatMessage(
-                        id: DateTime.now().millisecondsSinceEpoch.toString(),
-                        from: controller.myUserId,
-                        to: controller.friendId,
-                        text: text,
-                        createdAt: DateTime.now(),
-                        isMine: true,
-                      );
-                      controller.messages.insert(0, myMsg);
-                      controller.sendMessage();
-                    }
+                    controller.sendMessage();
                   },
                 ),
               ),
             ),
             const SizedBox(width: 8),
             CircleAvatar(
-              // CAMBIO: Botón enviar con color primario
               backgroundColor: context.theme.colorScheme.primary,
               child: IconButton(
                 icon: Icon(
@@ -133,19 +116,7 @@ class ChatScreen extends GetView<ChatController> {
                   size: 20,
                 ),
                 onPressed: () {
-                  final text = controller.textController.text.trim();
-                  if (text.isNotEmpty) {
-                    final myMsg = ChatMessage(
-                      id: DateTime.now().millisecondsSinceEpoch.toString(),
-                      from: controller.myUserId,
-                      to: controller.friendId,
-                      text: text,
-                      createdAt: DateTime.now(),
-                      isMine: true,
-                    );
-                    controller.messages.insert(0, myMsg);
-                    controller.sendMessage();
-                  }
+                  controller.sendMessage();
                 },
               ),
             ),
@@ -165,17 +136,12 @@ class _ChatBubble extends StatelessWidget {
     final time =
         "${message.createdAt.hour.toString().padLeft(2, '0')}:${message.createdAt.minute.toString().padLeft(2, '0')}";
 
-    // CAMBIO: Colores dinámicos para las burbujas
-    // Usamos el color primario "Light" (morado oscuro 0xFF7C3AED) para mantener contraste con texto blanco
-    // tanto en modo claro como oscuro
     const myBubbleColor = Color(0xFF7C3AED);
     final otherBubbleColor = context.isDarkMode
-        ? Color(0xFF424242) // Grey 800 fixed
-        : Color(0xFFEEEEEE); // Grey 200 fixed
+        ? const Color(0xFF424242)
+        : const Color(0xFFEEEEEE);
 
     const myTextColor = Colors.white;
-    // Forzamos el color del texto recibido para asegurar que coincida con el fondo
-    // (Fondo oscuro -> Texto blanco, Fondo claro -> Texto negro)
     final otherTextColor = context.isDarkMode ? Colors.white : Colors.black;
 
     return Align(
@@ -198,25 +164,63 @@ class _ChatBubble extends StatelessWidget {
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment: message.isMine
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
           children: [
-            // El mensaje de texto
-            Flexible(
-              child: Text(
+            if (message.imageUrl != null && message.imageUrl!.isNotEmpty)
+              GestureDetector(
+                onTap: () {
+                  final fullUrl =
+                      '${Get.find<UserServices>().baseUrl.replaceAll('/api/user', '')}${message.imageUrl}';
+                  Get.to(
+                    Scaffold(
+                      backgroundColor: Colors.black,
+                      appBar: AppBar(
+                        backgroundColor: Colors.black,
+                        iconTheme: const IconThemeData(color: Colors.white),
+                      ),
+                      body: Center(
+                        child: InteractiveViewer(
+                          child: Image.network(
+                            fullUrl,
+                            headers: {
+                              'Authorization':
+                                  'Bearer ${Get.find<AuthController>().token ?? ''}',
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      '${Get.find<UserServices>().baseUrl.replaceAll('/api/user', '')}${message.imageUrl}',
+                      headers: {
+                        'Authorization':
+                            'Bearer ${Get.find<AuthController>().token ?? ''}',
+                      },
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+            if (message.text.isNotEmpty)
+              Text(
                 message.text,
                 style: TextStyle(
-                  // CAMBIO: Texto legible según el fondo
                   color: message.isMine ? myTextColor : otherTextColor,
                   fontSize: 16,
                 ),
               ),
-            ),
             const SizedBox(height: 4),
-            // La hora
             Text(
               time,
               style: TextStyle(
-                // CAMBIO: Color de hora más sutil
                 color: message.isMine
                     ? myTextColor.withValues(alpha: 0.7)
                     : context.theme.hintColor,

@@ -194,18 +194,40 @@ class GlobalDrawer extends StatelessWidget {
             ],
           ),
         ),
-        _buildDrawerItem(
-          context,
-          icon: Icons.group_add_rounded,
-          title: translate('home.friends_section.requests_btn'),
-          onTap: () {
-            FriendRequestsDialog.show(
-              context,
-              requests: userController.friendsRequests,
-              onAccept: (user) => userController.acceptFriendRequest(user),
-              onReject: (user) => userController.rejectFriendRequest(user),
-            );
-          },
+        Obx(
+          () => _buildDrawerItem(
+            context,
+            icon: Icons.group_add_rounded,
+            title: translate('home.friends_section.requests_btn'),
+            trailing: userController.friendsRequests.isNotEmpty
+                ? Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: context.theme.colorScheme.error,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      userController.friendsRequests.length.toString(),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  )
+                : null,
+            onTap: () {
+              FriendRequestsDialog.show(
+                context,
+                requests: userController.friendsRequests,
+                onAccept: (user) => userController.acceptFriendRequest(user),
+                onReject: (user) => userController.rejectFriendRequest(user),
+              );
+            },
+          ),
         ),
         _buildDrawerItem(
           context,

@@ -10,6 +10,9 @@ import '../utils/logger.dart';
 import '../utils/app_theme.dart';
 import '../Controllers/valoracion_controller.dart';
 import '../Widgets/valoracion_list.dart';
+import '../Models/evento_photo.dart';
+import '../Services/eventos_services.dart';
+import 'package:video_player/video_player.dart';
 
 class EventosDetailScreen extends GetView<EventoController> {
   final String eventoId;
@@ -317,6 +320,29 @@ class EventosDetailScreen extends GetView<EventoController> {
                   ),
                 ),
               ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: OutlinedButton.icon(
+                  onPressed: () => _showPhotoGallery(context),
+                  icon: const Icon(Icons.photo_library_outlined),
+                  label: Text(
+                    translate('events.album_btn'),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFF4A90E2),
+                    side: const BorderSide(color: Color(0xFF4A90E2), width: 2),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
             ],
 
             const SizedBox(height: 32),
@@ -554,6 +580,290 @@ class EventosDetailScreen extends GetView<EventoController> {
               ),
             ],
           ),
+        ),
+      ],
+    );
+  }
+
+  void _showPhotoGallery(BuildContext context) {
+    controller.fetchEventPhotos(eventoId);
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: context.theme.scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 20),
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  translate('events.album_btn'),
+                  style: context.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.add_a_photo),
+                  onPressed: () => controller.uploadEventPhoto(eventoId),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: Obx(() {
+                if (controller.isPhotosLoading.value) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (controller.eventoPhotos.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'No hay fotos en el álbum todavía',
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: context.theme.hintColor,
+                      ),
+                    ),
+                  );
+                }
+                return GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                  ),
+                  itemCount: controller.eventoPhotos.length,
+                  itemBuilder: (context, index) {
+                    final photo = controller.eventoPhotos[index];
+                    final fullUrl =
+                        '${Get.find<EventosServices>().baseUrl.replaceAll('/api/event', '')}${photo.url}';
+
+                    return GestureDetector(
+                      onTap: () => _viewMedia(context, photo),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            photo.type == 'video'
+                                ? Container(
+                                    color: Colors.black87,
+                                    child: const Icon(
+                                      Icons.videocam,
+                                      color: Colors.white,
+                                      size: 40,
+                                    ),
+                                  )
+                                : Image.network(
+                                    fullUrl,
+                                    fit: BoxFit.cover,
+                                    headers: {
+                                      'Authorization':
+                                          'Bearer ${Get.find<AuthController>().token ?? ''}',
+                                    },
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const Icon(Icons.broken_image),
+                                  ),
+                            if (photo.type == 'video')
+                              Positioned(
+                                bottom: 4,
+                                right: 4,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 4,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black54,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: const Icon(
+                                    Icons.play_arrow,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+              }),
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
+  void _viewMedia(BuildContext context, EventoPhoto media) {
+    final fullUrl =
+        '${Get.find<EventosServices>().baseUrl.replaceAll('/api/event', '')}${media.url}';
+    final currentUserId = Get.find<AuthController>().currentUser.value?.id;
+    final isOwner = media.userId == currentUserId;
+
+    Get.to(
+      Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          iconTheme: const IconThemeData(color: Colors.white),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                media.type == 'video' ? 'Video' : 'Foto',
+                style: const TextStyle(color: Colors.white, fontSize: 18),
+              ),
+              Text(
+                'Subido por ${media.username}',
+                style: const TextStyle(color: Colors.white70, fontSize: 12),
+              ),
+            ],
+          ),
+          actions: [
+            if (isOwner)
+              IconButton(
+                icon: const Icon(Icons.delete, color: Colors.redAccent),
+                onPressed: () {
+                  Get.defaultDialog(
+                    title: 'Eliminar',
+                    middleText:
+                        '¿Estás seguro de que quieres eliminar este contenido?',
+                    textConfirm: 'Eliminar',
+                    textCancel: 'Cancelar',
+                    confirmTextColor: Colors.white,
+                    buttonColor: Colors.redAccent,
+                    onConfirm: () {
+                      Get.back(); // Cierra el diálogo
+                      Get.back(); // Cierra el visor de media
+                      controller.deletePhoto(eventoId, media.id);
+                    },
+                  );
+                },
+              ),
+            IconButton(
+              icon: const Icon(Icons.download),
+              onPressed: () => controller.downloadMedia(fullUrl),
+            ),
+          ],
+        ),
+        body: Center(
+          child: media.type == 'video'
+              ? _VideoPlayerWidget(url: fullUrl)
+              : InteractiveViewer(
+                  child: Image.network(
+                    fullUrl,
+                    headers: {
+                      'Authorization':
+                          'Bearer ${Get.find<AuthController>().token ?? ''}',
+                    },
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
+}
+
+class _VideoPlayerWidget extends StatefulWidget {
+  final String url;
+  const _VideoPlayerWidget({required this.url});
+
+  @override
+  State<_VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
+}
+
+class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
+  late VideoPlayerController _controller;
+  bool _isError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        VideoPlayerController.networkUrl(
+            Uri.parse(widget.url),
+            httpHeaders: {
+              'Authorization':
+                  'Bearer ${Get.find<AuthController>().token ?? ''}',
+            },
+          )
+          ..initialize()
+              .then((_) {
+                setState(() {});
+                _controller.play();
+              })
+              .catchError((e) {
+                setState(() {
+                  _isError = true;
+                });
+              });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isError) {
+      return const Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.error_outline, color: Colors.white, size: 48),
+          SizedBox(height: 16),
+          Text(
+            'Error al cargar el video',
+            style: TextStyle(color: Colors.white),
+          ),
+        ],
+      );
+    }
+
+    if (!_controller.value.isInitialized) {
+      return const CircularProgressIndicator(color: Colors.white);
+    }
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Flexible(
+          child: AspectRatio(
+            aspectRatio: _controller.value.aspectRatio,
+            child: VideoPlayer(_controller),
+          ),
+        ),
+        const SizedBox(height: 20),
+        IconButton(
+          icon: Icon(
+            _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+            color: Colors.white,
+            size: 32,
+          ),
+          onPressed: () {
+            setState(() {
+              _controller.value.isPlaying
+                  ? _controller.pause()
+                  : _controller.play();
+            });
+          },
         ),
       ],
     );

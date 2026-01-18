@@ -36,15 +36,21 @@ class UserController extends GetxController {
 
   @override
   void onInit() {
-    _initSocketConnection();
     fetchUsers(1);
-    fetchFriends();
 
-    // Escuchar cambios en el usuario para refrescar datos cuando se haga login/auto-login
+    // Si ya hay un usuario al inicializar, cargar sus datos
+    if (authController.currentUser.value != null &&
+        authController.currentUser.value!.id.isNotEmpty) {
+      fetchFriends();
+      fetchRequest();
+      _initSocketConnection();
+    }
+
+    // Escuchar cambios futuros en el usuario
     ever(authController.currentUser, (user) {
       if (user != null && user.id.isNotEmpty) {
         logger.i(
-          '👤 Usuario detectado en UserController, refrescando amigos...',
+          '👤 Cambio de usuario detectado en UserController, refrescando...',
         );
         fetchFriends();
         fetchRequest();
@@ -270,9 +276,7 @@ class UserController extends GetxController {
       isLoading(true);
       logger.d('📄 Creando lista de solicitudes');
       var friends = await _userServices.fetchRequest(id);
-      if (friends.isNotEmpty) {
-        friendsRequests.assignAll(friends);
-      }
+      friendsRequests.assignAll(friends);
     } finally {
       isLoading(false);
     }

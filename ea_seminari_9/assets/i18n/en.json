@@ -192,6 +192,7 @@
       "confirm_delete_msg": "Are you sure you want to delete \"{name}\"?"
     },
     "chat_btn": "Enter chat",
+    "album_btn": "Event album",
     "chat_subtitle": "Event chat",
     "chat_hint": "Write something in the event...",
     "reviews_title": "Ratings",

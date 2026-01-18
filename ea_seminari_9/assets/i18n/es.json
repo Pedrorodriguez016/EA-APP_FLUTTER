@@ -195,6 +195,7 @@
       "confirm_delete_msg": "¿Estás seguro de que quieres eliminar \"{name}\"?"
     },
     "chat_btn": "Chat del evento",
+    "album_btn": "Álbum del evento",
     "chat_subtitle": "Conversación grupal",
     "chat_hint": "Escribe un mensaje...",
     "reviews_title": "Valoraciones",

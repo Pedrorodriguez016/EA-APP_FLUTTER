@@ -154,6 +154,29 @@ class UserDetailScreen extends GetView<UserController> {
             color: context.theme.hintColor,
           ),
         ),
+        const SizedBox(height: 24),
+        // BOTÓN INDICADO POR EL USUARIO: Ir al chat (SOLO SI SON AMIGOS)
+        if (user.id != controller.authController.currentUser.value?.id &&
+            controller.friendsList.any((u) => u.id == user.id))
+          ElevatedButton.icon(
+            onPressed: () {
+              Get.toNamed(
+                '/chat',
+                arguments: {'friendId': user.id, 'friendName': user.username},
+              );
+            },
+            icon: const Icon(Icons.chat_bubble_outline),
+            label: Text(translate('chat.default_title') ?? 'Chat'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: context.theme.colorScheme.primary,
+              foregroundColor: context.theme.colorScheme.onPrimary,
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 0,
+            ),
+          ),
       ],
     );
   }

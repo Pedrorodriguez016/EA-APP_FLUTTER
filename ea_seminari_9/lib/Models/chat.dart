@@ -3,6 +3,7 @@ class ChatMessage {
   String from;
   String to;
   String text;
+  String? imageUrl;
   DateTime createdAt;
   bool isMine; // Propiedad visual
 
@@ -11,6 +12,7 @@ class ChatMessage {
     required this.from,
     required this.to,
     required this.text,
+    this.imageUrl,
     required this.createdAt,
     this.isMine = false,
   });
@@ -21,6 +23,7 @@ class ChatMessage {
       from: json['from'] ?? '',
       to: json['to'] ?? '',
       text: json['text'] ?? '',
+      imageUrl: json['imageUrl'],
       createdAt: DateTime.parse(
         json['createdAt'] ?? DateTime.now().toIso8601String(),
       ),
