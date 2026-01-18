@@ -16,7 +16,11 @@
     "no": "No",
     "fix_errors": "Si us plau, corregeix els errors",
     "user": "Usuari",
-    "continue": "Continua"
+    "continue": "Continua",
+    "clear": "Neteja",
+    "from": "Des de",
+    "to": "Fins a",
+    "not_specified": "No especificada"
   },
   "auth": {
     "login": {
@@ -55,8 +59,10 @@
       "username_empty": "Si us plau, introdueix un nom d'usuari",
       "username_short": "El nom d'usuari ha de tenir almenys 3 caràcters",
       "username_chars": "Només es permeten lletres, números i guions baixos",
+      "username_not_allowed": "Nom d'usuari no permès",
       "email_empty": "Si us plau, introdueix el teu gmail",
       "email_invalid": "Si us plau, introdueix un gmail vàlid",
+      "temp_email_not_allowed": "No es permeten correus temporals",
       "password_empty": "Si us plau, introdueix una contrasenya",
       "password_short": "La contrasenya ha de tenir almenys 6 caràcters",
       "password_mismatch": "Les contrasenyes no coincideixen",
@@ -98,7 +104,8 @@
       "title": "Amics",
       "requests_btn": "Sol·licituds",
       "search_btn": "Cercar amics",
-      "empty_msg": "Encara no tens amics per mostrar."
+      "empty_msg": "Encara no tens amics per mostrar.",
+      "view_all": "Veure tots els meus amics"
     },
     "loading_location": "Obtenint ubicació..."
   },
@@ -107,6 +114,7 @@
     "search_hint": "Cerca esdeveniment...",
     "empty_search": "No s'han trobat esdeveniments",
     "create_title": "Crear Esdeveniment",
+    "edit_title": "Editar Esdeveniment",
     "save_btn": "Desa l'esdeveniment",
     "field_title": "Títol de l'esdeveniment",
     "field_address": "Adreça",
@@ -116,6 +124,8 @@
     "select_category_hint": "Selecciona una categoria",
     "detail_title": "Detalls de l'Esdeveniment",
     "info_card_title": "Informació de l'Esdeveniment",
+    "personal_info": "Informació Personal",
+    "progress_achievements": "Progrés i Assoliments",
     "schedule": "Horari:",
     "participants": "Participants:",
     "not_found": "Esdeveniment no trobat",
@@ -141,7 +151,9 @@
       "load_error_title": "Error de Càrrega",
       "load_error_msg": "No s'han pogut carregar els esdeveniments. Revisa la connexió o el servidor.",
       "login_to_participate": "Has d'iniciar sessió per participar",
-      "load_my_events": "No s'han pogut carregar els teus esdeveniments"
+      "load_my_events": "No s'han pogut carregar els teus esdeveniments",
+      "confirm_delete_title": "Eliminar Esdeveniment",
+      "confirm_delete_msg": "Estàs segur que vols eliminar \"{name}\"?"
     },
     "chat_btn": "Entrar al xat",
     "chat_subtitle": "Xat de l'esdeveniment",
@@ -155,7 +167,11 @@
     "categories": "Categories",
     "filters": "Filtres",
     "popular_week": "Populars aquesta setmana",
-    "at_time": "a les"
+    "chat_participants": "Participants del Xat",
+    "date_range": "Rang de dates",
+    "apply_filters": "Aplicar filtres",
+    "at_time": "a les",
+    "invited_you_to": "t'ha convidat a"
   },
   "calendar": {
     "title": "Calendari",
@@ -214,6 +230,8 @@
     "notifications": "Notificacions",
     "privacy": "Privadesa",
     "language": "Idioma",
+    "preferences": "Preferències d'Interessos",
+    "preferences_subtitle": "Personalitza les teves recomanacions d'esdeveniments",
     "about_section": "Sobre l'app",
     "version": "Versió",
     "help": "Ajuda i Suport",
@@ -248,12 +266,33 @@
     },
     "gallery": "Galeria",
     "camera": "Càmera",
-    "delete_photo": "Eliminar foto"
+    "delete_photo": "Eliminar foto",
+    "created_events": "Esdeveniments creats per mi",
+    "no_created_events": "Encara no has creat cap esdeveniment",
+    "edit": "Editar"
   },
   "chatbot": {
     "title": "Assistent Virtual",
     "event_placeholder": "Esdeveniment",
-    "input_hint": "Escriu la teva consulta..."
+    "input_hint": "Escriu la teva consulta...",
+    "welcome_message": "Hola! Soc el teu assistent virtual. En què et puc ajudar avui?",
+    "error_message": "Ho sento, hi ha hagut un error en processar la teva sol·licitud.",
+    "no_events_found": "No he trobat esdeveniments que coincideixin amb la teva cerca.",
+    "found_events_count": "He trobat {count} esdeveniments:"
+  },
+  "questionnaire": {
+    "title": "Personalitza el teu feed",
+    "subtitle": "Digues-nos què t'apassiona per oferir-te els millors esdeveniments.",
+    "select_all": "Seleccionar tot {category}",
+    "selected_count": "{count} interessos seleccionats",
+    "category_all_selected": "Tota la categoria seleccionada",
+    "sub_interests_selected": "{count} sub-interessos seleccionats",
+    "save_btn": "Guardar Preferències",
+    "skip_btn": "Ometre per ara",
+    "errors": {
+      "select_least_one": "Si us plau selecciona almenys un interès",
+      "save_failed": "No s'han pogut guardar els interessos"
+    }
   },
   "gamification": {
     "title": "Gamificació",
@@ -287,11 +326,49 @@
     "no_friends_to_invite": "Encara no tens amics per convidar.",
     "invite_friends": "Convidar amics:",
     "max_capacity": "Capacitat màxima (opcional)",
-    "unlimited_capacity_hint": "Deixar en blanc per a capacitat il·limitada"
+    "unlimited_capacity_hint": "Deixar en blanc per a capacitat il·limitada",
+    "event_photos": "Fotos de l'Esdeveniment",
+    "no_photos_yet": "Encara no hi ha fotos compartides",
+    "share_media": "Compartir Multimèdia",
+    "open_gallery": "Obrir Galeria",
+    "photos_videos": "Fotos i vídeos",
+    "open_camera": "Obrir Càmera",
+    "capture_now": "Capturar foto o vídeo ara",
+    "take_photo": "Fer Foto",
+    "record_video": "Gravar Vídeo",
+    "video_load_error": "Error en carregar el vídeo",
+    "photo": "Foto",
+    "video": "Vídeo"
   },
   "notificaciones": {
     "titulo": "Notificacions",
     "vacia": "No tens notificacions",
     "marcar_todas_leidas": "Marca-ho tot com a llegit"
+  },
+  "invitations": {
+    "title": "Invitacions a Esdeveniments",
+    "pending": "Invitacions Pendents",
+    "empty_msg": "No tens invitacions de moment",
+    "accept": "Acceptar",
+    "reject": "Rebutjar"
+  },
+  "categories": {
+    "recommended": "Recomanats",
+    "Fútbol": "Futbol",
+    "Concierto Pop": "Concert Pop",
+    "Teatro": "Teatre",
+    "Exposición Arte": "Exposició d'Art",
+    "Restaurante": "Restaurant",
+    "Curso": "Curs",
+    "Gaming": "Videojocs",
+    "Discoteca": "Discoteca",
+    "Deportes": "Esports",
+    "Música": "Música",
+    "Tecnología": "Tecnologia",
+    "Gastronomía": "Gastronomia",
+    "Cultura": "Cultura",
+    "Social": "Social",
+    "Salud": "Salut",
+    "Aire Libre": "Aire Lliure"
   }
 }

@@ -349,6 +349,7 @@ class SettingsScreen extends GetView<UserController> {
       ),
       onTap: () {
         changeLocale(context, code);
+        Get.updateLocale(Locale(code));
         Get.back();
       },
     );

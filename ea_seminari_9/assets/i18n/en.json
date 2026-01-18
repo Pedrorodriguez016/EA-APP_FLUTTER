@@ -16,7 +16,11 @@
     "no": "No",
     "fix_errors": "Please fix the errors",
     "user": "User",
-    "continue": "Continue"
+    "continue": "Continue",
+    "clear": "Clear",
+    "from": "From",
+    "to": "To",
+    "not_specified": "Not specified"
   },
   "auth": {
     "login": {
@@ -55,8 +59,10 @@
       "username_empty": "Please enter a username",
       "username_short": "Username must be at least 3 characters",
       "username_chars": "Only letters, numbers, and underscores allowed",
+      "username_not_allowed": "Username not allowed",
       "email_empty": "Please enter your gmail",
       "email_invalid": "Please enter a valid gmail",
+      "temp_email_not_allowed": "Temporary emails are not allowed",
       "password_empty": "Please enter a password",
       "password_short": "Password must be at least 6 characters",
       "password_mismatch": "Passwords do not match",
@@ -68,7 +74,8 @@
       "google_failed": "Google login failed",
       "password_medium": "Medium password",
       "password_strong": "Strong password",
-      "password_secure": "Secure password"
+      "password_secure": "Secure password",
+      "password_weak": "Weak password"
     },
     "password_strength": {
       "medium": "Medium",
@@ -96,7 +103,8 @@
       "title": "Friends",
       "requests_btn": "Requests",
       "search_btn": "Search friends",
-      "empty_msg": "No friends to show yet."
+      "empty_msg": "No friends to show yet.",
+      "view_all": "See all my friends"
     },
     "loading_location": "Obtaining location..."
   },
@@ -115,6 +123,8 @@
     "select_category_hint": "Select a category",
     "detail_title": "Event Details",
     "info_card_title": "Event Information",
+    "personal_info": "Personal Information",
+    "progress_achievements": "Progress and Achievements",
     "schedule": "Schedule:",
     "participants": "Participants:",
     "not_found": "Event not found",
@@ -155,9 +165,12 @@
     "review_empty_msg": "Be the first to review this event",
     "categories": "Categories",
     "filters": "Filters",
+    "date_range": "Date Range",
+    "apply_filters": "Apply Filters",
     "popular_week": "Popular this week",
     "at_time": "at",
-    "chat_participants": "Chat Participants"
+    "chat_participants": "Chat Participants",
+    "invited_you_to": "invited you to"
   },
   "calendar": {
     "title": "Calendar",
@@ -216,6 +229,8 @@
     "notifications": "Notifications",
     "privacy": "Privacy",
     "language": "Language",
+    "preferences": "Interest Preferences",
+    "preferences_subtitle": "Personalize your event recommendations",
     "about_section": "About",
     "version": "Version",
     "help": "Help & Support",
@@ -258,7 +273,25 @@
   "chatbot": {
     "title": "Virtual Assistant",
     "event_placeholder": "Event",
-    "input_hint": "Type your query..."
+    "input_hint": "Type your query...",
+    "welcome_message": "Hello! I'm your virtual assistant. How can I help you today?",
+    "error_message": "I'm sorry, there was an error processing your request.",
+    "no_events_found": "I haven't found any events matching your search.",
+    "found_events_count": "I found {count} events:"
+  },
+  "questionnaire": {
+    "title": "Personalize your feed",
+    "subtitle": "Tell us what you're passionate about to offer you the best events.",
+    "select_all": "Select all {category}",
+    "selected_count": "{count} interests selected",
+    "category_all_selected": "All category selected",
+    "sub_interests_selected": "{count} sub-interests selected",
+    "save_btn": "Save Preferences",
+    "skip_btn": "Skip for now",
+    "errors": {
+      "select_least_one": "Please select at least one interest",
+      "save_failed": "Interests could not be saved"
+    }
   },
   "gamification": {
     "title": "Gamification",
@@ -292,7 +325,19 @@
     "no_friends_to_invite": "You don't have friends to invite yet.",
     "invite_friends": "Invite friends:",
     "max_capacity": "Max capacity (optional)",
-    "unlimited_capacity_hint": "Leave blank for unlimited capacity"
+    "unlimited_capacity_hint": "Leave blank for unlimited capacity",
+    "event_photos": "Event Photos",
+    "no_photos_yet": "No shared photos yet",
+    "share_media": "Share Media",
+    "open_gallery": "Open Gallery",
+    "photos_videos": "Photos and videos",
+    "open_camera": "Open Camera",
+    "capture_now": "Capture photo or video now",
+    "take_photo": "Take Photo",
+    "record_video": "Record Video",
+    "video_load_error": "Error loading video",
+    "photo": "Photo",
+    "video": "Video"
   },
   "notificaciones": {
     "titulo": "Notifications",
@@ -305,5 +350,24 @@
     "empty_msg": "No invitations for now",
     "accept": "Accept",
     "reject": "Reject"
+  },
+  "categories": {
+    "recommended": "Recommended",
+    "Fútbol": "Soccer",
+    "Concierto Pop": "Pop Concert",
+    "Teatro": "Theater",
+    "Exposición Arte": "Art Exhibition",
+    "Restaurante": "Restaurant",
+    "Curso": "Course",
+    "Gaming": "Gaming",
+    "Discoteca": "Nightclub",
+    "Deportes": "Sports",
+    "Música": "Music",
+    "Tecnología": "Technology",
+    "Gastronomía": "Gastronomy",
+    "Cultura": "Culture",
+    "Social": "Social",
+    "Salud": "Health",
+    "Aire Libre": "Outdoors"
   }
 }

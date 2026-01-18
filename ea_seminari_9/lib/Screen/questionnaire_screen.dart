@@ -125,7 +125,7 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
     if (_selectedInterests.isEmpty) {
       Get.snackbar(
         translate('common.error'),
-        'Por favor selecciona al menos un interés',
+        translate('questionnaire.errors.select_least_one'),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.redAccent,
         colorText: Colors.white,
@@ -152,7 +152,7 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
       setState(() => _isLoading = false);
       Get.snackbar(
         translate('common.error'),
-        'No se pudieron guardar los intereses',
+        translate('questionnaire.errors.save_failed'),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.redAccent,
         colorText: Colors.white,
@@ -222,7 +222,7 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
               const Icon(Icons.auto_awesome, color: Colors.white, size: 28),
               const SizedBox(width: 12),
               Text(
-                'Personaliza tu feed',
+                translate('questionnaire.title'),
                 style: context.textTheme.headlineSmall?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -232,7 +232,7 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
           ),
           const SizedBox(height: 12),
           Text(
-            'Dinos qué te apasiona para ofrecerte los mejores eventos.',
+            translate('questionnaire.subtitle'),
             style: context.textTheme.bodyMedium?.copyWith(
               color: Colors.white.withValues(alpha: 0.9),
             ),
@@ -253,7 +253,10 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
-          '${_selectedInterests.length} intereses seleccionados',
+          translate(
+            'questionnaire.selected_count',
+            args: {'count': _selectedInterests.length},
+          ),
           style: TextStyle(
             color: context.theme.colorScheme.primary,
             fontWeight: FontWeight.bold,
@@ -298,7 +301,10 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
                       ? context.theme.colorScheme.primary
                       : context.theme.hintColor.withValues(alpha: 0.5),
                 ),
-                tooltip: 'Seleccionar todo $category',
+                tooltip: translate(
+                  'questionnaire.select_all',
+                  args: {'category': translate('categories.$category')},
+                ),
               ),
               Expanded(
                 child: InkWell(
@@ -309,7 +315,7 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          category,
+                          translate('categories.$category'),
                           style: context.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: _selectedInterests.contains(category)
@@ -321,8 +327,13 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
                             _selectedInterests.contains(category))
                           Text(
                             _selectedInterests.contains(category)
-                                ? 'Toda la categoría seleccionada'
-                                : '$selectedInCat sub-intereses seleccionados',
+                                ? translate(
+                                    'questionnaire.category_all_selected',
+                                  )
+                                : translate(
+                                    'questionnaire.sub_interests_selected',
+                                    args: {'count': selectedInCat},
+                                  ),
                             style: context.textTheme.bodySmall?.copyWith(
                               color: context.theme.colorScheme.primary,
                               fontSize: 10,
@@ -405,8 +416,8 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
               ),
               child: _isLoading
                   ? const CircularProgressIndicator(color: Colors.white)
-                  : const Text(
-                      'Guardar Preferencias',
+                  : Text(
+                      translate('questionnaire.save_btn'),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -418,7 +429,7 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
           TextButton(
             onPressed: () => Get.offAllNamed('/home'),
             child: Text(
-              'Omitir por ahora',
+              translate('questionnaire.skip_btn'),
               style: TextStyle(color: context.theme.hintColor),
             ),
           ),

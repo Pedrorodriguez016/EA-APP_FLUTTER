@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import '../Services/chatbot_service.dart';
 import 'auth_controller.dart';
 
 class BotMessage {
-  final String text;
+  final String? text;
+  final String? translationKey;
   final bool isUser;
   final DateTime timestamp;
   final List<dynamic>? relatedEvents;
 
   BotMessage({
-    required this.text,
+    this.text,
+    this.translationKey,
     required this.isUser,
     DateTime? timestamp,
     this.relatedEvents,
-  }) : timestamp = timestamp ?? DateTime.now();
+  }) : timestamp = timestamp ?? DateTime.now(),
+       assert(text != null || translationKey != null);
 }
 
 class ChatBotController extends GetxController {
@@ -28,15 +32,14 @@ class ChatBotController extends GetxController {
   ChatBotController(this._service);
 
   @override
-  void onInit() {
-    super.onInit();
-    // Mensaje de bienvenida
-    messages.add(
-      BotMessage(
-        text: 'Hola! Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
-        isUser: false,
-      ),
-    );
+  void onReady() {
+    super.onReady();
+    // Mensaje de bienvenida reactivo usando llave de traducción
+    if (messages.isEmpty) {
+      messages.add(
+        BotMessage(translationKey: 'chatbot.welcome_message', isUser: false),
+      );
+    }
   }
 
   Future<void> sendQuery() async {
@@ -50,14 +53,34 @@ class ChatBotController extends GetxController {
 
     isLoading.value = true;
     try {
-      // 2. Llamar al servicio
+      // 2. Llamar al servicio con el idioma actual
       final authController = Get.find<AuthController>();
       final userId = authController.currentUser.value?.id ?? '';
 
-      final result = await _service.sendQuery(text, userId);
+      // Mapeo de idioma ca -> cat para el backend
+      String lang = LocalizedApp.of(
+        Get.context!,
+      ).delegate.currentLocale.languageCode;
+      if (lang == 'ca') lang = 'cat';
 
-      final String responseText = result['text'];
+      final result = await _service.sendQuery(text, userId, language: lang);
+
+      final String answer = result['answer'] ?? '';
       final List events = result['events'] ?? [];
+
+      String responseText = answer;
+      if (responseText.isEmpty) {
+        if (events.isEmpty) {
+          responseText = translate('chatbot.no_events_found');
+        } else {
+          final String countMsg = translate(
+            'chatbot.found_events_count',
+            args: {'count': events.length},
+          );
+          final names = events.map((e) => "- ${e['name']}").join('\n');
+          responseText = '$countMsg\n$names';
+        }
+      }
 
       // 3. Agregar respuesta del bot
       messages.add(
@@ -69,10 +92,7 @@ class ChatBotController extends GetxController {
       );
     } catch (e) {
       messages.add(
-        BotMessage(
-          text: 'Lo siento, hubo un error al procesar tu solicitud.',
-          isUser: false,
-        ),
+        BotMessage(translationKey: 'chatbot.error_message', isUser: false),
       );
     } finally {
       isLoading.value = false;

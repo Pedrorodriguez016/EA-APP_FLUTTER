@@ -17,7 +17,11 @@
     "fix_errors": "Por favor corrige los errores",
     "user": "Usuario",
     "continue": "Continuar",
-    "new_notification": "Nueva notificación"
+    "new_notification": "Nueva notificación",
+    "clear": "Limpiar",
+    "from": "Desde",
+    "to": "Hasta",
+    "not_specified": "No especificada"
   },
   "auth": {
     "login": {
@@ -56,8 +60,10 @@
       "username_empty": "Por favor ingresa un username",
       "username_short": "El username debe tener al menos 3 caracteres",
       "username_chars": "Solo se permiten letras, números y guiones bajos",
+      "username_not_allowed": "Nombre de usuario no permitido",
       "email_empty": "Por favor ingresa tu gmail",
       "email_invalid": "Por favor ingresa un gmail válido",
+      "temp_email_not_allowed": "No se permiten correos temporales",
       "password_empty": "Por favor ingresa una contraseña",
       "password_short": "La contraseña debe tener al menos 6 caracteres",
       "password_mismatch": "Las contraseñas no coinciden",
@@ -99,7 +105,8 @@
       "title": "Amigos",
       "requests_btn": "Solicitudes",
       "search_btn": "Buscar amigos",
-      "empty_msg": "Aún no tienes amigos para mostrar."
+      "empty_msg": "Aún no tienes amigos para mostrar.",
+      "view_all": "Ver todos mis amigos"
     },
     "loading_location": "Obteniendo ubicación..."
   },
@@ -118,6 +125,8 @@
     "select_category_hint": "Selecciona una categoría",
     "detail_title": "Detalles del Evento",
     "info_card_title": "Información del Evento",
+    "personal_info": "Información Personal",
+    "progress_achievements": "Progreso y Logros",
     "schedule": "Horario:",
     "participants": "Participantes:",
     "not_found": "Evento no encontrado",
@@ -264,7 +273,25 @@
   "chatbot": {
     "title": "Asistente Virtual",
     "event_placeholder": "Evento",
-    "input_hint": "Escribe tu consulta..."
+    "input_hint": "Escribe tu consulta...",
+    "welcome_message": "¡Hola! Soy tu asistente virtual. ¿En qué puedo ayudarte hoy?",
+    "error_message": "Lo siento, hubo un error al procesar tu solicitud.",
+    "no_events_found": "No he encontrado eventos que coincidan con tu búsqueda.",
+    "found_events_count": "He encontrado {count} eventos:"
+  },
+  "questionnaire": {
+    "title": "Personaliza tu feed",
+    "subtitle": "Dinos qué te apasiona para ofrecerte los mejores eventos.",
+    "select_all": "Seleccionar todo {category}",
+    "selected_count": "{count} intereses seleccionados",
+    "category_all_selected": "Toda la categoría seleccionada",
+    "sub_interests_selected": "{count} sub-intereses seleccionados",
+    "save_btn": "Guardar Preferencias",
+    "skip_btn": "Omitir por ahora",
+    "errors": {
+      "select_least_one": "Por favor selecciona al menos un interés",
+      "save_failed": "No se pudieron guardar los intereses"
+    }
   },
   "gamification": {
     "title": "Gamificación",
@@ -298,7 +325,19 @@
     "no_friends_to_invite": "No tienes amigos para invitar aún.",
     "invite_friends": "Invitar amigos:",
     "max_capacity": "Capacidad máxima (opcional)",
-    "unlimited_capacity_hint": "Dejar en blanco para capacidad ilimitada"
+    "unlimited_capacity_hint": "Dejar en blanco para capacidad ilimitada",
+    "event_photos": "Fotos del Evento",
+    "no_photos_yet": "No hay fotos compartidas aún",
+    "share_media": "Compartir Multimedia",
+    "open_gallery": "Abrir Galería",
+    "photos_videos": "Fotos y vídeos",
+    "open_camera": "Abrir Cámara",
+    "capture_now": "Capturar foto o vídeo ahora",
+    "take_photo": "Tomar Foto",
+    "record_video": "Grabar Vídeo",
+    "video_load_error": "Error al cargar el video",
+    "photo": "Foto",
+    "video": "Video"
   },
   "notificaciones": {
     "titulo": "Notificaciones",
@@ -311,5 +350,24 @@
     "empty_msg": "No tienes invitaciones por ahora",
     "accept": "Aceptar",
     "reject": "Rechazar"
+  },
+  "categories": {
+    "recommended": "Recomendados",
+    "Fútbol": "Fútbol",
+    "Concierto Pop": "Concierto Pop",
+    "Teatro": "Teatro",
+    "Exposición Arte": "Exposición Arte",
+    "Restaurante": "Restaurante",
+    "Curso": "Curso",
+    "Gaming": "Gaming",
+    "Discoteca": "Discoteca",
+    "Deportes": "Deportes",
+    "Música": "Música",
+    "Tecnología": "Tecnología",
+    "Gastronomía": "Gastronomía",
+    "Cultura": "Cultura",
+    "Social": "Social",
+    "Salud": "Salud",
+    "Aire Libre": "Aire Libre"
   }
 }

@@ -1076,7 +1076,7 @@ class EventoController extends GetxController {
                         filterDateTo.value = null;
                         filterCategory.value = null;
                       },
-                      child: const Text('Limpiar'),
+                      child: Text(translate('common.clear')),
                     ),
                   ],
                 ),
@@ -1085,7 +1085,7 @@ class EventoController extends GetxController {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Text(
-                  'Categoría',
+                  translate('events.field_category'),
                   style: context.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -1105,7 +1105,7 @@ class EventoController extends GetxController {
                     return Obx(() {
                       final isSelected = filterCategory.value == cat;
                       return ChoiceChip(
-                        label: Text(cat),
+                        label: Text(translate('categories.$cat')),
                         selected: isSelected,
                         onSelected: (val) {
                           filterCategory.value = val ? cat : null;
@@ -1129,7 +1129,7 @@ class EventoController extends GetxController {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Text(
-                  'Rango de fechas',
+                  translate('events.date_range'),
                   style: context.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -1143,7 +1143,7 @@ class EventoController extends GetxController {
                     Expanded(
                       child: _buildDateTile(
                         context,
-                        'Desde',
+                        translate('common.from'),
                         filterDateFrom,
                         () async {
                           final date = await showDatePicker(
@@ -1164,7 +1164,7 @@ class EventoController extends GetxController {
                     Expanded(
                       child: _buildDateTile(
                         context,
-                        'Hasta',
+                        translate('common.to'),
                         filterDateTo,
                         () async {
                           final date = await showDatePicker(
@@ -1204,9 +1204,9 @@ class EventoController extends GetxController {
                       ),
                       elevation: 0,
                     ),
-                    child: const Text(
-                      'Aplicar Filtros',
-                      style: TextStyle(
+                    child: Text(
+                      translate('events.apply_filters'),
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
                       ),

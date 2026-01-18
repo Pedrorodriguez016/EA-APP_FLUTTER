@@ -228,7 +228,7 @@ class EventosCard extends StatelessWidget {
                                           ),
                                         ),
                                       ),
-                                      child: const Row(
+                                      child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Icon(
@@ -238,8 +238,10 @@ class EventosCard extends StatelessWidget {
                                           ),
                                           SizedBox(width: 4),
                                           Text(
-                                            'Lleno',
-                                            style: TextStyle(
+                                            translate(
+                                              'events_extra.full_label',
+                                            ),
+                                            style: const TextStyle(
                                               fontSize: 10,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.orange,
@@ -265,7 +267,7 @@ class EventosCard extends StatelessWidget {
                                           ),
                                         ),
                                       ),
-                                      child: const Row(
+                                      child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Icon(
@@ -275,8 +277,10 @@ class EventosCard extends StatelessWidget {
                                           ),
                                           SizedBox(width: 4),
                                           Text(
-                                            'Lista espera',
-                                            style: TextStyle(
+                                            translate(
+                                              'events_extra.waitlist_btn',
+                                            ),
+                                            style: const TextStyle(
                                               fontSize: 10,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.purple,

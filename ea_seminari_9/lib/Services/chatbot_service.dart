@@ -12,14 +12,20 @@ class ChatBotService {
     _client.interceptors.add(AuthInterceptor());
   }
 
-  Future<Map<String, dynamic>> sendQuery(String query, String userId) async {
+  Future<Map<String, dynamic>> sendQuery(
+    String query,
+    String userId, {
+    String language = 'es',
+  }) async {
     try {
-      logger.d('🤖 Enviando query al chatbot: $query (UID: $userId)');
+      logger.d(
+        '🤖 Enviando query al chatbot: $query (UID: $userId, LANG: $language)',
+      );
       logger.d('🔗 URL completa: ${_client.options.baseUrl}/search');
 
       final response = await _client.post(
         '/search',
-        data: {'query': query, 'userId': userId},
+        data: {'query': query, 'userId': userId, 'language': language},
       );
 
       logger.i('✅ Respuesta del chatbot recibida');
@@ -28,19 +34,7 @@ class ChatBotService {
       final String answer = data['answer'] ?? '';
       final List events = (data['data'] is List) ? data['data'] : [];
 
-      // Si el backend no devuelve un texto procesado por la IA, usamos un fallback
-      String responseText = answer;
-      if (responseText.isEmpty) {
-        if (events.isEmpty) {
-          responseText =
-              'No he encontrado eventos que coincidan con tu búsqueda.';
-        } else {
-          final names = events.map((e) => "- ${e['name']}").join('\n');
-          responseText = 'He encontrado ${events.length} eventos:\n$names';
-        }
-      }
-
-      return {'text': responseText, 'events': events};
+      return {'answer': answer, 'events': events};
     } catch (e) {
       logger.e('❌ Error consultando el chatbot', error: e);
       throw Exception('Error al conectar con el asistente');

@@ -214,7 +214,7 @@ class UserDetailScreen extends GetView<UserController> {
             context,
             Icons.cake,
             '${translate("auth.fields.birthday")}:',
-            _formatDate(user.birthday),
+            _formatDate(context, user.birthday),
           ),
         ],
       ),
@@ -355,11 +355,14 @@ class UserDetailScreen extends GetView<UserController> {
     );
   }
 
-  String _formatDate(String dateStr) {
-    if (dateStr.isEmpty) return 'No especificada';
+  String _formatDate(BuildContext context, String dateStr) {
+    if (dateStr.isEmpty) return translate('common.not_specified');
     try {
       final date = DateTime.parse(dateStr);
-      return DateFormat("d 'de' MMMM 'de' y", 'es_ES').format(date);
+      final String currentLocale = LocalizedApp.of(
+        context,
+      ).delegate.currentLocale.languageCode;
+      return DateFormat("d 'de' MMMM 'de' y", currentLocale).format(date);
     } catch (_) {
       return dateStr;
     }

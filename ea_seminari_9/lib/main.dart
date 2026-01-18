@@ -35,6 +35,7 @@ import 'utils/app_theme.dart';
 import 'Screen/calendar_screen.dart';
 import 'Screen/blocked_users_screen.dart';
 import 'Screen/questionnaire_screen.dart';
+import 'Services/language_preferences.dart';
 
 void main() async {
   logger.i('🚀 Iniciando aplicación...');
@@ -47,6 +48,7 @@ void main() async {
     fallbackLocale: 'es',
     supportedLocales: ['es', 'en', 'ca', 'fr'],
     basePath: 'assets/i18n/',
+    preferences: LanguagePreferences(),
   );
   await initializeDateFormatting(null, null);
   timeago.setLocaleMessages('es', timeago.EsMessages());

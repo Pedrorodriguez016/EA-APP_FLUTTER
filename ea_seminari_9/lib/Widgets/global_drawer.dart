@@ -91,10 +91,7 @@ class GlobalDrawer extends StatelessWidget {
                   icon: isDark
                       ? Icons.dark_mode_rounded
                       : Icons.light_mode_rounded,
-                  title:
-                      translate('settings.theme_mode') == 'settings.theme_mode'
-                      ? 'Tema'
-                      : translate('settings.theme_mode'),
+                  title: translate('settings.theme_mode'),
                   trailing: Switch(
                     value: isDark,
                     activeThumbColor: context.theme.colorScheme.primary,
@@ -272,7 +269,7 @@ class GlobalDrawer extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Ver todos mis amigos',
+                          translate('home.friends_section.view_all'),
                           style: TextStyle(
                             color: context.theme.colorScheme.primary,
                             fontWeight: FontWeight.bold,

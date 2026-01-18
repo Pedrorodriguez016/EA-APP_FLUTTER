@@ -102,12 +102,16 @@ class CategoriesGrid extends StatelessWidget {
           itemCount: categories.length,
           itemBuilder: (context, index) {
             final cat = categories[index];
-            final title = cat['title'] as String;
+            final titleKey = cat['title'] as String;
+            final translatedTitle = titleKey == 'Recomendados'
+                ? translate('categories.recommended')
+                : translate('categories.$titleKey');
             return _buildCategoryCard(
               context,
-              title,
+              translatedTitle,
               cat['icon'] as IconData,
               cat['color'] as Color,
+              categoryValue: titleKey,
               isSpecial: cat['isSpecial'] as bool? ?? false,
             );
           },
@@ -118,9 +122,10 @@ class CategoriesGrid extends StatelessWidget {
 
   Widget _buildCategoryCard(
     BuildContext context,
-    String title,
+    String displayTitle,
     IconData icon,
     Color color, {
+    required String categoryValue,
     bool isSpecial = false,
   }) {
     return Container(
@@ -143,7 +148,7 @@ class CategoriesGrid extends StatelessWidget {
               controller.showRecommendedOnly();
             } else {
               controller.searchEditingController.clear();
-              controller.filterCategory.value = title;
+              controller.filterCategory.value = categoryValue;
               controller.isSearching.value = true;
               controller.fetchEventos(1);
             }
@@ -164,7 +169,7 @@ class CategoriesGrid extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  title,
+                  displayTitle,
                   style: context.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,

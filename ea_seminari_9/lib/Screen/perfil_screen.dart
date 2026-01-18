@@ -35,10 +35,10 @@ class ProfileScreen extends GetView<UserController> {
       try {
         final date = DateTime.parse(user.birthday);
         selectedBirthDate = date;
-        birthdayController.text = DateFormat(
-          "d 'de' MMMM 'de' y",
-          'es_ES',
-        ).format(date);
+        final String currentLocale = LocalizedApp.of(
+          context,
+        ).delegate.currentLocale.languageCode;
+        birthdayController.text = DateFormat.yMMMMd(currentLocale).format(date);
       } catch (_) {
         birthdayController.text = user.birthday;
       }
@@ -92,7 +92,7 @@ class ProfileScreen extends GetView<UserController> {
                   const SizedBox(height: 32),
 
                   Text(
-                    'Progreso y Logros',
+                    translate('events.progress_achievements'),
                     style: context.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,
@@ -106,7 +106,7 @@ class ProfileScreen extends GetView<UserController> {
 
                   const SizedBox(height: 32),
                   Text(
-                    'Información Personal',
+                    translate('events.personal_info'),
                     style: context.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,
@@ -782,7 +782,7 @@ class ProfileScreen extends GetView<UserController> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      evento.categoria,
+                      translate('categories.${evento.categoria}'),
                       style: TextStyle(
                         color: context.theme.hintColor,
                         fontSize: 12,
@@ -847,7 +847,7 @@ class ProfileScreen extends GetView<UserController> {
                   Icons.delete_outline_rounded,
                   color: Colors.red,
                 ),
-                tooltip: 'Eliminar',
+                tooltip: translate('common.delete'),
               ),
             ],
           ),

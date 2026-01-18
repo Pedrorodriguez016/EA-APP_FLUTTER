@@ -119,7 +119,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return translate('auth.errors.username_chars');
     }
     if (_reservedUsernames.contains(trimmed.toLowerCase())) {
-      return 'Nombre de usuario no permitido';
+      return translate('auth.errors.username_not_allowed');
     }
     return null;
   }
@@ -191,7 +191,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     final domain = email.split('@').last.toLowerCase();
     if (_temporaryDomains.contains(domain)) {
-      return 'No se permiten correos temporales';
+      return translate('auth.errors.temp_email_not_allowed');
     }
     return null;
   }
@@ -439,7 +439,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
               switch (strength) {
                 case PasswordStrength.weak:
-                  label = translate('common.error');
+                  label = translate('auth.errors.password_weak');
                   break;
                 case PasswordStrength.medium:
                   label = translate('auth.errors.password_medium');

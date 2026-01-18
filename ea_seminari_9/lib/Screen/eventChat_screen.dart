@@ -227,7 +227,7 @@ class EventChatScreen extends GetView<EventChatController> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Fotos del Evento',
+                    translate('events_extra.event_photos'),
                     style: context.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -257,7 +257,7 @@ class EventChatScreen extends GetView<EventChatController> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'No hay fotos compartidas aún',
+                          translate('events_extra.no_photos_yet'),
                           style: TextStyle(color: context.theme.hintColor),
                         ),
                       ],
@@ -336,7 +336,7 @@ class EventChatScreen extends GetView<EventChatController> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Compartir Multimedia',
+              translate('events_extra.share_media'),
               style: context.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -344,8 +344,8 @@ class EventChatScreen extends GetView<EventChatController> {
             const SizedBox(height: 16),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('Abrir Galería'),
-              subtitle: const Text('Fotos y vídeos'),
+              title: Text(translate('events_extra.open_gallery')),
+              subtitle: Text(translate('events_extra.photos_videos')),
               onTap: () {
                 Get.back();
                 controller.uploadMedia(isGeneralGallery: true);
@@ -354,8 +354,8 @@ class EventChatScreen extends GetView<EventChatController> {
             const Divider(),
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('Abrir Cámara'),
-              subtitle: const Text('Capturar foto o vídeo ahora'),
+              title: Text(translate('events_extra.open_camera')),
+              subtitle: Text(translate('events_extra.capture_now')),
               onTap: () {
                 Get.back();
                 Get.bottomSheet(
@@ -371,7 +371,7 @@ class EventChatScreen extends GetView<EventChatController> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'Cámara',
+                          translate('profile.camera'),
                           style: context.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
@@ -379,7 +379,7 @@ class EventChatScreen extends GetView<EventChatController> {
                         const SizedBox(height: 16),
                         ListTile(
                           leading: const Icon(Icons.camera_alt),
-                          title: const Text('Tomar Foto'),
+                          title: Text(translate('events_extra.take_photo')),
                           onTap: () {
                             Get.back();
                             controller.uploadMedia(
@@ -390,7 +390,7 @@ class EventChatScreen extends GetView<EventChatController> {
                         ),
                         ListTile(
                           leading: const Icon(Icons.videocam),
-                          title: const Text('Grabar Vídeo'),
+                          title: Text(translate('events_extra.record_video')),
                           onTap: () {
                             Get.back();
                             controller.uploadMedia(
@@ -423,7 +423,9 @@ class EventChatScreen extends GetView<EventChatController> {
           backgroundColor: Colors.black,
           iconTheme: const IconThemeData(color: Colors.white),
           title: Text(
-            media.type == 'video' ? 'Video' : 'Foto',
+            media.type == 'video'
+                ? translate('events_extra.video')
+                : translate('events_extra.photo'),
             style: const TextStyle(color: Colors.white),
           ),
           actions: [
@@ -495,14 +497,14 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
   @override
   Widget build(BuildContext context) {
     if (_isError) {
-      return const Column(
+      return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(Icons.error_outline, color: Colors.white, size: 48),
           SizedBox(height: 16),
           Text(
-            'Error al cargar el video',
-            style: TextStyle(color: Colors.white),
+            translate('events_extra.video_load_error'),
+            style: const TextStyle(color: Colors.white),
           ),
         ],
       );

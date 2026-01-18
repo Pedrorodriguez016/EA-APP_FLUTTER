@@ -16,7 +16,11 @@
     "no": "Non",
     "fix_errors": "Veuillez corriger les erreurs",
     "user": "Utilisateur",
-    "continue": "Continuer"
+    "continue": "Continuer",
+    "clear": "Effacer",
+    "from": "De",
+    "to": "À",
+    "not_specified": "Non spécifiée"
   },
   "auth": {
     "login": {
@@ -55,8 +59,10 @@
       "username_empty": "Veuillez entrer un nom d'utilisateur",
       "username_short": "Le nom d'utilisateur doit comporter au moins 3 caractères",
       "username_chars": "Seuls les lettres, les chiffres et les traits de soulignement sont autorisés",
+      "username_not_allowed": "Nom d'utilisateur non autorisé",
       "email_empty": "Veuillez entrer votre adresse e-mail",
       "email_invalid": "Veuillez entrer un gmail valide",
+      "temp_email_not_allowed": "Les e-mails temporaires ne sont pas autorisés",
       "password_empty": "Veuillez entrer un mot de passe",
       "password_short": "Le mot de passe doit comporter au moins 6 caractères",
       "password_mismatch": "Les mots de passe ne correspondent pas",
@@ -98,7 +104,8 @@
       "title": "Amis",
       "requests_btn": "Demandes",
       "search_btn": "Rechercher des amis",
-      "empty_msg": "Pas encore d'amis à afficher."
+      "empty_msg": "Pas encore d'amis à afficher.",
+      "view_all": "Voir tous mes amis"
     },
     "loading_location": "Obtention de l'emplacement..."
   },
@@ -107,6 +114,7 @@
     "search_hint": "Rechercher un événement...",
     "empty_search": "Aucun événement trouvé",
     "create_title": "Créer un événement",
+    "edit_title": "Éditer l'événement",
     "save_btn": "Enregistrer l'événement",
     "field_title": "Titre de l'événement",
     "field_address": "Adresse",
@@ -116,6 +124,8 @@
     "select_category_hint": "Sélectionnez une catégorie",
     "detail_title": "Détails de l'événement",
     "info_card_title": "Informations sur l'événement",
+    "personal_info": "Informations Personnelles",
+    "progress_achievements": "Progrès et Réalisations",
     "schedule": "Horaire :",
     "participants": "Participants :",
     "not_found": "Événement non trouvé",
@@ -141,7 +151,9 @@
       "load_error_title": "Erreur de Chargement",
       "load_error_msg": "Impossible de charger les événements. Vérifiez votre connexion ou le serveur.",
       "login_to_participate": "Vous devez vous connecter pour participer",
-      "load_my_events": "Impossible de charger vos événements"
+      "load_my_events": "Impossible de charger vos événements",
+      "confirm_delete_title": "Supprimer l'événement",
+      "confirm_delete_msg": "Êtes-vous sûr de vouloir supprimer \"{name}\" ?"
     },
     "chat_btn": "Entrer dans le chat",
     "chat_subtitle": "Chat de l'événement",
@@ -155,7 +167,11 @@
     "categories": "Catégories",
     "filters": "Filtres",
     "popular_week": "Populaires cette semaine",
-    "at_time": "à"
+    "chat_participants": "Participants du Chat",
+    "date_range": "Plage de dates",
+    "apply_filters": "Appliquer les filtres",
+    "at_time": "à",
+    "invited_you_to": "vous a invité à"
   },
   "calendar": {
     "title": "Calendrier des Événements",
@@ -214,6 +230,8 @@
     "notifications": "Notifications",
     "privacy": "Confidentialité",
     "language": "Langue",
+    "preferences": "Préférences d'intérêts",
+    "preferences_subtitle": "Personnalisez vos recommandations d'événements",
     "about_section": "À propos",
     "version": "Version",
     "help": "Aide et support",
@@ -248,12 +266,33 @@
     },
     "gallery": "Galerie",
     "camera": "Caméra",
-    "delete_photo": "Supprimer la photo"
+    "delete_photo": "Supprimer la photo",
+    "created_events": "Événements créés par moi",
+    "no_created_events": "Vous n'avez pas encore créé d'événements",
+    "edit": "Éditer"
   },
   "chatbot": {
     "title": "Assistant Virtuel",
     "event_placeholder": "Événement",
-    "input_hint": "Écrivez votre question..."
+    "input_hint": "Écrivez votre question...",
+    "welcome_message": "Bonjour ! Je suis votre assistant virtuel. Comment puis-je vous aider aujourd'hui ?",
+    "error_message": "Désolé, une erreur s'est produite lors du traitement de votre demande.",
+    "no_events_found": "Je n'ai pas trouvé d'événements correspondant à votre recherche.",
+    "found_events_count": "J'ai trouvé {count} événements :"
+  },
+  "questionnaire": {
+    "title": "Personnalisez votre flux",
+    "subtitle": "Dites-nous ce qui vous passionne pour vous proposer les meilleurs événements.",
+    "select_all": "Tout sélectionner {category}",
+    "selected_count": "{count} intérêts sélectionnés",
+    "category_all_selected": "Toute la catégorie sélectionnée",
+    "sub_interests_selected": "{count} sous-intérêts sélectionnés",
+    "save_btn": "Enregistrer les Préférences",
+    "skip_btn": "Ignorer pour l'instant",
+    "errors": {
+      "select_least_one": "Veuillez sélectionner au moins un intérêt",
+      "save_failed": "Les intérêts n'ont pas pu être enregistrés"
+    }
   },
   "gamification": {
     "title": "Gamification",
@@ -282,16 +321,54 @@
   "events_extra": {
     "private_event": "Événement Privé",
     "private_subtitle": "Seuls les invités peuvent voir et rejoindre cet événement",
-    "waitlist_btn": "Entrar sur liste d'attente",
+    "waitlist_btn": "Entrer sur liste d'attente",
     "full_label": "COMPLET",
     "no_friends_to_invite": "Vous n'avez pas encore d'amis à inviter.",
     "invite_friends": "Inviter des amis :",
     "max_capacity": "Capacité maximale (optionnel)",
-    "unlimited_capacity_hint": "Laisser vide pour une capacité illimitée"
+    "unlimited_capacity_hint": "Laisser vide pour une capacité illimitée",
+    "event_photos": "Photos de l'Événement",
+    "no_photos_yet": "Aucune photo partagée pour le moment",
+    "share_media": "Partager Multimédia",
+    "open_gallery": "Ouvrir la Galerie",
+    "photos_videos": "Photos et vidéos",
+    "open_camera": "Ouvrir l'Appareil Photo",
+    "capture_now": "Prendre une photo ou une vidéo maintenant",
+    "take_photo": "Prendre une Photo",
+    "record_video": "Enregistrer une Vidéo",
+    "video_load_error": "Erreur lors du chargement de la vidéo",
+    "photo": "Photo",
+    "video": "Vidéo"
   },
   "notificaciones": {
     "titulo": "Notifications",
     "vacia": "Vous n'avez aucune notification",
     "marcar_todas_leidas": "Tout marquer comme lu"
+  },
+  "invitations": {
+    "title": "Invitations d'Événements",
+    "pending": "Invitations en Attente",
+    "empty_msg": "Vous n'avez pas d'invitations pour le moment",
+    "accept": "Accepter",
+    "reject": "Refuser"
+  },
+  "categories": {
+    "recommended": "Recommandés",
+    "Fútbol": "Football",
+    "Concierto Pop": "Concert Pop",
+    "Teatro": "Théâtre",
+    "Exposición Arte": "Exposition d'Art",
+    "Restaurante": "Restaurant",
+    "Curso": "Cours",
+    "Gaming": "Jeux vidéo",
+    "Discoteca": "Discothèque",
+    "Deportes": "Sports",
+    "Música": "Musique",
+    "Tecnología": "Technologie",
+    "Gastronomía": "Gastronomie",
+    "Cultura": "Culture",
+    "Social": "Social",
+    "Salud": "Santé",
+    "Aire Libre": "Plein Air"
   }
 }

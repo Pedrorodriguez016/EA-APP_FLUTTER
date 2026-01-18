@@ -446,7 +446,7 @@ class EventosDetailScreen extends GetView<EventoController> {
             context,
             Icons.category_rounded,
             translate('events.field_category'),
-            evento.categoria,
+            translate('categories.${evento.categoria}'),
           ),
 
           const SizedBox(height: 20),

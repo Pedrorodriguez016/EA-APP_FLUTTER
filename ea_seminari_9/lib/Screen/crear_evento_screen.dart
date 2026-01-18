@@ -5,6 +5,7 @@ import '../Models/eventos.dart';
 import '../Controllers/eventos_controller.dart';
 import '../utils/app_theme.dart';
 import '../Widgets/address_autocomplete_field.dart';
+import 'package:intl/intl.dart';
 
 class CrearEventoScreen extends GetView<EventoController> {
   const CrearEventoScreen({super.key});
@@ -57,7 +58,7 @@ class CrearEventoScreen extends GetView<EventoController> {
                 items: listaCategorias.map((String categoria) {
                   return DropdownMenuItem<String>(
                     value: categoria,
-                    child: Text(categoria),
+                    child: Text(translate('categories.$categoria')),
                   );
                 }).toList(),
                 onChanged: (newValue) {
@@ -323,9 +324,13 @@ class CrearEventoScreen extends GetView<EventoController> {
           String buttonText = translate('events.select_date_btn');
           if (isDateSelected) {
             final dt = controller.selectedSchedule.value!;
-            final String minute = dt.minute.toString().padLeft(2, '0');
-            buttonText =
-                '${dt.day}/${dt.month}/${dt.year} - ${dt.hour}:$minute';
+            final String currentLocale = LocalizedApp.of(
+              context,
+            ).delegate.currentLocale.languageCode;
+            buttonText = DateFormat(
+              'dd/MM/yyyy - HH:mm',
+              currentLocale,
+            ).format(dt);
           }
           final Color activeColor = context.theme.colorScheme.primary;
           final Color inactiveColor = context.theme.hintColor;

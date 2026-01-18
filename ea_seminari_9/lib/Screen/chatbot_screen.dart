@@ -85,7 +85,9 @@ class ChatBotScreen extends GetView<ChatBotController> {
               ),
             ),
             child: Text(
-              msg.text,
+              msg.translationKey != null
+                  ? translate(msg.translationKey!)
+                  : (msg.text ?? ''),
               style: TextStyle(color: textColor, fontSize: 15),
             ),
           ),
