@@ -36,6 +36,7 @@ import 'Screen/calendar_screen.dart';
 import 'Screen/blocked_users_screen.dart';
 import 'Screen/questionnaire_screen.dart';
 import 'Services/language_preferences.dart';
+import 'Screen/verification_screen.dart';
 
 void main() async {
   logger.i('🚀 Iniciando aplicación...');
@@ -108,9 +109,15 @@ class MyApp extends StatelessWidget {
       initialRoute: '/login',
       getPages: [
         GetPage(name: '/login', page: () => const LoginScreen()),
+
         GetPage(
           name: '/register',
           page: () => const RegisterScreen(),
+          binding: AuthBinding(),
+        ),
+        GetPage(
+          name: '/verify-email',
+          page: () => const VerificationScreen(),
           binding: AuthBinding(),
         ),
         GetPage(

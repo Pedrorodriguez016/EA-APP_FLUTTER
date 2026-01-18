@@ -794,7 +794,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
       setState(() => isLoading = false);
 
       if (result['success'] == true) {
-        _showSuccessDialog();
+        if (result['email'] != null) {
+          // Pass password and username to verification screen to allow auto-login simulation on frontend
+          Get.toNamed(
+            '/verify-email',
+            arguments: {
+              'email': result['email'],
+              'password': passwordController.text,
+              'username': usernameController.text,
+            },
+          );
+        } else {
+          _showSuccessDialog();
+        }
       } else {
         Get.snackbar(
           translate('common.error'),

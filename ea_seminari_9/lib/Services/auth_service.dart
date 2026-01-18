@@ -35,9 +35,11 @@ class AuthService {
 
   Future<dynamic> register(User newUser) async {
     try {
-      logger.d('📡 POST /user - registrando usuario: ${newUser.username}');
+      logger.d(
+        '📡 POST /auth/register - registrando usuario: ${newUser.username}',
+      );
       final response = await _client.post(
-        '/user',
+        '/auth/register',
         data: {
           'username': newUser.username,
           'gmail': newUser.gmail,
@@ -63,12 +65,12 @@ class AuthService {
     String? username,
   }) async {
     try {
-      logger.d('📡 POST /user/auth/google - Enviando idToken');
+      logger.d('📡 POST /auth/google - Enviando idToken');
       final Map<String, dynamic> data = {'credential': idToken};
       if (birthday != null) data['birthday'] = birthday;
       if (username != null) data['username'] = username;
 
-      final response = await _client.post('/user/auth/google', data: data);
+      final response = await _client.post('/auth/google', data: data);
       logger.i('✅ Google Login HTTP OK');
       return response.data;
     } catch (e) {
@@ -80,6 +82,7 @@ class AuthService {
   Future<Map<String, dynamic>> checkGoogleUser(String idToken) async {
     try {
       logger.d('📡 POST /user/auth/google/check - Comprobando usuario');
+      // Fix: this endpoint is in usuarioRoutes (mounted at /api/user)
       final response = await _client.post(
         '/user/auth/google/check',
         data: {'credential': idToken},
@@ -88,6 +91,36 @@ class AuthService {
       return response.data;
     } catch (e) {
       logger.e('❌ Error en check Google User HTTP', error: e);
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> verifyEmail(String email, String otp) async {
+    try {
+      logger.d('📡 POST /auth/verify-email - email: $email');
+      final response = await _client.post(
+        '/auth/verify-email',
+        data: {'email': email, 'otp': otp},
+      );
+      logger.i('✅ Email verificado correctamente para: $email');
+      return response.data;
+    } catch (e) {
+      logger.e('❌ Error verificando email para: $email', error: e);
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>> resendVerification(String email) async {
+    try {
+      logger.d('📡 POST /auth/resend-verification - email: $email');
+      final response = await _client.post(
+        '/auth/resend-verification',
+        data: {'email': email},
+      );
+      logger.i('✅ Código reenviado a: $email');
+      return response.data;
+    } catch (e) {
+      logger.e('❌ Error reenviando código a: $email', error: e);
       rethrow;
     }
   }

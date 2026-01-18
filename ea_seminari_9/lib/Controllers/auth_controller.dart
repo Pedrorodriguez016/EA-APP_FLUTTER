@@ -115,6 +115,20 @@ class AuthController extends GetxController {
       String msg = errorData != null && errorData['error'] != null
           ? errorData['error']
           : translate('common.error');
+
+      if (e.response?.statusCode == 403 &&
+          errorData['error'] == 'EMAIL_NOT_VERIFIED') {
+        if (loginUserCtrl.text.contains('@')) {
+          Get.toNamed('/verify-email', arguments: loginUserCtrl.text);
+          isLoginLoading.value = false;
+          return;
+        } else {
+          // If we don't have the email (user logged in with username), warn them.
+          msg =
+              'Email no verificado. Por favor inicia sesión con tu email para verificarlo.';
+        }
+      }
+
       Get.snackbar(
         translate('common.error'),
         msg,
@@ -391,32 +405,12 @@ class AuthController extends GetxController {
   Future<Map<String, dynamic>> register(User newUser) async {
     try {
       await _authService.register(newUser);
-      logger.i('✅ Registro completado. Iniciando sesión automática...');
-
-      // Realizamos el login automático usando las credenciales del registro
-      final loginData = await _authService.login(
-        newUser.username,
-        newUser.password!,
-      );
-
-      final userData = loginData['user'];
-      final user = User.fromJson({
-        ...userData,
-        'token': loginData['token'],
-        'refreshToken': loginData['refreshToken'],
-      });
-
-      currentUser.value = user;
-      token = loginData['token'];
-      refreshToken = loginData['refreshToken'];
-      isLoggedIn.value = true;
-
-      await _storageService.saveSession(user);
-      logger.i('✅ Login automático tras registro exitoso');
+      logger.i('✅ Registro completado. Verificación pendiente.');
 
       return {
         'success': true,
         'message': translate('auth.register.success_msg'),
+        'email': newUser.gmail,
       };
     } on DioException catch (e) {
       final errorData = e.response?.data;
@@ -433,6 +427,97 @@ class AuthController extends GetxController {
 
   void togglePasswordVisibility() {
     isObscurePassword.value = !isObscurePassword.value;
+  }
+
+  Future<bool> verifyOtp(String email, String otp) async {
+    try {
+      final response = await _authService.verifyEmail(email, otp);
+
+      // If backend returns a token, perform auto-login
+      if (response.containsKey('token') && response['token'] != null) {
+        final userData = response['user'];
+        final user = User.fromJson({
+          ...userData,
+          'token': response['token'],
+          'refreshToken': response['refreshToken'],
+        });
+
+        currentUser.value = user;
+        token = response['token'];
+        refreshToken = response['refreshToken'];
+        isLoggedIn.value = true;
+
+        await _storageService.saveSession(user);
+        logger.i('✅ Auto-login tras verificación exitoso');
+      }
+
+      return true;
+    } on DioException catch (e) {
+      final errorData = e.response?.data;
+      String msg = errorData != null && errorData['error'] != null
+          ? errorData['error']
+          : translate('common.error');
+
+      if (msg == 'INVALID_CODE')
+        msg = translate('auth.verification.error_invalid_code');
+      if (msg == 'EXPIRED_CODE')
+        msg = translate('auth.verification.error_expired');
+
+      Get.snackbar(
+        translate('auth.verification.error_title'),
+        msg,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } catch (e) {
+      Get.snackbar(
+        translate('common.error'),
+        '$e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    }
+  }
+
+  Future<bool> resendCode(String email) async {
+    try {
+      await _authService.resendVerification(email);
+      Get.snackbar(
+        translate('common.success'),
+        translate('auth.verification.resend_success'),
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return true;
+    } on DioException catch (e) {
+      final errorData = e.response?.data;
+      String msg = errorData != null && errorData['error'] != null
+          ? errorData['error']
+          : translate('common.error');
+
+      Get.snackbar(
+        translate('common.error'),
+        msg,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } catch (e) {
+      Get.snackbar(
+        translate('common.error'),
+        '$e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    }
   }
 
   @override

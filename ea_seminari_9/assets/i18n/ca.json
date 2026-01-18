@@ -90,6 +90,20 @@
       "uppercase": "A-Z",
       "numbers": "0-9",
       "special_chars": "!@#$"
+    },
+    "verification": {
+      "title": "Verificar Correu",
+      "subtitle": "Introdueix el codi de 6 dígits enviat al teu correu.",
+      "code_label": "Codi de verificació",
+      "verify_btn": "Verificar",
+      "resend_btn": "Reenviar codi",
+      "resend_timer": "Reenviar en ",
+      "success": "Correu verificat correctament",
+      "resend_success": "Codi reenviat",
+      "error_title": "Error de verificació",
+      "error_invalid_code": "Codi incorrecte",
+      "error_expired": "El codi ha caducat",
+      "success_login": "Verificació correcta, si us plau inicia sessió"
     }
   },
   "home": {

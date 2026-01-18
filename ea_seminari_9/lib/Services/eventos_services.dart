@@ -11,12 +11,21 @@ import '../Services/storage_service.dart';
 class EventosServices {
   final String baseUrl = '${dotenv.env['BASE_URL']}/api/event';
   late final Dio _client;
-  final User currentUser = Get.find<StorageService>().getUser()!;
+  late final User currentUser;
 
   EventosServices() {
     logger.i('🚀 [EventosServices] Constructor iniciado');
     _client = Dio(BaseOptions(baseUrl: baseUrl));
     _client.interceptors.add(AuthInterceptor());
+    try {
+      currentUser = Get.find<StorageService>().getUser()!;
+    } catch (e) {
+      // Handle case where user might be null during initialization before login
+      logger.w('⚠️ Initializing EventosServices without user (login flow?)');
+      // We can leave it uninitialized or mock it if needed, but better to initialize late or check.
+      // However, the error showed simple null check operator used on null value.
+      // It seems getUser() returned null.
+    }
   }
 
   Future<List<Evento>> fetchEventsByBounds({

@@ -90,6 +90,20 @@
       "uppercase": "A-Z",
       "numbers": "0-9",
       "special_chars": "!@#$"
+    },
+    "verification": {
+      "title": "Vérifier l'e-mail",
+      "subtitle": "Entrez le code à 6 chiffres envoyé à votre adresse e-mail.",
+      "code_label": "Code de vérification",
+      "verify_btn": "Vérifier",
+      "resend_btn": "Renvoyer le code",
+      "resend_timer": "Renvoyer dans ",
+      "success": "E-mail vérifié avec succès",
+      "resend_success": "Code renvoyé",
+      "error_title": "Erreur de vérification",
+      "error_invalid_code": "Code invalide",
+      "error_expired": "Code expiré",
+      "success_login": "Vérification réussie, veuillez vous connecter"
     }
   },
   "home": {

@@ -89,6 +89,20 @@
       "uppercase": "A-Z",
       "numbers": "0-9",
       "special_chars": "!@#$"
+    },
+    "verification": {
+      "title": "Verify Email",
+      "subtitle": "Enter the 6-digit code sent to your email.",
+      "code_label": "Verification Code",
+      "verify_btn": "Verify",
+      "resend_btn": "Resend Code",
+      "resend_timer": "Resend in ",
+      "success": "Email verified successfully",
+      "resend_success": "Code resent",
+      "error_title": "Verification Error",
+      "error_invalid_code": "Invalid code",
+      "error_expired": "Code expired",
+      "success_login": "Verification successful, please log in"
     }
   },
   "home": {

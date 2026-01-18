@@ -91,6 +91,21 @@
       "uppercase": "A-Z",
       "numbers": "0-9",
       "special_chars": "!@#$"
+    },
+
+    "verification": {
+      "title": "Verificar Email",
+      "subtitle": "Introduce el código de 6 dígitos enviado a tu correo.",
+      "code_label": "Código de verificación",
+      "verify_btn": "Verificar",
+      "resend_btn": "Reenviar código",
+      "resend_timer": "Reenviar en ",
+      "success": "Email verificado correctamente",
+      "resend_success": "Código reenviado",
+      "error_title": "Error de verificación",
+      "error_invalid_code": "Código incorrecto",
+      "error_expired": "El código ha expirado",
+      "success_login": "Verificación exitosa, por favor inicia sesión"
     }
   },
   "home": {
