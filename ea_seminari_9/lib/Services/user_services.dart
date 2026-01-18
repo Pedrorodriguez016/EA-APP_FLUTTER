@@ -18,17 +18,29 @@ class UserServices {
     _client.interceptors.add(AuthInterceptor());
   }
 
-  Future<Map<String, dynamic>> fetchVisibleUsers() async {
+  Future<Map<String, dynamic>> fetchVisibleUsers({
+    int page = 1,
+    int limit = 20,
+  }) async {
     try {
-      logger.d('📑 Obteniendo usuarios visibles');
-      final response = await _client.get('/visibleusers');
+      logger.d(
+        '📑 Obteniendo usuarios visibles - Página: $page, Límite: $limit',
+      );
+      final response = await _client.get(
+        '/visibleusers',
+        queryParameters: {'page': page, 'limit': limit},
+      );
 
       final responseData = response.data;
-      final List<dynamic> userList = responseData['data'];
-      logger.i('✅ Usuarios visibles obtenidos: ${userList.length} usuarios');
+      final List<dynamic> userList = responseData['data'] ?? [];
+      logger.i(
+        '✅ Usuarios visibles obtenidos: ${userList.length} usuarios, Total: ${responseData['totalItems']}',
+      );
 
       return {
         'users': userList.map((json) => User.fromJson(json)).toList(),
+        'totalPages': responseData['totalPages'] ?? 1,
+        'currentPage': responseData['page'] ?? 1,
         'total': responseData['totalItems'] ?? 0,
       };
     } catch (e) {
@@ -39,16 +51,16 @@ class UserServices {
 
   Future<User> fetchUserById(String id) async {
     if (id.isEmpty) {
-      logger.e('❌ Error: ID de usuario vacío en fetchUserById');
+      logger.e('Error: ID de usuario vacío en fetchUserById');
       throw Exception('ID de usuario vacío');
     }
     try {
-      logger.d('📑 Obteniendo usuario con ID: $id');
+      logger.d('Obteniendo usuario con ID: $id');
       final response = await _client.get('/$id');
-      logger.i('✅ Usuario obtenido: ${response.data['username']}');
+      logger.i('Usuario obtenido: ${response.data['username']}');
       return User.fromJson(response.data);
     } catch (e) {
-      logger.e('❌ Error al cargar el usuario: $id', error: e);
+      logger.e('Error al cargar el usuario: $id', error: e);
       throw Exception('Error al cargar el usuario: $e');
     }
   }

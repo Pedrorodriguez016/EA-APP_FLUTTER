@@ -66,25 +66,29 @@ class UserController extends GetxController {
   }
 
   Future<void> fetchUsers(int page) async {
-    // El nuevo endpoint devuelve todos los usuarios visibles de una vez,
-    // por lo que solo cargamos si es la primera página.
-    if (page > 1) {
-      return;
+    if (page == 1) {
+      isLoading.value = true;
+    } else {
+      isMoreLoading.value = true;
     }
 
-    isLoading.value = true;
-
     try {
-      final data = await _userServices.fetchVisibleUsers();
+      final data = await _userServices.fetchVisibleUsers(
+        page: page,
+        limit: limit,
+      );
 
       final List<User> newUsers = data['users'];
 
-      userList.assignAll(newUsers);
+      if (page == 1) {
+        userList.assignAll(newUsers);
+      } else {
+        userList.addAll(newUsers);
+      }
 
-      currentPage.value = 1;
-      totalPages.value =
-          1; // Ya no hay paginación, todos vienen en la primera carga
-      totalUsers.value = data['total'] ?? newUsers.length;
+      currentPage.value = data['currentPage'];
+      totalPages.value = data['totalPages'];
+      totalUsers.value = data['total'];
     } catch (e) {
       Get.snackbar(
         translate('common.error'),
