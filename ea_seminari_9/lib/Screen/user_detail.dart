@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import '../Models/user.dart';
 import '../Controllers/user_controller.dart';
+import '../Widgets/user_avatar.dart';
 import 'package:intl/intl.dart';
 
 class UserDetailScreen extends GetView<UserController> {
@@ -118,11 +119,9 @@ class UserDetailScreen extends GetView<UserController> {
     return Column(
       children: [
         Container(
-          width: 120,
-          height: 120,
+          padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              // CAMBIO: Gradiente usando colores del tema
               colors: [
                 context.theme.colorScheme.primary,
                 context.theme.colorScheme.secondary,
@@ -130,18 +129,11 @@ class UserDetailScreen extends GetView<UserController> {
             ),
             shape: BoxShape.circle,
           ),
-          child: Center(
-            child: Text(
-              user.username.isNotEmpty ? user.username[0].toUpperCase() : '?',
-              style: TextStyle(
-                fontSize: 48,
-                color: context
-                    .theme
-                    .colorScheme
-                    .onPrimary, // Texto blanco sobre primario
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+          child: UserAvatar(
+            photoUrl: user.profilePhoto,
+            username: user.username,
+            radius: 58,
+            backgroundColor: context.theme.scaffoldBackgroundColor,
           ),
         ),
         const SizedBox(height: 20),

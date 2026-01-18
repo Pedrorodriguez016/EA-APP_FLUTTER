@@ -3,6 +3,7 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:get/get.dart';
 import '../Controllers/chat_controller.dart';
 import '../Models/chat.dart';
+import '../Widgets/user_avatar.dart';
 
 class ChatScreen extends GetView<ChatController> {
   const ChatScreen({super.key});
@@ -24,18 +25,10 @@ class ChatScreen extends GetView<ChatController> {
         ),
         title: Row(
           children: [
-            CircleAvatar(
-              // CAMBIO: Color primario del tema
-              backgroundColor: context.theme.colorScheme.primary,
-              child: Text(
-                controller.friendName.isNotEmpty
-                    ? controller.friendName.substring(0, 2).toUpperCase()
-                    : '?',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: context.theme.colorScheme.onPrimary,
-                ),
-              ),
+            UserAvatar(
+              photoUrl: controller.friendPhoto,
+              username: controller.friendName,
+              radius: 20,
             ),
             const SizedBox(width: 10),
             GestureDetector(

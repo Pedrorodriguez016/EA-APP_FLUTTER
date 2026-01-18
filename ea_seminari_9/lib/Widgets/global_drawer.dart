@@ -7,6 +7,7 @@ import '../Controllers/eventos_controller.dart';
 import '../Widgets/user_card.dart';
 import '../Widgets/solicitudes.dart';
 import '../Widgets/event_invitations_dialog.dart';
+import '../Widgets/user_avatar.dart';
 import 'friends_bottomsheet.dart';
 import '../utils/app_theme.dart';
 
@@ -35,14 +36,12 @@ class GlobalDrawer extends StatelessWidget {
             decoration: const BoxDecoration(gradient: AppGradients.primaryBtn),
             child: Row(
               children: [
-                CircleAvatar(
+                UserAvatar(
+                  photoUrl: user?.profilePhoto,
+                  username: user?.username ?? translate('common.user'),
                   radius: 30,
                   backgroundColor: Colors.white.withValues(alpha: 0.2),
-                  child: const Icon(
-                    Icons.person_rounded,
-                    color: Colors.white,
-                    size: 30,
-                  ),
+                  textColor: Colors.white,
                 ),
                 const SizedBox(width: 16),
                 Expanded(

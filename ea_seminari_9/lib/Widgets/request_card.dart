@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import '../Models/user.dart';
+import '../Widgets/user_avatar.dart';
 
 class FriendRequestCard extends StatelessWidget {
   final User user;
@@ -36,17 +37,10 @@ class FriendRequestCard extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            CircleAvatar(
+            UserAvatar(
+              photoUrl: user.profilePhoto,
+              username: user.username,
               radius: 24,
-              backgroundColor: context.theme.colorScheme.primary,
-              child: Text(
-                user.username.isNotEmpty ? user.username[0].toUpperCase() : '?',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
             ),
             const SizedBox(width: 12),
             Expanded(

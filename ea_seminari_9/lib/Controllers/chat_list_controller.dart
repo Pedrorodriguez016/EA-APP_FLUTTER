@@ -81,7 +81,11 @@ class ChatListController extends GetxController {
     logger.i('💬 Abriendo chat con: ${friend.username}');
     Get.toNamed(
       '/chat',
-      arguments: {'friendId': friend.id, 'friendName': friend.username},
+      arguments: {
+        'friendId': friend.id,
+        'friendName': friend.username,
+        'friendPhoto': friend.profilePhoto,
+      },
     );
   }
 

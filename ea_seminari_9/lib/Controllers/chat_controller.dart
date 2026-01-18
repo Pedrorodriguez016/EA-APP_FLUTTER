@@ -24,6 +24,7 @@ class ChatController extends GetxController {
   late String myUserId;
   late String friendId;
   late String friendName;
+  String? friendPhoto;
 
   ChatController(this._socketService, this._authController);
 
@@ -36,6 +37,7 @@ class ChatController extends GetxController {
     final args = Get.arguments ?? {};
     friendId = args['friendId'] ?? '';
     friendName = args['friendName'] ?? 'Chat';
+    friendPhoto = args['friendPhoto'];
 
     logger.i(
       '💬 Inicializando ChatController - Mi ID: $myUserId, Amigo ID: $friendId',

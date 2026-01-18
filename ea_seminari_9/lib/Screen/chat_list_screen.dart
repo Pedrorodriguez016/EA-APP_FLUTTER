@@ -6,6 +6,7 @@ import '../Widgets/navigation_bar.dart';
 import '../Models/user.dart';
 import '../Models/eventos.dart';
 import '../Widgets/global_drawer.dart';
+import '../Widgets/user_avatar.dart';
 
 class ChatListScreen extends GetView<ChatListController> {
   const ChatListScreen({super.key});
@@ -253,19 +254,10 @@ class ChatListScreen extends GetView<ChatListController> {
   ) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      leading: CircleAvatar(
+      leading: UserAvatar(
+        photoUrl: friend.profilePhoto,
+        username: friend.username,
         radius: 28,
-        backgroundColor: context.theme.colorScheme.primary,
-        child: Text(
-          friend.username.length > 1
-              ? friend.username.substring(0, 2).toUpperCase()
-              : friend.username.substring(0, 1).toUpperCase(),
-          style: TextStyle(
-            color: context.theme.colorScheme.onPrimary,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-        ),
       ),
       title: Text(
         friend.username,
