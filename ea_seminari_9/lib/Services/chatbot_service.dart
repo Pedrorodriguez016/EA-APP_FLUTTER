@@ -25,16 +25,19 @@ class ChatBotService {
       logger.i('✅ Respuesta del chatbot recibida');
 
       final data = response.data;
-      final int count = (data['count'] is int) ? data['count'] : 0;
+      final String answer = data['answer'] ?? '';
       final List events = (data['data'] is List) ? data['data'] : [];
 
-      String responseText;
-      if (count == 0) {
-        responseText =
-            'No he encontrado eventos que coincidan con tu búsqueda.';
-      } else {
-        final names = events.map((e) => "- ${e['name']}").join('\n');
-        responseText = 'He encontrado $count eventos:\n$names';
+      // Si el backend no devuelve un texto procesado por la IA, usamos un fallback
+      String responseText = answer;
+      if (responseText.isEmpty) {
+        if (events.isEmpty) {
+          responseText =
+              'No he encontrado eventos que coincidan con tu búsqueda.';
+        } else {
+          final names = events.map((e) => "- ${e['name']}").join('\n');
+          responseText = 'He encontrado ${events.length} eventos:\n$names';
+        }
       }
 
       return {'text': responseText, 'events': events};
