@@ -6,6 +6,7 @@ import '../Widgets/app_bar.dart';
 import '../Widgets/mi_progreso_card.dart';
 import '../Widgets/mis_insignias_section.dart';
 import '../Widgets/estadisticas_section.dart';
+import '../Widgets/global_drawer.dart';
 
 class GamificacionScreen extends GetView<GamificacionController> {
   const GamificacionScreen({super.key});
@@ -13,6 +14,7 @@ class GamificacionScreen extends GetView<GamificacionController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      endDrawer: const GlobalDrawer(),
       backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: StandardAppBar(title: translate('gamification.title')),
       body: RefreshIndicator(

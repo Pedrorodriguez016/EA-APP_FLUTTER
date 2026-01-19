@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import '../Widgets/user_card.dart';
+import '../Widgets/global_drawer.dart';
 
 class UserListScreen extends GetView<UserController> {
   const UserListScreen({super.key});
@@ -11,6 +12,7 @@ class UserListScreen extends GetView<UserController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      endDrawer: const GlobalDrawer(),
       // CAMBIO: Fondo dinámico
       backgroundColor: context.theme.scaffoldBackgroundColor,
       appBar: StandardAppBar(title: translate('users.list_title')),

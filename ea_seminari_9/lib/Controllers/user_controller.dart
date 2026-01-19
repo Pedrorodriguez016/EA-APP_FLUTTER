@@ -448,7 +448,7 @@ class UserController extends GetxController {
 
   // --- MÉTODOS DE BLOQUEO ---
 
-  void fetchBlockedUsers() async {
+  Future<void> fetchBlockedUsers() async {
     try {
       isLoading(true);
       var blocked = await _userServices.fetchBlockedUsers();

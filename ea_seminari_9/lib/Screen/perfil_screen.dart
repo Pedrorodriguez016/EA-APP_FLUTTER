@@ -21,6 +21,15 @@ class ProfileScreen extends GetView<UserController> {
   final gamificacionController = Get.put(GamificacionController());
   final eventoController = Get.find<EventoController>();
 
+  Future<void> _refreshData() async {
+    // 1. Refrescar datos del usuario actual
+    await authController.fetchCurrentUser();
+    // 2. Refrescar gamificación
+    await gamificacionController.cargarMiProgreso();
+    // 3. Refrescar mis eventos
+    await eventoController.fetchMisEventosEspecificos();
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = authController.currentUser.value;
@@ -83,65 +92,70 @@ class ProfileScreen extends GetView<UserController> {
           ],
         ),
         endDrawer: const GlobalDrawer(),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              _buildProfileHeader(context),
-              Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildStatsBar(context),
-                    const SizedBox(height: 32),
+        body: RefreshIndicator(
+          onRefresh: _refreshData,
+          color: context.theme.colorScheme.primary,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              children: [
+                _buildProfileHeader(context),
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildStatsBar(context),
+                      const SizedBox(height: 32),
 
-                    Text(
-                      translate('events.progress_achievements'),
-                      style: context.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
+                      Text(
+                        translate('events.progress_achievements'),
+                        style: context.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    const GamificacionCard(),
+                      const SizedBox(height: 16),
+                      const GamificacionCard(),
 
-                    const SizedBox(height: 32),
-                    _buildMyEventsSection(context),
+                      const SizedBox(height: 32),
+                      _buildMyEventsSection(context),
 
-                    const SizedBox(height: 32),
-                    Text(
-                      translate('events.personal_info'),
-                      style: context.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
+                      const SizedBox(height: 32),
+                      Text(
+                        translate('events.personal_info'),
+                        style: context.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildProfileFields(
-                      context,
-                      nameController,
-                      emailController,
-                      birthdayController,
-                      (date) => selectedBirthDate = date,
-                    ),
+                      const SizedBox(height: 16),
+                      _buildProfileFields(
+                        context,
+                        nameController,
+                        emailController,
+                        birthdayController,
+                        (date) => selectedBirthDate = date,
+                      ),
 
-                    const SizedBox(height: 40),
-                    _buildSaveButton(
-                      context,
-                      user,
-                      nameController,
-                      emailController,
-                      birthdayController,
-                      () => selectedBirthDate, // Pass getter
-                    ),
+                      const SizedBox(height: 40),
+                      _buildSaveButton(
+                        context,
+                        user,
+                        nameController,
+                        emailController,
+                        birthdayController,
+                        () => selectedBirthDate, // Pass getter
+                      ),
 
-                    const SizedBox(height: 16),
-                    _buildDeleteAccountButton(context),
-                    const SizedBox(height: 40),
-                  ],
+                      const SizedBox(height: 16),
+                      _buildDeleteAccountButton(context),
+                      const SizedBox(height: 40),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         bottomNavigationBar: const CustomNavBar(currentIndex: 4),

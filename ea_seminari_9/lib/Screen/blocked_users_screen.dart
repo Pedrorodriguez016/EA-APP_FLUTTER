@@ -55,14 +55,18 @@ class BlockedUsersScreen extends GetView<UserController> {
           );
         }
 
-        return ListView.separated(
-          padding: const EdgeInsets.all(16),
-          itemCount: controller.blockedUsersList.length,
-          separatorBuilder: (context, index) => const SizedBox(height: 12),
-          itemBuilder: (context, index) {
-            final user = controller.blockedUsersList[index];
-            return _buildBlockedUserCard(context, user);
-          },
+        return RefreshIndicator(
+          onRefresh: controller.fetchBlockedUsers,
+          child: ListView.separated(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(16),
+            itemCount: controller.blockedUsersList.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 12),
+            itemBuilder: (context, index) {
+              final user = controller.blockedUsersList[index];
+              return _buildBlockedUserCard(context, user);
+            },
+          ),
         );
       }),
     );

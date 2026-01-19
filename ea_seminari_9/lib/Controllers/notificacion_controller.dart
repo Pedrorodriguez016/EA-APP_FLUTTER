@@ -77,8 +77,7 @@ class NotificacionController extends GetxController
           backgroundColor: Get.theme.colorScheme.primary.withValues(alpha: 0.9),
           colorText: Colors.white,
           onTap: (_) {
-            markAsRead(newNotif.id);
-            _handleNotificationClick(newNotif);
+            handleNotificationTap(newNotif);
           },
         );
 
@@ -237,7 +236,11 @@ class NotificacionController extends GetxController
     }
   }
 
-  void _handleNotificationClick(Notificacion notif) {
+  void handleNotificationTap(Notificacion notif) {
+    if (!notif.read) {
+      markAsRead(notif.id);
+    }
+
     if (notif.type == 'new_message' && notif.relatedUserId != null) {
       Get.toNamed(
         '/chat',

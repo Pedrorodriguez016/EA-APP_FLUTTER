@@ -12,10 +12,10 @@ import '../Widgets/global_drawer.dart';
 class CalendarScreen extends GetView<EventoController> {
   const CalendarScreen({super.key});
 
-  void _fetchEventsForMonth(DateTime date) {
+  Future<void> _fetchEventsForMonth(DateTime date) async {
     final firstDay = DateTime(date.year, date.month, 1);
     final lastDay = DateTime(date.year, date.month + 1, 0);
-    controller.fetchCalendarEvents(firstDay, lastDay);
+    await controller.fetchCalendarEvents(firstDay, lastDay);
   }
 
   @override

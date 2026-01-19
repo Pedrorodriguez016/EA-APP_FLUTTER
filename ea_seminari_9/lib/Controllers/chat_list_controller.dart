@@ -35,7 +35,7 @@ class ChatListController extends GetxController {
     loadData();
   }
 
-  void loadData() async {
+  Future<void> loadData() async {
     try {
       isLoading(true);
       final myId = _authController.currentUser.value?.id;

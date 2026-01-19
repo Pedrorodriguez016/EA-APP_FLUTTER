@@ -226,36 +226,11 @@ class _NotificacionTile extends StatelessWidget {
             ],
           ),
           onTap: () {
-            controller.markAsRead(notif.id);
-            _handleNavigation(notif);
+            Get.back(); // Cierra el popup primero
+            controller.handleNotificationTap(notif);
           },
         ),
       ),
     );
-  }
-
-  void _handleNavigation(Notificacion notif) {
-    Get.back(); // Cierra el popup primero
-    if (notif.type == 'new_message' && notif.relatedUserId != null) {
-      Get.toNamed(
-        '/chat',
-        arguments: {
-          'friendId': notif.relatedUserId,
-          'friendName': notif.relatedUsername ?? 'Chat',
-        },
-      );
-    } else if (notif.relatedEventId != null) {
-      Get.toNamed('/evento/${notif.relatedEventId}');
-    } else if (notif.type == 'friend_request' ||
-        notif.type == 'friend_accepted') {
-      if (notif.relatedUserId != null) {
-        Get.toNamed('/user/${notif.relatedUserId}');
-      }
-    } else if (notif.actionUrl != null && notif.actionUrl!.isNotEmpty) {
-      // Mapeo preventivo para la web
-      String target = notif.actionUrl!;
-      if (target == '/menu') target = '/home';
-      Get.toNamed(target);
-    }
   }
 }

@@ -29,10 +29,6 @@ class ChatListScreen extends GetView<ChatListController> {
           backgroundColor: context.theme.scaffoldBackgroundColor,
           elevation: 0,
           actions: [
-            IconButton(
-              icon: Icon(Icons.refresh, color: context.theme.iconTheme.color),
-              onPressed: controller.loadData,
-            ),
             Builder(
               builder: (scaffoldContext) => IconButton(
                 icon: Icon(
@@ -59,35 +55,38 @@ class ChatListScreen extends GetView<ChatListController> {
               _buildFilterBar(context),
               Divider(height: 1, color: context.theme.dividerColor),
               Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  children: [
-                    if (controller.selectedFilter.value == ChatFilter.all ||
-                        controller.selectedFilter.value == ChatFilter.events)
-                      if (controller.eventsList.isNotEmpty) ...[
-                        _buildSectionHeader(
-                          context,
-                          translate('chat.events_section'),
-                        ),
-                        ...controller.eventsList.map(
-                          (event) =>
-                              _buildEventTile(context, event, controller),
-                        ),
-                        const SizedBox(height: 20),
-                      ],
-                    if (controller.selectedFilter.value == ChatFilter.all ||
-                        controller.selectedFilter.value == ChatFilter.friends)
-                      if (controller.friendsList.isNotEmpty) ...[
-                        _buildSectionHeader(
-                          context,
-                          translate('chat.friends_section'),
-                        ),
-                        ...controller.friendsList.map(
-                          (friend) =>
-                              _buildFriendTile(context, friend, controller),
-                        ),
-                      ],
-                  ],
+                child: RefreshIndicator(
+                  onRefresh: controller.loadData,
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    children: [
+                      if (controller.selectedFilter.value == ChatFilter.all ||
+                          controller.selectedFilter.value == ChatFilter.events)
+                        if (controller.eventsList.isNotEmpty) ...[
+                          _buildSectionHeader(
+                            context,
+                            translate('chat.events_section'),
+                          ),
+                          ...controller.eventsList.map(
+                            (event) =>
+                                _buildEventTile(context, event, controller),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+                      if (controller.selectedFilter.value == ChatFilter.all ||
+                          controller.selectedFilter.value == ChatFilter.friends)
+                        if (controller.friendsList.isNotEmpty) ...[
+                          _buildSectionHeader(
+                            context,
+                            translate('chat.friends_section'),
+                          ),
+                          ...controller.friendsList.map(
+                            (friend) =>
+                                _buildFriendTile(context, friend, controller),
+                          ),
+                        ],
+                    ],
+                  ),
                 ),
               ),
             ],

@@ -790,7 +790,7 @@ class EventoController extends GetxController {
     }
   }
 
-  void fetchMisEventosEspecificos() async {
+  Future<void> fetchMisEventosEspecificos() async {
     try {
       isLoading(true);
       final resultado = await _eventosServices.getMisEventos();

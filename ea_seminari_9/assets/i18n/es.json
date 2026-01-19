@@ -392,6 +392,19 @@
   },
   "categories": {
     "recommended": "Recomendados",
+    "SPORTS": "Deportes",
+    "MUSIC": "Música",
+    "CULTURE": "Cultura",
+    "FOOD": "Gastronomía",
+    "SOCIAL": "Social",
+    "LEARNING": "Aprendizaje",
+    "TECH": "Tecnología",
+    "WELLNESS": "Bienestar",
+    "VOLUNTEER": "Voluntariado",
+    "NATURE": "Naturaleza",
+    "GAMES": "Juegos",
+    "FAMILY": "Familia",
+    "OTHER": "Otros",
     "Fútbol": "Fútbol",
     "Concierto Pop": "Concierto Pop",
     "Teatro": "Teatro",
@@ -399,14 +412,6 @@
     "Restaurante": "Restaurante",
     "Curso": "Curso",
     "Gaming": "Gaming",
-    "Discoteca": "Discoteca",
-    "Deportes": "Deportes",
-    "Música": "Música",
-    "Tecnología": "Tecnología",
-    "Gastronomía": "Gastronomía",
-    "Cultura": "Cultura",
-    "Social": "Social",
-    "Salud": "Salud",
-    "Aire Libre": "Aire Libre"
+    "Discoteca": "Discoteca"
   }
 }
