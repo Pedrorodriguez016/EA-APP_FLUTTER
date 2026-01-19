@@ -431,12 +431,12 @@
     "photo": "Photo",
     "video": "Vidéo"
   },
-  "notifications": {
-    "title": "Notifications",
-    "empty": "Vous n'avez aucune notification",
-    "mark_all_read": "Tout marquer comme lu",
+  "notificaciones": {
+    "titulo": "Notifications",
+    "vacia": "Vous n'avez aucune notification",
+    "marcar_todas_leidas": "Tout marquer comme lu",
     "delete_all_success": "Toutes les notifications ont été supprimées",
-    "delete_error": "Erreur lors de la suppression des notifications"
+    "error_al_eliminar": "Erreur lors de la suppression des notifications"
   },
   "ratings": {
     "title": "Évaluations",

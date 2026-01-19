@@ -32,7 +32,7 @@ class EventChatMessage {
       imageUrl: json['imageUrl'],
       createdAt: DateTime.parse(
         json['createdAt'] ?? DateTime.now().toIso8601String(),
-      ),
+      ).toLocal(),
       isMine: (json['userId'] == myUserId),
     );
   }

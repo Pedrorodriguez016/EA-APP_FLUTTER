@@ -437,12 +437,12 @@
     "photo": "Photo",
     "video": "Video"
   },
-  "notifications": {
-    "title": "Notifications",
-    "empty": "You have no notifications",
-    "mark_all_read": "Mark all as read",
+  "notificaciones": {
+    "titulo": "Notifications",
+    "vacia": "You have no notifications",
+    "marcar_todas_leidas": "Mark all as read",
     "delete_all_success": "All notifications have been deleted",
-    "delete_error": "Some notifications could not be deleted"
+    "error_al_eliminar": "Some notifications could not be deleted"
   },
   "invitations": {
     "title": "Event Invitations",

@@ -23,7 +23,7 @@ class EventosCard extends StatelessWidget {
       return translate('events.date_unavailable');
     }
     try {
-      final DateTime scheduleDate = DateTime.parse(scheduleString);
+      final DateTime scheduleDate = DateTime.parse(scheduleString).toLocal();
       final String currentLocale = LocalizedApp.of(
         context,
       ).delegate.currentLocale.languageCode;

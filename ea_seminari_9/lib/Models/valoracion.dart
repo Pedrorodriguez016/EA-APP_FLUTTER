@@ -43,7 +43,7 @@ class Valoracion {
       puntuacion: (json['puntuacion'] ?? 0).toInt(),
       comentario: json['comentario'] ?? '',
       createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'])
+          ? DateTime.parse(json['createdAt']).toLocal()
           : DateTime.now(),
     );
   }

@@ -26,7 +26,7 @@ class ChatMessage {
       imageUrl: json['imageUrl'],
       createdAt: DateTime.parse(
         json['createdAt'] ?? DateTime.now().toIso8601String(),
-      ),
+      ).toLocal(),
       // Determinamos si es mío comparando el 'from' con mi ID
       isMine: (json['from'] == myUserId),
     );

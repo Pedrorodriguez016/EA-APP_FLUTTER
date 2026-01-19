@@ -40,7 +40,7 @@ class Notificacion {
       relatedEventName: json['relatedEventName'],
       read: json['read'] ?? false,
       createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'])
+          ? DateTime.parse(json['createdAt']).toLocal()
           : DateTime.now(),
       actionUrl: json['actionUrl'],
     );

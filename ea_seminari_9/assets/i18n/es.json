@@ -436,12 +436,12 @@
     "photo": "Foto",
     "video": "Video"
   },
-  "notifications": {
-    "title": "Notificaciones",
-    "empty": "No tienes notificaciones",
-    "mark_all_read": "Marcar todas como leídas",
+  "notificaciones": {
+    "titulo": "Notificaciones",
+    "vacia": "No tienes notificaciones",
+    "marcar_todas_leidas": "Marcar todas como leídas",
     "delete_all_success": "Todas las notificaciones han sido eliminadas",
-    "delete_error": "No se pudieron eliminar algunas notificaciones"
+    "error_al_eliminar": "No se pudieron eliminar algunas notificaciones"
   },
   "invitations": {
     "title": "Invitaciones a Eventos",

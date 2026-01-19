@@ -27,7 +27,9 @@ class EventosDetailScreen extends GetView<EventoController> {
     }
 
     try {
-      final DateTime? scheduleDate = DateTime.tryParse(cleanScheduleString);
+      final DateTime? scheduleDate = DateTime.tryParse(
+        cleanScheduleString,
+      )?.toLocal();
 
       if (scheduleDate == null) {
         return translate('events.format_error');

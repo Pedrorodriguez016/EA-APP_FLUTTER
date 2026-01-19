@@ -431,12 +431,12 @@
     "photo": "Foto",
     "video": "Vídeo"
   },
-  "notifications": {
-    "title": "Notificacions",
-    "empty": "No tens notificacions",
-    "mark_all_read": "Marca-ho tot com a llegit",
+  "notificaciones": {
+    "titulo": "Notificacions",
+    "vacia": "No tens notificacions",
+    "marcar_todas_leidas": "Marca-ho tot com a llegit",
     "delete_all_success": "S'han eliminat totes les notificacions",
-    "delete_error": "Error en eliminar les notificacions"
+    "error_al_eliminar": "Error en eliminar les notificacions"
   },
   "ratings": {
     "title": "Valoracions",

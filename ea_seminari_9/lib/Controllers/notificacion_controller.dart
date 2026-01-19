@@ -222,7 +222,7 @@ class NotificacionController extends GetxController
       logger.e('Error eliminando todas las notificaciones', error: e);
       Get.snackbar(
         translate('common.error'),
-        translate('notifications.delete_error'),
+        translate('notificaciones.error_al_eliminar'),
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
