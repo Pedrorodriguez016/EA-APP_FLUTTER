@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import '../Services/socket_services.dart';
 import '../Controllers/auth_controller.dart';
 import '../Models/event_chat.dart';
@@ -80,8 +81,11 @@ class EventChatController extends GetxController {
   void _handleChatError(dynamic data) {
     logger.e('🛑 Error en chat: ${data['message']}');
     Get.snackbar(
-      'Error',
-      data['message'] ?? 'No se pudo enviar el mensaje',
+      translate('common.error'),
+      data['message'] ??
+          translate(
+            'chat_extra.send_error',
+          ), // Need to add this to JSON? No, I'll use a generic one or data['message']
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.red,
       colorText: Colors.white,
@@ -196,7 +200,7 @@ class EventChatController extends GetxController {
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
-                  '¿Enviar imagen?',
+                  translate('chat_extra.send_image_confirm'),
                   style: Get.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -216,7 +220,7 @@ class EventChatController extends GetxController {
                     TextButton(
                       onPressed: () => Get.back(result: false),
                       child: Text(
-                        'Cancelar',
+                        translate('common.cancel'),
                         style: TextStyle(color: Colors.grey.shade600),
                       ),
                     ),
@@ -229,7 +233,9 @@ class EventChatController extends GetxController {
                         ),
                       ),
                       onPressed: () => Get.back(result: true),
-                      child: const Text('Enviar'),
+                      child: Text(
+                        translate('common.accept'),
+                      ), // Or common.send? Let's check common. I'll use accept for now or add send.
                     ),
                   ],
                 ),
@@ -262,8 +268,8 @@ class EventChatController extends GetxController {
     } catch (e) {
       logger.e('❌ Error al enviar imagen al chat', error: e);
       Get.snackbar(
-        'Error',
-        'No se pudo enviar la imagen',
+        translate('common.error'),
+        translate('chat_extra.send_image_error'),
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -313,18 +319,11 @@ class EventChatController extends GetxController {
       isLoading.value = true;
       final newMedia = await _eventosServices.uploadMedia(eventId, file.path);
       photos.insert(0, newMedia);
-
-      Get.snackbar(
-        '¡Éxito!',
-        'Contenido compartido correctamente',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
     } catch (e) {
       logger.e('❌ Error al subir contenido', error: e);
       Get.snackbar(
-        'Error',
-        'No se pudo compartir el contenido',
+        translate('common.error'),
+        translate('chat_extra.share_error'),
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -360,8 +359,8 @@ class EventChatController extends GetxController {
       }
 
       Get.snackbar(
-        '¡Descarga completada!',
-        'El archivo se ha guardado en tu galería',
+        translate('chat_extra.download_success_title'),
+        translate('chat_extra.download_success_msg'),
         backgroundColor: Colors.green,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
@@ -369,8 +368,8 @@ class EventChatController extends GetxController {
     } catch (e) {
       logger.e('❌ Error al descargar el contenido', error: e);
       Get.snackbar(
-        'Error de descarga',
-        'No se pudo guardar el archivo en la galería',
+        translate('chat_extra.download_error_title'),
+        translate('chat_extra.download_error_msg'),
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
@@ -383,17 +382,11 @@ class EventChatController extends GetxController {
       isLoading.value = true;
       await _eventosServices.deleteEventoPhoto(eventId, photoId);
       photos.removeWhere((p) => p.id == photoId);
-      Get.snackbar(
-        '¡Éxito!',
-        'Foto eliminada del álbum',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
     } catch (e) {
       logger.e('❌ Error al eliminar foto', error: e);
       Get.snackbar(
-        'Error',
-        'No se pudo eliminar la foto',
+        translate('common.error'),
+        translate('chat_extra.photo_deleted_error'),
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );

@@ -19,7 +19,10 @@ class EventInvitationCard extends StatelessWidget {
   String _formatDate(String dateStr) {
     try {
       final date = DateTime.parse(dateStr);
-      return DateFormat('dd MMM yyyy, HH:mm', 'es').format(date);
+      final locale = LocalizedApp.of(
+        Get.context!,
+      ).delegate.currentLocale.languageCode;
+      return DateFormat.yMMMd(locale).add_Hm().format(date);
     } catch (e) {
       return dateStr;
     }
@@ -78,7 +81,7 @@ class EventInvitationCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'De: ${evento.creadorName ?? "Desconocido"}',
+                        '${translate('common.from')}: ${evento.creadorName ?? translate('common.unknown')}',
                         style: context.textTheme.bodySmall?.copyWith(
                           color: context.theme.hintColor,
                         ),

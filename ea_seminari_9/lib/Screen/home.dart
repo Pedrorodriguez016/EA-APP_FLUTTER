@@ -257,13 +257,6 @@ class HomeScreen extends GetView<UserController> {
                     fontSize: 22,
                   ),
                 ),
-                IconButton(
-                  onPressed: () => Get.toNamed('/eventos'),
-                  icon: Icon(
-                    Icons.arrow_forward_rounded,
-                    color: context.theme.colorScheme.primary,
-                  ),
-                ),
               ],
             ),
             const SizedBox(height: 20),
@@ -286,12 +279,6 @@ class HomeScreen extends GetView<UserController> {
                     () => Get.toNamed('/eventos'),
                   ),
                   const SizedBox(width: 12),
-                  _buildActionButton(
-                    context,
-                    Icons.calendar_month_rounded,
-                    translate('home.events_section.my_events_btn'),
-                    () => Get.toNamed('/eventos?mine=true'),
-                  ),
                 ],
               ),
             ),

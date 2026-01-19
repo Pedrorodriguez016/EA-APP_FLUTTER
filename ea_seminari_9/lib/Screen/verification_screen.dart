@@ -128,32 +128,14 @@ class _VerificationScreenState extends State<VerificationScreen> {
 
           Get.offAllNamed('/questionnaire');
 
-          Get.snackbar(
-            translate('common.success'),
-            translate('auth.verification.success'),
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-          );
           return; // Exit
         } catch (e) {
           // If auto-login fails, fall back to manual login
           Get.offAllNamed('/login');
-          Get.snackbar(
-            translate('common.success'),
-            translate('auth.verification.success_login'),
-            backgroundColor: Colors.green,
-            colorText: Colors.white,
-          );
         }
       } else {
         // Fallback if no password passed
         Get.offAllNamed('/login');
-        Get.snackbar(
-          translate('common.success'),
-          translate('auth.verification.success'),
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
       }
     }
   }
@@ -189,7 +171,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     width: 80,
                     height: 80,
                     decoration: BoxDecoration(
-                      color: context.theme.colorScheme.primary.withOpacity(0.1),
+                      color: context.theme.colorScheme.primary.withValues(
+                        alpha: 0.1,
+                      ),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -214,7 +198,9 @@ class _VerificationScreenState extends State<VerificationScreen> {
                   "${translate('auth.verification.subtitle')}\n$email",
                   textAlign: TextAlign.center,
                   style: context.textTheme.bodyLarge?.copyWith(
-                    color: context.theme.colorScheme.onSurface.withOpacity(0.7),
+                    color: context.theme.colorScheme.onSurface.withValues(
+                      alpha: 0.7,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 40),
@@ -227,7 +213,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
+                        color: Colors.black.withValues(alpha: 0.05),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -265,8 +251,8 @@ class _VerificationScreenState extends State<VerificationScreen> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: context.theme.colorScheme.primary.withOpacity(
-                          0.3,
+                        color: context.theme.colorScheme.primary.withValues(
+                          alpha: 0.3,
                         ),
                         blurRadius: 10,
                         offset: const Offset(0, 4),

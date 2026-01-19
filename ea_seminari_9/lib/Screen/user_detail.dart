@@ -97,7 +97,14 @@ class UserDetailScreen extends GetView<UserController> {
           );
         }
         final user = controller.selectedUser.value!;
-        return _buildUserDetail(context, user);
+        return RefreshIndicator(
+          onRefresh: () async {
+            await controller.fetchUserById(userId);
+            // También refrescar la lista de amigos para asegurar el botón de chat
+            await controller.fetchFriends();
+          },
+          child: _buildUserDetail(context, user),
+        );
       }),
     );
   }
@@ -377,7 +384,7 @@ class UserDetailScreen extends GetView<UserController> {
       final String currentLocale = LocalizedApp.of(
         context,
       ).delegate.currentLocale.languageCode;
-      return DateFormat("d 'de' MMMM 'de' y", currentLocale).format(date);
+      return DateFormat.yMMMMd(currentLocale).format(date);
     } catch (_) {
       return dateStr;
     }

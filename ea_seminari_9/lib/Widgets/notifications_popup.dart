@@ -47,19 +47,19 @@ class NotificationsPopup extends StatelessWidget {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.delete_sweep_rounded),
-                      tooltip: 'Borrar todas',
+                      tooltip: translate('common.delete_all'),
                       onPressed: () {
                         if (controller.notificaciones.isEmpty) return;
                         Get.dialog(
                           AlertDialog(
-                            title: const Text('Borrar todas'),
-                            content: const Text(
-                              '¿Estás seguro de que quieres eliminar todas las notificaciones?',
+                            title: Text(translate('common.delete_all')),
+                            content: Text(
+                              translate('common.delete_all_confirm'),
                             ),
                             actions: [
                               TextButton(
                                 onPressed: () => Get.back(),
-                                child: const Text('Cancelar'),
+                                child: Text(translate('common.cancel')),
                               ),
                               TextButton(
                                 onPressed: () {
@@ -69,7 +69,7 @@ class NotificationsPopup extends StatelessWidget {
                                 style: TextButton.styleFrom(
                                   foregroundColor: Colors.red,
                                 ),
-                                child: const Text('Borrar'),
+                                child: Text(translate('common.delete')),
                               ),
                             ],
                           ),
@@ -220,7 +220,12 @@ class _NotificacionTile extends StatelessWidget {
               Text(notif.message, style: const TextStyle(fontSize: 13)),
               const SizedBox(height: 4),
               Text(
-                timeago.format(notif.createdAt, locale: 'es'),
+                timeago.format(
+                  notif.createdAt,
+                  locale: LocalizedApp.of(
+                    context,
+                  ).delegate.currentLocale.languageCode,
+                ),
                 style: TextStyle(fontSize: 11, color: Colors.grey[600]),
               ),
             ],

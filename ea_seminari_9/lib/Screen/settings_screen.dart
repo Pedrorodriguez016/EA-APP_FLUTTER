@@ -81,14 +81,6 @@ class SettingsScreen extends GetView<UserController> {
           const Divider(height: 1),
           _buildSettingItem(
             context: context,
-            icon: Icons.notifications_outlined,
-            title: translate('settings.notifications'),
-            subtitle: translate('settings.coming_soon'),
-            onTap: () => _showComingSoon(translate('settings.notifications')),
-          ),
-          const Divider(height: 1),
-          _buildSettingItem(
-            context: context,
             icon: Icons.language_outlined,
             title: translate('settings.language'),
             subtitle: _getLanguageName(currentLangCode),

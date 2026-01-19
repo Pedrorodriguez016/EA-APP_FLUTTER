@@ -135,7 +135,7 @@ class UserController extends GetxController {
     } catch (e) {
       Get.snackbar(
         translate('common.error'),
-        e.toString(),
+        translate('common.error_occurred'),
         snackPosition: SnackPosition.BOTTOM,
         colorText: Colors.white,
         backgroundColor: Colors.red,
@@ -160,7 +160,7 @@ class UserController extends GetxController {
     } catch (e) {
       Get.snackbar(
         translate('common.error'),
-        e.toString(),
+        translate('common.error_occurred'),
         snackPosition: SnackPosition.BOTTOM,
         colorText: Colors.white,
         backgroundColor: Colors.red,
@@ -181,7 +181,7 @@ class UserController extends GetxController {
     } catch (e) {
       Get.snackbar(
         translate('common.error'),
-        e.toString(),
+        translate('common.error_occurred'),
         snackPosition: SnackPosition.BOTTOM,
         colorText: Colors.white,
         backgroundColor: Colors.red,
@@ -256,17 +256,10 @@ class UserController extends GetxController {
 
       friendsRequests.removeWhere((u) => u.id == requester.id);
       fetchFriends();
-      Get.snackbar(
-        translate('common.success'),
-        translate('users.friendship_accepted'), // 'Amistad aceptada'
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
     } catch (e) {
       Get.snackbar(
         translate('common.error'),
-        e.toString(),
+        translate('common.error_occurred'),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -280,17 +273,10 @@ class UserController extends GetxController {
       await _userServices.rejectFriendRequest(userId, requester.id);
 
       friendsRequests.removeWhere((u) => u.id == requester.id);
-      Get.snackbar(
-        translate('common.success'),
-        translate('users.req_rejected'), // 'Solicitud rechazada'
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
     } catch (e) {
       Get.snackbar(
         translate('common.error'),
-        e.toString(),
+        translate('common.error_occurred'),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -323,17 +309,10 @@ class UserController extends GetxController {
         sentRequests: updatedSentRequests,
         interests: currentUser.interests,
       );
-      Get.snackbar(
-        translate('common.success'),
-        translate('users.req_sent'), // 'Solicitud de amistad enviada'
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
     } catch (e) {
       Get.snackbar(
         translate('common.error'),
-        e.toString(),
+        translate('common.error_occurred'),
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
@@ -364,13 +343,6 @@ class UserController extends GetxController {
           // Evitar duplicados
           if (!friendsRequests.any((u) => u.id == newUser.id)) {
             friendsRequests.add(newUser);
-            Get.snackbar(
-              translate('common.new_notification'),
-              '${newUser.username} ${translate('notifications.friend_req')}',
-              backgroundColor: Colors.blue,
-              colorText: Colors.white,
-              snackPosition: SnackPosition.TOP,
-            );
           }
         } catch (e) {
           logger.e(
@@ -400,17 +372,10 @@ class UserController extends GetxController {
     try {
       isLoading(true);
       await _userServices.uploadProfilePhoto(id, imageFile);
-      Get.snackbar(
-        translate('common.success'),
-        translate('profile.update_success'),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
     } catch (e) {
       Get.snackbar(
         translate('common.error'),
-        e.toString(),
+        translate('common.error_occurred'),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -423,20 +388,11 @@ class UserController extends GetxController {
   Future<void> deleteProfilePhoto(String id) async {
     try {
       isLoading(true);
-      bool success = await _userServices.deleteProfilePhoto(id);
-      if (success) {
-        Get.snackbar(
-          translate('common.success'),
-          'Foto eliminada',
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
-      }
+      await _userServices.deleteProfilePhoto(id);
     } catch (e) {
       Get.snackbar(
         translate('common.error'),
-        e.toString(),
+        translate('common.error_occurred'),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -489,18 +445,10 @@ class UserController extends GetxController {
           );
         }
       }
-
-      Get.snackbar(
-        translate('common.success'),
-        translate('users.block_success'),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.redAccent,
-        colorText: Colors.white,
-      );
     } catch (e) {
       Get.snackbar(
         translate('common.error'),
-        e.toString(),
+        translate('common.error_occurred'),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -534,18 +482,10 @@ class UserController extends GetxController {
           blockedUsers: newBlocked,
         );
       }
-
-      Get.snackbar(
-        translate('common.success'),
-        translate('users.unblock_success'),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
     } catch (e) {
       Get.snackbar(
         translate('common.error'),
-        e.toString(),
+        translate('common.error_occurred'),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,

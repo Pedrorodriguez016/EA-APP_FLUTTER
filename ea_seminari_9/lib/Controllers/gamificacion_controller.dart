@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:logger/logger.dart';
 import '../Models/usuario_progreso.dart';
 import '../Models/insignia.dart';
@@ -50,8 +51,8 @@ class GamificacionController extends GetxController {
     } catch (e) {
       logger.e('Error al cargar progreso de usuario: $e');
       Get.snackbar(
-        'Error',
-        'No se pudo cargar el progreso del usuario',
+        translate('common.error'),
+        translate('gamification.errors.load_user_progress'),
         snackPosition: SnackPosition.BOTTOM,
       );
       return null;

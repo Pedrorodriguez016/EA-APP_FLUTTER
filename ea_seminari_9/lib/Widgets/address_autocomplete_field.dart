@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'dart:async';
+import 'package:flutter_translate/flutter_translate.dart';
 import '../Services/geocoding_service.dart';
 
 class AddressAutocompleteField extends StatefulWidget {
@@ -169,7 +170,7 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
                                     const SizedBox(width: 4),
                                     Expanded(
                                       child: Text(
-                                        'Dirección completa',
+                                        translate('address.complete'),
                                         style: context.textTheme.bodySmall
                                             ?.copyWith(color: Colors.green),
                                       ),
@@ -187,7 +188,13 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
-                                  'Incompleta: falta ${suggestion.missingComponents.join(", ")}',
+                                  translate(
+                                    'address.incomplete',
+                                    args: {
+                                      'components': suggestion.missingComponents
+                                          .join(", "),
+                                    },
+                                  ),
                                   style: context.textTheme.bodySmall?.copyWith(
                                     color: Colors.orange,
                                   ),
@@ -254,7 +261,7 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                'Dirección incompleta',
+                translate('address.incomplete_title'),
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
@@ -265,7 +272,7 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Esta dirección no tiene suficiente información:',
+              translate('address.incomplete_info'),
               style: TextStyle(fontSize: 14),
             ),
             const SizedBox(height: 12),
@@ -280,7 +287,7 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Falta:',
+                    translate('address.missing_label'),
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                   ),
                   const SizedBox(height: 4),
@@ -301,13 +308,16 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Por favor, busca una dirección más específica con calle, número y código postal.',
+              translate('address.specific_hint'),
               style: TextStyle(fontSize: 13, color: context.theme.hintColor),
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: Text('Entendido')),
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(translate('address.understood')),
+          ),
         ],
       ),
     );
@@ -394,7 +404,7 @@ class _AddressAutocompleteFieldState extends State<AddressAutocompleteField> {
               horizontal: 20,
               vertical: 16,
             ),
-            hintText: 'Escribe una dirección...',
+            hintText: translate('address.write_address'),
             hintStyle: TextStyle(color: context.theme.hintColor),
           ),
         ),

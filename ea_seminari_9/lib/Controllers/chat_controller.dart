@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import '../Services/socket_services.dart';
 import '../Controllers/auth_controller.dart';
 import '../Models/chat.dart';
@@ -82,8 +83,8 @@ class ChatController extends GetxController {
   void _handleChatError(dynamic data) {
     logger.e('🛑 Error en chat: ${data['message']}');
     Get.snackbar(
-      'Error',
-      data['message'] ?? 'No se pudo enviar el mensaje',
+      translate('common.error'),
+      data['message'] ?? translate('chat_extra.send_error'),
       snackPosition: SnackPosition.BOTTOM,
       backgroundColor: Colors.red,
       colorText: Colors.white,
@@ -192,8 +193,8 @@ class ChatController extends GetxController {
     } catch (e) {
       logger.e('❌ Error al enviar imagen al chat', error: e);
       Get.snackbar(
-        'Error',
-        'No se pudo enviar la imagen',
+        translate('common.error'),
+        translate('chat_extra.send_image_error'),
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );

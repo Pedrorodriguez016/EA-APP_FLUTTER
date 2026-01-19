@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import '../utils/logger.dart';
 import '../Models/valoracion.dart';
 import '../Services/valoracion_services.dart';
@@ -44,8 +45,8 @@ class ValoracionController extends GetxController {
   Future<void> submitRating(String eventId) async {
     if (ratingScore.value < 1) {
       Get.snackbar(
-        'Error',
-        'Por favor selecciona una puntuación',
+        translate('common.error'),
+        translate('ratings.select_score_error'),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -85,17 +86,10 @@ class ValoracionController extends GetxController {
       loadRatings(eventId);
 
       Get.back();
-      Get.snackbar(
-        'Éxito',
-        'Valoración guardada correctamente',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
     } catch (e) {
       Get.snackbar(
-        'Error',
-        'No se pudo guardar la valoración: $e',
+        translate('common.error'),
+        translate('ratings.save_error'),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -118,17 +112,10 @@ class ValoracionController extends GetxController {
       await loadRatings(eventId);
 
       Get.back();
-      Get.snackbar(
-        'Éxito',
-        'Valoración eliminada',
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
     } catch (e) {
       Get.snackbar(
-        'Error',
-        'No se pudo eliminar: $e',
+        translate('common.error'),
+        translate('ratings.delete_error'),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,

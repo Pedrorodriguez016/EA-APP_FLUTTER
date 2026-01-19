@@ -14,6 +14,7 @@ import '../Models/eventos.dart';
 import '../Controllers/eventos_controller.dart';
 import '../Widgets/custom_date_picker.dart';
 import 'package:intl/intl.dart';
+import '../Widgets/user_card.dart';
 
 class ProfileScreen extends GetView<UserController> {
   ProfileScreen({super.key});
@@ -829,7 +830,21 @@ class ProfileScreen extends GetView<UserController> {
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => _showParticipantsDialog(context, evento),
+                  icon: const Icon(Icons.people_rounded, size: 18),
+                  label: Text(translate('events.chat_participants_btn')),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
               IconButton(
                 onPressed: () {
                   Get.dialog(
@@ -917,21 +932,6 @@ class ProfileScreen extends GetView<UserController> {
             'email': email.text,
             'birthday': finalDateISO.isNotEmpty ? finalDateISO : user.birthday,
           });
-
-          Get.snackbar(
-            translate('profile.snackbars.success_title'),
-            translate('profile.snackbars.success_msg'),
-            snackPosition: SnackPosition.TOP,
-            backgroundColor: Colors.green.withValues(alpha: 0.9),
-            colorText: Colors.white,
-            margin: const EdgeInsets.all(16),
-            borderRadius: 16,
-            icon: const Icon(
-              Icons.check_circle_outline_rounded,
-              color: Colors.white,
-            ),
-            duration: const Duration(seconds: 2),
-          );
         },
         icon: const Icon(Icons.save_rounded, color: Colors.white),
         label: Text(
@@ -939,6 +939,86 @@ class ProfileScreen extends GetView<UserController> {
           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),
+    );
+  }
+
+  void _showParticipantsDialog(BuildContext context, Evento evento) {
+    final participants = evento.participantesFull ?? [];
+
+    Get.bottomSheet(
+      Container(
+        height: Get.height * 0.7,
+        decoration: BoxDecoration(
+          color: context.theme.scaffoldBackgroundColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: context.theme.dividerColor.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Row(
+                children: [
+                  Text(
+                    translate('events.chat_participants'),
+                    style: context.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '${participants.length}',
+                    style: TextStyle(
+                      color: context.theme.colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: participants.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.people_outline,
+                            size: 64,
+                            color: context.theme.hintColor.withValues(
+                              alpha: 0.3,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            translate('events_extra.no_participants'),
+                            style: TextStyle(color: context.theme.hintColor),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: participants.length,
+                      itemBuilder: (context, index) {
+                        final user = participants[index];
+                        return UserCard(user: user);
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+      isScrollControlled: true,
     );
   }
 }

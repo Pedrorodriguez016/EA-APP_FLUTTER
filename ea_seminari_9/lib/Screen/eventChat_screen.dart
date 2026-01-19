@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import '../Controllers/event_chat_controller.dart';
@@ -354,8 +355,8 @@ class EventChatScreen extends GetView<EventChatController> {
             const SizedBox(height: 16),
             ListTile(
               leading: const Icon(Icons.image_outlined),
-              title: const Text('Enviar imagen al chat'),
-              subtitle: const Text('Solo para esta conversación'),
+              title: Text(translate('chat_extra.send_image')),
+              subtitle: Text(translate('chat_extra.send_image_conv')),
               onTap: () {
                 Get.back();
                 controller.sendImageMessage();
@@ -456,11 +457,10 @@ class EventChatScreen extends GetView<EventChatController> {
                 icon: const Icon(Icons.delete, color: Colors.red),
                 onPressed: () {
                   Get.defaultDialog(
-                    title: 'Eliminar',
-                    middleText:
-                        '¿Estás seguro de que quieres eliminar este contenido?',
-                    textConfirm: 'Eliminar',
-                    textCancel: 'Cancelar',
+                    title: translate('common.delete'),
+                    middleText: translate('chat_extra.delete_item_confirm'),
+                    textConfirm: translate('common.delete'),
+                    textCancel: translate('common.cancel'),
                     confirmTextColor: Colors.white,
                     onConfirm: () {
                       Get.back(); // Cierra el dialogo
@@ -505,6 +505,8 @@ class _VideoPlayerWidget extends StatefulWidget {
 class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
   late VideoPlayerController _controller;
   bool _isError = false;
+  bool _showControls = true;
+  Timer? _hideTimer;
 
   @override
   void initState() {
@@ -521,18 +523,50 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
               .then((_) {
                 setState(() {});
                 _controller.play();
+                _startHideTimer();
               })
               .catchError((e) {
                 setState(() {
                   _isError = true;
                 });
               });
+
+    _controller.addListener(() {
+      if (mounted) setState(() {});
+    });
+  }
+
+  void _startHideTimer() {
+    _hideTimer?.cancel();
+    _hideTimer = Timer(const Duration(seconds: 3), () {
+      if (mounted && _controller.value.isPlaying) {
+        setState(() {
+          _showControls = false;
+        });
+      }
+    });
+  }
+
+  void _toggleControls() {
+    setState(() {
+      _showControls = !_showControls;
+    });
+    if (_showControls) {
+      _startHideTimer();
+    }
   }
 
   @override
   void dispose() {
+    _hideTimer?.cancel();
     _controller.dispose();
     super.dispose();
+  }
+
+  String _formatDuration(Duration duration) {
+    String minutes = duration.inMinutes.toString().padLeft(2, '0');
+    String seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
+    return '$minutes:$seconds';
   }
 
   @override
@@ -541,8 +575,8 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, color: Colors.white, size: 48),
-          SizedBox(height: 16),
+          const Icon(Icons.error_outline, color: Colors.white, size: 48),
+          const SizedBox(height: 16),
           Text(
             translate('events_extra.video_load_error'),
             style: const TextStyle(color: Colors.white),
@@ -555,41 +589,173 @@ class _VideoPlayerWidgetState extends State<_VideoPlayerWidget> {
       return const CircularProgressIndicator(color: Colors.white);
     }
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Flexible(
-          child: AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
-            child: VideoPlayer(_controller),
+    return GestureDetector(
+      onTap: _toggleControls,
+      behavior: HitTestBehavior.opaque,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Center(
+            child: AspectRatio(
+              aspectRatio: _controller.value.aspectRatio,
+              child: VideoPlayer(_controller),
+            ),
           ),
-        ),
-        const SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            IconButton(
-              icon: Icon(
-                _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
-                color: Colors.white,
-                size: 32,
+          if (_showControls)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withValues(alpha: 0.3),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Top Bar
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              _controller.value.volume == 0
+                                  ? Icons.volume_off
+                                  : Icons.volume_up,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _controller.setVolume(
+                                  _controller.value.volume == 0 ? 1.0 : 0.0,
+                                );
+                              });
+                              _startHideTimer();
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Center Controls
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: const Icon(
+                            Icons.replay_10_rounded,
+                            color: Colors.white,
+                            size: 36,
+                          ),
+                          onPressed: () {
+                            final newPos =
+                                _controller.value.position -
+                                const Duration(seconds: 10);
+                            _controller.seekTo(newPos);
+                            _startHideTimer();
+                          },
+                        ),
+                        const SizedBox(width: 24),
+                        IconButton(
+                          icon: Icon(
+                            _controller.value.isPlaying
+                                ? Icons.pause_circle_filled_rounded
+                                : Icons.play_circle_filled_rounded,
+                            color: Colors.white,
+                            size: 64,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _controller.value.isPlaying
+                                  ? _controller.pause()
+                                  : _controller.play();
+                            });
+                            _startHideTimer();
+                          },
+                        ),
+                        const SizedBox(width: 24),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.forward_10_rounded,
+                            color: Colors.white,
+                            size: 36,
+                          ),
+                          onPressed: () {
+                            final newPos =
+                                _controller.value.position +
+                                const Duration(seconds: 10);
+                            _controller.seekTo(newPos);
+                            _startHideTimer();
+                          },
+                        ),
+                      ],
+                    ),
+                    // Bottom Controls
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                _formatDuration(_controller.value.position),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              Text(
+                                _formatDuration(_controller.value.duration),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SliderTheme(
+                          data: SliderTheme.of(context).copyWith(
+                            trackHeight: 2,
+                            thumbShape: const RoundSliderThumbShape(
+                              enabledThumbRadius: 6,
+                            ),
+                            overlayShape: const RoundSliderOverlayShape(
+                              overlayRadius: 14,
+                            ),
+                            activeTrackColor: context.theme.colorScheme.primary,
+                            inactiveTrackColor: Colors.white.withValues(
+                              alpha: 0.3,
+                            ),
+                            thumbColor: context.theme.colorScheme.primary,
+                          ),
+                          child: Slider(
+                            value: _controller.value.position.inMilliseconds
+                                .toDouble(),
+                            min: 0.0,
+                            max: _controller.value.duration.inMilliseconds
+                                .toDouble(),
+                            onChanged: (value) {
+                              setState(() {
+                                _controller.seekTo(
+                                  Duration(milliseconds: value.toInt()),
+                                );
+                              });
+                            },
+                            onChangeStart: (_) => _hideTimer?.cancel(),
+                            onChangeEnd: (_) => _startHideTimer(),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              onPressed: () {
-                setState(() {
-                  _controller.value.isPlaying
-                      ? _controller.pause()
-                      : _controller.play();
-                });
-              },
             ),
-            Text(
-              '${_controller.value.position.inMinutes}:${(_controller.value.position.inSeconds % 60).toString().padLeft(2, '0')} / '
-              '${_controller.value.duration.inMinutes}:${(_controller.value.duration.inSeconds % 60).toString().padLeft(2, '0')}',
-              style: const TextStyle(color: Colors.white),
-            ),
-          ],
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

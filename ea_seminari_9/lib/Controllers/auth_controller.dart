@@ -102,14 +102,6 @@ class AuthController extends GetxController {
       loginPassCtrl.clear();
 
       Get.offAllNamed('/home');
-
-      Get.snackbar(
-        translate('common.success'),
-        translate('auth.login.success_msg'),
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
     } on DioException catch (e) {
       final errorData = e.response?.data;
       String msg = errorData != null && errorData['error'] != null
@@ -131,7 +123,7 @@ class AuthController extends GetxController {
     } catch (e) {
       Get.snackbar(
         translate('common.error'),
-        '$e',
+        translate('common.error_occurred'),
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
@@ -227,21 +219,13 @@ class AuthController extends GetxController {
       } else {
         Get.offAllNamed('/home');
       }
-
-      Get.snackbar(
-        translate('common.success'),
-        translate('auth.login.success_msg'),
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
     } catch (e) {
       logger.e('Error al procesar login de Google con el backend', error: e);
       String errorMsg = e.toString();
       if (e is DioException && e.response?.data != null) {
         errorMsg = e.response?.data['message'] ?? e.message;
         if (e.response?.data['message'] == 'USERNAME_EXISTS') {
-          errorMsg = 'El nombre de usuario ya está en uso. Prueba con otro.';
+          errorMsg = translate('common.username_taken');
         }
       }
 
@@ -466,7 +450,7 @@ class AuthController extends GetxController {
     } catch (e) {
       Get.snackbar(
         translate('common.error'),
-        '$e',
+        translate('common.error_occurred'),
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
@@ -503,7 +487,7 @@ class AuthController extends GetxController {
     } catch (e) {
       Get.snackbar(
         translate('common.error'),
-        '$e',
+        translate('common.error_occurred'),
         backgroundColor: Colors.red,
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM,
@@ -532,7 +516,8 @@ class AuthController extends GetxController {
       String msg = translate('common.error');
       if (e is DioException) {
         msg = e.response?.data['error'] ?? msg;
-        if (msg == 'RATE_LIMITED') msg = 'Rate limit exceeded. Wait a bit.';
+        if (msg == 'RATE_LIMITED')
+          msg = translate('common.rate_limit_exceeded');
       }
       Get.snackbar(
         translate('common.error'),

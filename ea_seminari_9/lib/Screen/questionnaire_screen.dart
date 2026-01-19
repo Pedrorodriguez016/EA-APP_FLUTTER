@@ -142,6 +142,37 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
     ],
   };
 
+  IconData _getCategoryIcon(String category) {
+    switch (category) {
+      case 'SPORTS':
+        return Icons.sports_soccer_rounded;
+      case 'MUSIC':
+        return Icons.music_note_rounded;
+      case 'CULTURE':
+        return Icons.theater_comedy_rounded;
+      case 'FOOD':
+        return Icons.restaurant_rounded;
+      case 'SOCIAL':
+        return Icons.people_rounded;
+      case 'LEARNING':
+        return Icons.school_rounded;
+      case 'TECH':
+        return Icons.terminal_rounded;
+      case 'WELLNESS':
+        return Icons.spa_rounded;
+      case 'VOLUNTEER':
+        return Icons.volunteer_activism_rounded;
+      case 'NATURE':
+        return Icons.terrain_rounded;
+      case 'GAMES':
+        return Icons.videogame_asset_rounded;
+      case 'FAMILY':
+        return Icons.family_restroom_rounded;
+      default:
+        return Icons.more_horiz_rounded;
+    }
+  }
+
   final List<String> _selectedInterests = [];
   String? _expandedCategory;
   bool _isLoading = false;
@@ -163,12 +194,35 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
     }
   }
 
+  bool _isCategorySelected(String category) {
+    final subInterests = _categoryMap[category] ?? [];
+    if (subInterests.isEmpty) return _selectedInterests.contains(category);
+    return subInterests.every((i) => _selectedInterests.contains(i));
+  }
+
   void _toggleInterest(String interest) {
     setState(() {
-      if (_selectedInterests.contains(interest)) {
-        _selectedInterests.remove(interest);
+      if (_categoryMap.containsKey(interest)) {
+        // Toggling a whole category
+        final subInterests = _categoryMap[interest]!;
+        final allSelected = _isCategorySelected(interest);
+
+        if (allSelected) {
+          _selectedInterests.removeWhere((i) => subInterests.contains(i));
+        } else {
+          for (final i in subInterests) {
+            if (!_selectedInterests.contains(i)) {
+              _selectedInterests.add(i);
+            }
+          }
+        }
       } else {
-        _selectedInterests.add(interest);
+        // Toggling a single sub-interest
+        if (_selectedInterests.contains(interest)) {
+          _selectedInterests.remove(interest);
+        } else {
+          _selectedInterests.add(interest);
+        }
       }
     });
   }
@@ -356,10 +410,10 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
               IconButton(
                 onPressed: () => _toggleInterest(category),
                 icon: Icon(
-                  _selectedInterests.contains(category)
+                  _isCategorySelected(category)
                       ? Icons.check_circle_rounded
                       : Icons.radio_button_unchecked_rounded,
-                  color: _selectedInterests.contains(category)
+                  color: _isCategorySelected(category)
                       ? context.theme.colorScheme.primary
                       : context.theme.hintColor.withValues(alpha: 0.5),
                 ),
@@ -376,19 +430,30 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          translate('categories.$category'),
-                          style: context.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: _selectedInterests.contains(category)
-                                ? context.theme.colorScheme.primary
-                                : null,
-                          ),
+                        Row(
+                          children: [
+                            Icon(
+                              _getCategoryIcon(category),
+                              size: 18,
+                              color: _isCategorySelected(category)
+                                  ? context.theme.colorScheme.primary
+                                  : context.theme.hintColor,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              translate('categories.$category'),
+                              style: context.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: _isCategorySelected(category)
+                                    ? context.theme.colorScheme.primary
+                                    : null,
+                              ),
+                            ),
+                          ],
                         ),
-                        if (selectedInCat > 0 ||
-                            _selectedInterests.contains(category))
+                        if (selectedInCat > 0)
                           Text(
-                            _selectedInterests.contains(category)
+                            _isCategorySelected(category)
                                 ? translate(
                                     'questionnaire.category_all_selected',
                                   )
@@ -425,7 +490,7 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
               children: subInterests.map((interest) {
                 final isSelected = _selectedInterests.contains(interest);
                 return FilterChip(
-                  label: Text(interest),
+                  label: Text(translate('categories.$interest')),
                   selected: isSelected,
                   onSelected: (_) => _toggleInterest(interest),
                   selectedColor: context.theme.colorScheme.primary.withValues(

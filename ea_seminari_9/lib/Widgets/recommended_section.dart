@@ -47,7 +47,7 @@ class _RecommendedSectionState extends State<RecommendedSection> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Recomendados para ti',
+                translate('categories.recommended_for_you'),
                 style: context.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w800,
                   fontSize: 20,
@@ -58,7 +58,7 @@ class _RecommendedSectionState extends State<RecommendedSection> {
                   widget.controller.showRecommendedOnly();
                   Get.toNamed('/eventos');
                 },
-                child: const Text('Ver todos'),
+                child: Text(translate('categories.see_all')),
               ),
             ],
           ),
@@ -71,7 +71,7 @@ class _RecommendedSectionState extends State<RecommendedSection> {
             if (recommended.isEmpty && !widget.controller.isLoading.value) {
               return Center(
                 child: Text(
-                  'No hay recomendaciones aún.\n¡Selecciona tus intereses!',
+                  translate('categories.no_recommendations'),
                   textAlign: TextAlign.center,
                   style: context.textTheme.bodyMedium?.copyWith(
                     color: context.theme.hintColor,
@@ -244,7 +244,7 @@ class _RecommendedSectionState extends State<RecommendedSection> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
-                            evento.categoria,
+                            translate('categories.${evento.categoria}'),
                             style: TextStyle(
                               color: context.theme.colorScheme.primary,
                               fontSize: 10,

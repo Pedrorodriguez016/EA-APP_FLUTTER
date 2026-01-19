@@ -171,7 +171,8 @@ class ValoracionList extends StatelessWidget {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    val.usuarioNombre ?? 'Anonimo',
+                                    val.usuarioNombre ??
+                                        translate('common.anonymous'),
                                     overflow: TextOverflow.ellipsis,
                                     style: context.textTheme.bodyLarge
                                         ?.copyWith(fontWeight: FontWeight.bold),
@@ -195,9 +196,9 @@ class ValoracionList extends StatelessWidget {
                                         ),
                                       ),
                                     ),
-                                    child: const Text(
-                                      'Tú',
-                                      style: TextStyle(
+                                    child: Text(
+                                      translate('common.me_you'),
+                                      style: const TextStyle(
                                         fontSize: 10,
                                         color: Colors.green,
                                         fontWeight: FontWeight.bold,
@@ -238,7 +239,12 @@ class ValoracionList extends StatelessWidget {
                             ],
                             const SizedBox(height: 4),
                             Text(
-                              DateFormat('dd MMM yyyy').format(val.createdAt),
+                              DateFormat(
+                                'dd MMM yyyy',
+                                LocalizedApp.of(
+                                  context,
+                                ).delegate.currentLocale.languageCode,
+                              ).format(val.createdAt),
                               style: context.textTheme.bodySmall?.copyWith(
                                 fontSize: 12,
                               ),

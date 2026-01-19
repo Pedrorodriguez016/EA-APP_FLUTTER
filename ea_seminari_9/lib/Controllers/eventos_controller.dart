@@ -147,16 +147,6 @@ class EventoController extends GetxController {
 
           // Refrescar la lista de invitaciones
           fetchPendingInvitations();
-
-          // Mostrar notificación al usuario
-          Get.snackbar(
-            translate('common.new_notification'),
-            '$fromUsername ${translate('events.invited_you_to')} "$eventName"',
-            backgroundColor: Colors.blue,
-            colorText: Colors.white,
-            snackPosition: SnackPosition.TOP,
-            duration: const Duration(seconds: 4),
-          );
         } catch (e) {
           logger.e(
             '[EventoController] Error procesando invitación a evento por socket',
@@ -279,8 +269,8 @@ class EventoController extends GetxController {
       if (page == 1) eventosList.clear();
 
       Get.snackbar(
-        'Error de Carga',
-        'No se pudieron cargar los eventos. Revise su conexión o el servidor.',
+        translate('events.errors.load_error_title'),
+        translate('events.errors.load_error_msg'),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
       );
@@ -506,8 +496,8 @@ class EventoController extends GetxController {
       final capacidad = int.tryParse(capacidadText);
       if (capacidad == null || capacidad <= 0) {
         Get.snackbar(
-          'Valor inválido',
-          'La capacidad máxima debe ser un número mayor a 0.',
+          translate('common.invalid_value'),
+          translate('events.max_capacity_error'),
           snackPosition: SnackPosition.BOTTOM,
           backgroundColor: Colors.orange,
           colorText: Colors.white,
@@ -542,19 +532,11 @@ class EventoController extends GetxController {
 
       Get.back();
       limpiarFormularioCrear();
-
-      Get.snackbar(
-        translate('common.success'),
-        translate('events.created_success'),
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
       refreshEventos();
     } catch (e) {
       Get.snackbar(
         translate('common.error'),
-        e.toString(),
+        translate('common.error_occurred'),
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red,
         colorText: Colors.white,
@@ -600,7 +582,7 @@ class EventoController extends GetxController {
         selectedCategoria.value == null) {
       Get.snackbar(
         translate('common.error'),
-        'Por favor, completa los campos obligatorios.',
+        translate('common.mandatory_fields_empty'),
         backgroundColor: Colors.orange,
       );
       return;
@@ -629,19 +611,12 @@ class EventoController extends GetxController {
       isEditing.value = false;
       editingEventoId.value = null;
 
-      Get.snackbar(
-        translate('common.success'),
-        'Evento actualizado correctamente',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
-
       _updateEventInLists(updatedEvento);
       fetchMisEventosEspecificos(); // Recargar mis eventos creados
     } catch (e) {
       Get.snackbar(
         translate('common.error'),
-        e.toString(),
+        translate('common.error_occurred'),
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -653,15 +628,13 @@ class EventoController extends GetxController {
       await _eventosServices.deleteEvento(id);
       eventosList.removeWhere((e) => e.id == id);
       misEventosCreados.removeWhere((e) => e.id == id);
-
+    } catch (e) {
       Get.snackbar(
-        'Eliminado',
-        'El evento ha sido eliminado',
-        backgroundColor: Colors.green,
+        translate('common.error'),
+        translate('events.errors.delete_error'),
+        backgroundColor: Colors.red,
         colorText: Colors.white,
       );
-    } catch (e) {
-      Get.snackbar('Error', 'No se pudo eliminar el evento');
     }
   }
 
@@ -712,35 +685,12 @@ class EventoController extends GetxController {
 
       if (isParticipant) {
         updatedEvento = await _eventosServices.leaveEvent(event.id);
-        Get.snackbar(
-          translate('common.success'),
-          translate('events.left_success'),
-          backgroundColor: Colors.orange,
-          colorText: Colors.white,
-        );
       } else if (isOnWaitlist) {
         // Usar leaveWaitlist específicamente para lista de espera
         updatedEvento = await _eventosServices.leaveWaitlist(event.id);
-        Get.snackbar(
-          translate('common.success'),
-          translate('events.left_waitlist'),
-          backgroundColor: Colors.orange,
-          colorText: Colors.white,
-        );
       } else {
         final response = await _eventosServices.joinEvent(event.id);
         updatedEvento = response['evento'] as Evento;
-        final enListaEspera = response['enListaEspera'] as bool;
-        final mensaje = response['mensaje'] as String;
-
-        // Mostrar el mensaje del backend
-        Get.snackbar(
-          enListaEspera ? 'En lista de espera' : 'Éxito!',
-          mensaje,
-          backgroundColor: enListaEspera ? Colors.orange : Colors.green,
-          colorText: Colors.white,
-          duration: Duration(seconds: enListaEspera ? 4 : 3),
-        );
       }
 
       selectedEvento.value = updatedEvento;
@@ -750,8 +700,8 @@ class EventoController extends GetxController {
       _updateEventInLists(updatedEvento);
     } catch (e) {
       Get.snackbar(
-        'Error',
-        e.toString(),
+        translate('common.error'),
+        translate('common.error_occurred'),
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -906,19 +856,10 @@ class EventoController extends GetxController {
         }
       }
 
-      if (successCount > 0) {
+      if (successCount == 0 && files.isNotEmpty) {
         Get.snackbar(
-          '¡Éxito!',
-          successCount == 1
-              ? 'Contenido compartido correctamente'
-              : '$successCount elementos compartidos correctamente',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
-      } else if (files.isNotEmpty) {
-        Get.snackbar(
-          'Error',
-          'No se pudo compartir el contenido',
+          translate('common.error'),
+          translate('chat_extra.share_error'),
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
@@ -926,8 +867,8 @@ class EventoController extends GetxController {
     } catch (e) {
       logger.e('Error uploading media: $e');
       Get.snackbar(
-        'Error',
-        'Ocurrió un error al procesar el contenido',
+        translate('common.error'),
+        translate('common.error_occurred'),
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -941,17 +882,11 @@ class EventoController extends GetxController {
       isLoading(true);
       await _eventosServices.deleteEventoPhoto(eventId, photoId);
       eventoPhotos.removeWhere((p) => p.id == photoId);
-      Get.snackbar(
-        '¡Éxito!',
-        'Contenido eliminado correctamente',
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
-      );
     } catch (e) {
       logger.e('Error deleting media: $e');
       Get.snackbar(
-        'Error',
-        'No se pudo eliminar el contenido',
+        translate('common.error'),
+        translate('chat_extra.photo_deleted_error'),
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -968,13 +903,16 @@ class EventoController extends GetxController {
         hasPermission = await Gal.requestAccess();
       }
       if (!hasPermission) {
-        Get.snackbar('Permiso denegado', 'Se requiere acceso a la galería');
+        Get.snackbar(
+          translate('chat_extra.permission_denied'),
+          translate('chat_extra.gallery_access_required'),
+        );
         return;
       }
 
       Get.snackbar(
-        'Descargando...',
-        'Iniciando descarga de contenido',
+        translate('chat_extra.downloading'),
+        translate('chat_extra.downloading_msg'),
         showProgressIndicator: true,
       );
 
@@ -1005,16 +943,16 @@ class EventoController extends GetxController {
       }
 
       Get.snackbar(
-        '¡Éxito!',
-        'Imagen/Video guardado en la galería',
+        translate('chat_extra.download_success_title'),
+        translate('chat_extra.download_success_msg'),
         backgroundColor: Colors.green,
         colorText: Colors.white,
       );
     } catch (e) {
       logger.e('Error downloading media: $e');
       Get.snackbar(
-        'Error',
-        'No se pudo descargar el contenido',
+        translate('chat_extra.download_error_title'),
+        translate('chat_extra.download_error_msg'),
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
@@ -1039,20 +977,8 @@ class EventoController extends GetxController {
 
       if (accept) {
         updatedEvento = await _eventosServices.acceptInvitation(eventToUse.id);
-        Get.snackbar(
-          'Éxito',
-          'Invitación aceptada',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
       } else {
         updatedEvento = await _eventosServices.rejectInvitation(eventToUse.id);
-        Get.snackbar(
-          'Información',
-          'Invitación rechazada',
-          backgroundColor: Colors.orange,
-          colorText: Colors.white,
-        );
       }
 
       if (event == null) {
@@ -1066,7 +992,7 @@ class EventoController extends GetxController {
       fetchPendingInvitations(); // Recargar para estar seguros
     } catch (e) {
       Get.snackbar(
-        'Error',
+        translate('common.error'),
         e.toString(),
         backgroundColor: Colors.red,
         colorText: Colors.white,

@@ -560,8 +560,30 @@ class LoginScreen extends GetView<AuthController> {
             actions: [
               if (!isLoading)
                 TextButton(
-                  onPressed: () => Get.back(),
-                  child: Text(translate('common.cancel')),
+                  onPressed: () {
+                    if (step == 2) {
+                      setState(() => step = 1);
+                    } else {
+                      Get.back();
+                    }
+                  },
+                  child: Text(
+                    step == 2
+                        ? translate('common.back')
+                        : translate('common.cancel'),
+                  ),
+                ),
+              if (step == 2 && !isLoading)
+                TextButton(
+                  onPressed: () async {
+                    setState(() => isLoading = true);
+                    await controller.resendCode(emailCtrl.text.trim());
+                    setState(() => isLoading = false);
+                  },
+                  child: Text(
+                    translate('auth.verification.resend_btn'),
+                    style: TextStyle(color: context.theme.colorScheme.primary),
+                  ),
                 ),
               ElevatedButton(
                 onPressed: isLoading

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import '../Models/notificacion.dart';
 import '../Services/notificacion_services.dart';
 import '../Services/socket_services.dart';
@@ -93,7 +94,7 @@ class NotificacionController extends GetxController
               'chat|${newNotif.relatedUserId}|${newNotif.relatedUsername ?? 'Chat'}';
         }
 
-        // 4. Mostrar notificación de Android (Aviso externo)
+        // 3. Mostrar notificación de Android/iOS (Siempre)
         LocalNotificationService.show(
           id: newNotif.id.hashCode.abs(),
           title: newNotif.title,
@@ -217,19 +218,11 @@ class NotificacionController extends GetxController
       // Limpiamos la lista local
       notificaciones.clear();
       _updateUnreadCount();
-
-      Get.snackbar(
-        'Éxito',
-        'Todas las notificaciones han sido eliminadas',
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
     } catch (e) {
       logger.e('Error eliminando todas las notificaciones', error: e);
       Get.snackbar(
-        'Error',
-        'No se pudieron eliminar algunas notificaciones',
+        translate('common.error'),
+        translate('notifications.delete_error'),
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
