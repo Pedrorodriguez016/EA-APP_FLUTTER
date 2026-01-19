@@ -40,7 +40,7 @@ class MisInsigniasSection extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
+                      color: context.theme.shadowColor.withValues(alpha: 0.05),
                       blurRadius: 10,
                     ),
                   ],

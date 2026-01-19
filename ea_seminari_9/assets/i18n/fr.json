@@ -224,10 +224,11 @@
     "review_empty_msg": "Soyez le premier à évaluer cet événement",
     "categories": "Catégories",
     "filters": "Filtres",
+    "apply_filters": "Appliquer les filtres",
     "popular_week": "Populaires cette semaine",
     "chat_participants": "Participants du Chat",
     "date_range": "Plage de dates",
-    "apply_filters": "Appliquer les filtres",
+
     "at_time": "à",
 
     "chat_participants_btn": "Voir les participants",

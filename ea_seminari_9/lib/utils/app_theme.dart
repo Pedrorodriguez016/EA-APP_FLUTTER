@@ -83,6 +83,8 @@ class AppTheme {
       onSurface: _lightOnBackground,
       outline: _lightBorderColor,
       error: Color(0xFFEF4444),
+      tertiary: Colors
+          .green, // Mapping success/green to tertiary for easy theme access if needed
     ),
 
     scaffoldBackgroundColor: _lightBackgroundColor,

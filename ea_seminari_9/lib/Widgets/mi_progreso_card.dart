@@ -4,6 +4,8 @@ import 'package:flutter_translate/flutter_translate.dart';
 import '../Controllers/gamificacion_controller.dart';
 import '../Models/usuario_progreso.dart';
 
+import '../utils/app_theme.dart';
+
 class MiProgresoCard extends StatelessWidget {
   final UsuarioProgreso progreso;
 
@@ -16,14 +18,7 @@ class MiProgresoCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            context.theme.colorScheme.primary,
-            context.theme.colorScheme.primary.withValues(alpha: 0.7),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: AppGradients.primaryBtn,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(

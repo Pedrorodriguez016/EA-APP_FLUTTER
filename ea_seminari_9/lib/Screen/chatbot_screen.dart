@@ -54,7 +54,7 @@ class ChatBotScreen extends GetView<ChatBotController> {
     final isUser = msg.isUser;
     // Forzamos color de marca (0xFF7C3AED) y texto blanco para el usuario
     // para garantizar visibilidad en Dark Mode.
-    const userBubbleColor = Color(0xFF7C3AED);
+    final userBubbleColor = context.theme.colorScheme.primary;
     final botBubbleColor = context.isDarkMode
         ? Colors.grey.shade800
         : Colors.grey.shade200;

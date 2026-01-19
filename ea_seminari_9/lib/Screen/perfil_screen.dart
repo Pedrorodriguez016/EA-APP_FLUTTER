@@ -14,6 +14,7 @@ import '../Models/eventos.dart';
 import '../Controllers/eventos_controller.dart';
 import '../Widgets/custom_date_picker.dart';
 import 'package:intl/intl.dart';
+import '../utils/app_theme.dart';
 import '../Widgets/user_card.dart';
 
 class ProfileScreen extends GetView<UserController> {
@@ -322,15 +323,7 @@ class ProfileScreen extends GetView<UserController> {
           height: 200,
           width: double.infinity,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                context.theme.colorScheme.primary,
-                context.theme.colorScheme.primary.withValues(alpha: 0.8),
-                context.theme.colorScheme.secondary.withValues(alpha: 0.6),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            gradient: AppGradients.primaryBtn,
             borderRadius: const BorderRadius.vertical(
               bottom: Radius.circular(40),
             ),

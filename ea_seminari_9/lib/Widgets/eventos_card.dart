@@ -87,8 +87,11 @@ class EventosCard extends StatelessWidget {
             : Border.all(color: Colors.transparent, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: (showParticipationStatus ? statusColor : Colors.black)
-                .withValues(alpha: 0.05),
+            color:
+                (showParticipationStatus
+                        ? statusColor
+                        : context.theme.shadowColor)
+                    .withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),

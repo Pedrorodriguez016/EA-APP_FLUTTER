@@ -312,8 +312,11 @@ class EventosDetailScreen extends GetView<EventoController> {
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF667EEA),
-                    side: const BorderSide(color: Color(0xFF667EEA), width: 2),
+                    foregroundColor: context.theme.colorScheme.primary,
+                    side: BorderSide(
+                      color: context.theme.colorScheme.primary,
+                      width: 2,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -335,8 +338,11 @@ class EventosDetailScreen extends GetView<EventoController> {
                     ),
                   ),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF4A90E2),
-                    side: const BorderSide(color: Color(0xFF4A90E2), width: 2),
+                    foregroundColor: context.theme.colorScheme.secondary,
+                    side: BorderSide(
+                      color: context.theme.colorScheme.secondary,
+                      width: 2,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -601,7 +607,7 @@ class EventosDetailScreen extends GetView<EventoController> {
               height: 4,
               margin: const EdgeInsets.only(bottom: 20),
               decoration: BoxDecoration(
-                color: Colors.grey[300],
+                color: context.theme.dividerColor,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),

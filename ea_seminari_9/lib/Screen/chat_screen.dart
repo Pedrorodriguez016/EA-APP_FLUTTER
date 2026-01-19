@@ -136,7 +136,7 @@ class _ChatBubble extends StatelessWidget {
     final time =
         "${message.createdAt.hour.toString().padLeft(2, '0')}:${message.createdAt.minute.toString().padLeft(2, '0')}";
 
-    const myBubbleColor = Color(0xFF7C3AED);
+    final myBubbleColor = context.theme.colorScheme.primary;
     final otherBubbleColor = context.isDarkMode
         ? const Color(0xFF424242)
         : const Color(0xFFEEEEEE);

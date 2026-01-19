@@ -16,9 +16,7 @@ class CustomNavBar extends StatelessWidget {
         color: theme.colorScheme.surface,
         boxShadow: [
           BoxShadow(
-            color: isDark
-                ? Colors.black.withValues(alpha: 0.3)
-                : Colors.grey.withValues(alpha: 0.1),
+            color: theme.shadowColor.withValues(alpha: isDark ? 0.3 : 0.1),
             blurRadius: 20,
             offset: const Offset(0, -5),
           ),

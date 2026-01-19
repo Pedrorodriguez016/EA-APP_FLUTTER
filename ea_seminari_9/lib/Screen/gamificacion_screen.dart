@@ -20,7 +20,6 @@ class GamificacionScreen extends GetView<GamificacionController> {
       body: RefreshIndicator(
         onRefresh: () async {
           await controller.cargarMiProgreso();
-          await controller.cargarRanking();
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -43,7 +42,9 @@ class GamificacionScreen extends GetView<GamificacionController> {
                       color: context.theme.cardColor,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: Colors.orange.withValues(alpha: 0.3),
+                        color: context.theme.colorScheme.secondary.withValues(
+                          alpha: 0.3,
+                        ),
                         width: 2,
                       ),
                     ),
@@ -52,7 +53,7 @@ class GamificacionScreen extends GetView<GamificacionController> {
                         Icon(
                           Icons.info_outline_rounded,
                           size: 60,
-                          color: Colors.orange,
+                          color: context.theme.colorScheme.secondary,
                         ),
                         const SizedBox(height: 16),
                         Text(

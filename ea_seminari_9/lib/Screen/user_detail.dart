@@ -5,6 +5,7 @@ import '../Models/user.dart';
 import '../Controllers/user_controller.dart';
 import '../Widgets/user_avatar.dart';
 import 'package:intl/intl.dart';
+import '../utils/app_theme.dart';
 
 class UserDetailScreen extends GetView<UserController> {
   final String userId;
@@ -128,12 +129,7 @@ class UserDetailScreen extends GetView<UserController> {
         Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                context.theme.colorScheme.primary,
-                context.theme.colorScheme.secondary,
-              ],
-            ),
+            gradient: AppGradients.primaryBtn,
             shape: BoxShape.circle,
           ),
           child: UserAvatar(

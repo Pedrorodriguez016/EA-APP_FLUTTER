@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import '../utils/app_theme.dart';
 
 class GamificacionCard extends StatelessWidget {
   const GamificacionCard({super.key});
@@ -13,18 +14,11 @@ class GamificacionCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              const Color(0xFFFFD700).withValues(alpha: 0.8), // Oro
-              const Color(0xFFFF8C00).withValues(alpha: 0.8), // Naranja
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          gradient: AppGradients.primaryBtn,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFFFD700).withValues(alpha: 0.3),
+              color: context.theme.colorScheme.primary.withValues(alpha: 0.3),
               blurRadius: 20,
               offset: const Offset(0, 8),
             ),

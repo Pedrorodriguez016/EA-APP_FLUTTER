@@ -34,7 +34,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: context.theme.shadowColor.withValues(alpha: 0.05),
             blurRadius: 20,
             offset: const Offset(0, 4),
           ),

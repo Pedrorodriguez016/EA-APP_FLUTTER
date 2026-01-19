@@ -224,10 +224,11 @@
     "review_empty_msg": "Sigues el primer a valorar aquest esdeveniment",
     "categories": "Categories",
     "filters": "Filtres",
+    "apply_filters": "Aplicar filtres",
     "popular_week": "Populars aquesta setmana",
     "chat_participants": "Participants del Xat",
     "date_range": "Rang de dates",
-    "apply_filters": "Aplicar filtres",
+
     "at_time": "a les",
 
     "chat_participants_btn": "Veure Participants",

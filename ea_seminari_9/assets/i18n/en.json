@@ -223,8 +223,9 @@
     "review_empty_msg": "Be the first to review this event",
     "categories": "Categories",
     "filters": "Filters",
-    "date_range": "Date Range",
     "apply_filters": "Apply Filters",
+    "date_range": "Date Range",
+
     "popular_week": "Popular this week",
     "at_time": "at",
     "chat_participants": "Chat Participants",

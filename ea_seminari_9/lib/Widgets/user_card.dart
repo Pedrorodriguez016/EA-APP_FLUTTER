@@ -18,7 +18,7 @@ class UserCard extends GetView<UserController> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: context.theme.shadowColor.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -131,6 +131,10 @@ class UserCard extends GetView<UserController> {
                 ),
 
                 Obx(() {
+                  final currentUserId =
+                      controller.authController.currentUser.value?.id;
+                  if (user.id == currentUserId) return const SizedBox.shrink();
+
                   final bool isFriend = controller.friendsList.any(
                     (f) => f.id == user.id,
                   );

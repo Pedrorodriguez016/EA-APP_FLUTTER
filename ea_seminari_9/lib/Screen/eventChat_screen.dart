@@ -181,7 +181,7 @@ class EventChatScreen extends GetView<EventChatController> {
               child: Obx(() {
                 // Filtramos para no mostrarnos a nosotros mismos en la lista
                 final participants = controller.event.value?.participantesFull
-                    ?.where((u) => u.id != controller.myUserId)
+                    ?.where((u) => u.id.trim() != controller.myUserId.trim())
                     .toList();
 
                 if (participants == null || participants.isEmpty) {
