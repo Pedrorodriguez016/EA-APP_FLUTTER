@@ -1337,7 +1337,7 @@ class EventoController extends GetxController {
               () => Text(
                 dateObs.value != null
                     ? '${dateObs.value!.day}/${dateObs.value!.month}/${dateObs.value!.year}'
-                    : 'Seleccionar',
+                    : translate('common.select'),
                 style: context.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -1415,7 +1415,9 @@ class EventoController extends GetxController {
   }
 
   void showRecommendedOnly() {
-    searchEditingController.text = 'Recomendado'; // Visual feedback only
+    searchEditingController.text = translate(
+      'categories.recommended',
+    ); // Visual feedback only
     filterCategory.value = null;
     currentFilter.value = EventFilter.recommended; // Use the new filter state
     isSearching.value = true;
