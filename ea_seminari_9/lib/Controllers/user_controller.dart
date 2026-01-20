@@ -1,0 +1,497 @@
+import 'package:ea_seminari_9/Models/user.dart';
+import 'package:ea_seminari_9/Services/user_services.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart'; // Importar
+import '../Controllers/auth_controller.dart';
+import '../Services/socket_services.dart';
+import '../utils/logger.dart';
+import 'dart:io';
+
+class UserController extends GetxController {
+  final AuthController authController = Get.find<AuthController>();
+  final SocketService _socketService;
+  var isLoading = true.obs;
+  var isMoreLoading = false.obs;
+  var userList = <User>[].obs;
+  var selectedUser = Rxn<User>();
+  var friendsList = <User>[].obs;
+  var friendsRequests = <User>[].obs;
+  var friendsCurrentPage = 1.obs;
+  var friendsTotalPages = 1.obs;
+  var isMoreFriendsLoading = false.obs;
+
+  var blockedUsersList = <User>[].obs;
+  var currentPage = 1.obs;
+  var totalPages = 1.obs;
+  var totalUsers = 0.obs;
+  var currentSearchQuery = ''.obs; // Search query state
+  final int limit = 20;
+  final int friendsLimit = 20;
+
+  final TextEditingController searchEditingController = TextEditingController();
+  final UserServices _userServices;
+
+  final ScrollController scrollController = ScrollController();
+  UserController(this._userServices, this._socketService);
+
+  @override
+  void onInit() {
+    fetchUsers(1);
+
+    // Si ya hay un usuario al inicializar, cargar sus datos
+    if (authController.currentUser.value != null &&
+        authController.currentUser.value!.id.isNotEmpty) {
+      fetchFriends();
+      fetchRequest();
+      _initSocketConnection();
+    }
+
+    // Escuchar cambios futuros en el usuario
+    ever(authController.currentUser, (user) {
+      if (user != null && user.id.isNotEmpty) {
+        logger.i(
+          '👤 Cambio de usuario detectado en UserController, refrescando...',
+        );
+        fetchFriends();
+        fetchRequest();
+        _initSocketConnection();
+      }
+    });
+
+    super.onInit();
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent - 200) {
+        if (!isLoading.value &&
+            !isMoreLoading.value &&
+            currentPage.value < totalPages.value) {
+          loadMoreUsers();
+        }
+      }
+    });
+  }
+
+  Future<void> fetchUsers(int page) async {
+    if (page == 1) {
+      isLoading.value = true;
+    } else {
+      isMoreLoading.value = true;
+    }
+
+    try {
+      final data = await _userServices.fetchVisibleUsers(
+        page: page,
+        limit: limit,
+        query: currentSearchQuery.value,
+      );
+
+      final List<User> newUsers = data['users'];
+
+      if (page == 1) {
+        userList.assignAll(newUsers);
+      } else {
+        userList.addAll(newUsers);
+      }
+
+      currentPage.value = data['currentPage'];
+      totalPages.value = data['totalPages'];
+      totalUsers.value = data['total'];
+    } catch (e) {
+      Get.snackbar(
+        translate('common.error'),
+        translate('chat.errors.load_contacts'),
+      );
+    } finally {
+      isLoading.value = false;
+      isMoreLoading.value = false;
+    }
+  }
+
+  void loadMoreUsers() {
+    // Con el nuevo endpoint no hay paginación real, pero mantenemos el método
+    // para no romper referencias, aunque fetchUsers(>1) no hará nada.
+    if (currentPage.value < totalPages.value) {
+      fetchUsers(currentPage.value + 1);
+    }
+  }
+
+  void searchUsers(String query) async {
+    currentSearchQuery.value = query;
+    await fetchUsers(1);
+  }
+
+  Future<void> refreshUsers() async {
+    searchEditingController.clear();
+    currentSearchQuery.value = '';
+    await fetchUsers(1);
+  }
+
+  fetchUserById(String id) async {
+    try {
+      isLoading(true);
+      var user = await _userServices.fetchUserById(id);
+      selectedUser.value = user;
+    } catch (e) {
+      Get.snackbar(
+        translate('common.error'),
+        translate('common.error_occurred'),
+        snackPosition: SnackPosition.BOTTOM,
+        colorText: Colors.white,
+        backgroundColor: Colors.red,
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  updateUserByid(String id, Map<String, dynamic> newData) async {
+    try {
+      logger.i('📁 Actualizando usuario: $id');
+      isLoading(true);
+      var user = await _userServices.updateUserById(id, newData);
+      selectedUser.value = user;
+      logger.i('✅ Usuario actualizado exitosamente');
+
+      final authController = Get.find<AuthController>();
+      if (authController.currentUser.value?.id == id) {
+        authController.currentUser.value = user;
+      }
+    } catch (e) {
+      Get.snackbar(
+        translate('common.error'),
+        translate('common.error_occurred'),
+        snackPosition: SnackPosition.BOTTOM,
+        colorText: Colors.white,
+        backgroundColor: Colors.red,
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  disableUserByid(String id, password) async {
+    try {
+      isLoading(true);
+      bool disableuser = await _userServices.disableUserById(id, password);
+      if (disableuser == true) {
+        isLoading(false);
+        Get.offAllNamed('/login');
+      }
+    } catch (e) {
+      Get.snackbar(
+        translate('common.error'),
+        translate('common.error_occurred'),
+        snackPosition: SnackPosition.BOTTOM,
+        colorText: Colors.white,
+        backgroundColor: Colors.red,
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> fetchFriends({int page = 1}) async {
+    try {
+      final user = authController.currentUser.value;
+      if (user == null || user.id.isEmpty) {
+        logger.w('⚠️ No se pueden cargar amigos: ID de usuario no disponible');
+        return;
+      }
+      var id = user.id;
+      if (page == 1) {
+        isLoading.value = true;
+      } else {
+        isMoreFriendsLoading.value = true;
+      }
+
+      final data = await _userServices.fetchFriends(
+        id,
+        page: page,
+        limit: friendsLimit,
+      );
+      final List<User> newFriends = data['friends'];
+
+      if (page == 1) {
+        friendsList.assignAll(newFriends);
+      } else {
+        friendsList.addAll(newFriends);
+      }
+
+      friendsCurrentPage.value = data['currentPage'];
+      friendsTotalPages.value = data['totalPages'];
+    } catch (e) {
+      logger.e('❌ Error al cargar amigos', error: e);
+    } finally {
+      isLoading.value = false;
+      isMoreFriendsLoading.value = false;
+    }
+  }
+
+  void loadMoreFriends() {
+    if (friendsCurrentPage.value < friendsTotalPages.value &&
+        !isMoreFriendsLoading.value) {
+      fetchFriends(page: friendsCurrentPage.value + 1);
+    }
+  }
+
+  Future<void> fetchRequest() async {
+    try {
+      final user = authController.currentUser.value;
+      if (user == null || user.id.isEmpty) return;
+      var id = user.id;
+      isLoading(true);
+      logger.d('📄 Creando lista de solicitudes');
+      var friends = await _userServices.fetchRequest(id);
+      friendsRequests.assignAll(friends);
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  void acceptFriendRequest(User requester) async {
+    try {
+      final userId = authController.currentUser.value!.id;
+      await _userServices.acceptFriendRequest(userId, requester.id);
+
+      friendsRequests.removeWhere((u) => u.id == requester.id);
+      fetchFriends();
+    } catch (e) {
+      Get.snackbar(
+        translate('common.error'),
+        translate('common.error_occurred'),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  void rejectFriendRequest(User requester) async {
+    try {
+      final userId = authController.currentUser.value!.id;
+      await _userServices.rejectFriendRequest(userId, requester.id);
+
+      friendsRequests.removeWhere((u) => u.id == requester.id);
+    } catch (e) {
+      Get.snackbar(
+        translate('common.error'),
+        translate('common.error_occurred'),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  sendFriendRequest(String targetUserId) async {
+    try {
+      final userId = authController.currentUser.value!.id;
+      await _userServices.sendFriendRequest(userId, targetUserId);
+
+      // Update local user state
+      final currentUser = authController.currentUser.value!;
+      final updatedSentRequests = List<String>.from(
+        currentUser.sentRequests ?? [],
+      );
+      updatedSentRequests.add(targetUserId);
+
+      authController.currentUser.value = User(
+        id: currentUser.id,
+        username: currentUser.username,
+        gmail: currentUser.gmail,
+        birthday: currentUser.birthday,
+        profilePhoto: currentUser.profilePhoto, // Keep existing photo
+        token: currentUser.token,
+        refreshToken: currentUser.refreshToken,
+        online: currentUser.online,
+        blockedUsers: currentUser.blockedUsers,
+        sentRequests: updatedSentRequests,
+        interests: currentUser.interests,
+      );
+    } catch (e) {
+      Get.snackbar(
+        translate('common.error'),
+        translate('common.error_occurred'),
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  void _initSocketConnection() {
+    // Obtenemos el ID del usuario actual desde el AuthController
+    final userId = authController.currentUser.value?.id;
+
+    if (userId != null && userId.isNotEmpty) {
+      logger.i('🔌 Inicializando conexión Socket para $userId');
+      _socketService.connectWithUserId(userId);
+
+      // Escuchar solicitudes de amistad en tiempo real
+      _socketService.listenToFriendRequests((data) {
+        logger.i('📨 Solicitud de amistad recibida por socket: $data');
+        try {
+          final newUser = User(
+            id: data['fromUserId'],
+            username: data['fromUsername'],
+            gmail: data['fromGmail'],
+            birthday:
+                '', // No viene en el socket, pero no es crítico para la card
+          );
+
+          // Evitar duplicados
+          if (!friendsRequests.any((u) => u.id == newUser.id)) {
+            friendsRequests.add(newUser);
+          }
+        } catch (e) {
+          logger.e(
+            'Error procesando solicitud de amistad por socket',
+            error: e,
+          );
+        }
+      });
+    }
+  }
+
+  @override
+  void onClose() {
+    _socketService.stopListeningToFriendRequests();
+    // No desconectamos el socket aquí porque es un servicio global
+    // que necesitamos para las notificaciones en segundo plano.
+    super.onClose();
+  }
+
+  // --- MÉTODOS DE FOTO DE PERFIL ---
+
+  String? getFullPhotoUrl(String? photoPath) {
+    return _userServices.getFullPhotoUrl(photoPath);
+  }
+
+  Future<void> uploadProfilePhoto(String id, File imageFile) async {
+    try {
+      isLoading(true);
+      await _userServices.uploadProfilePhoto(id, imageFile);
+    } catch (e) {
+      Get.snackbar(
+        translate('common.error'),
+        translate('common.error_occurred'),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> deleteProfilePhoto(String id) async {
+    try {
+      isLoading(true);
+      await _userServices.deleteProfilePhoto(id);
+    } catch (e) {
+      Get.snackbar(
+        translate('common.error'),
+        translate('common.error_occurred'),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  // --- MÉTODOS DE BLOQUEO ---
+
+  Future<void> fetchBlockedUsers() async {
+    try {
+      isLoading(true);
+      var blocked = await _userServices.fetchBlockedUsers();
+      blockedUsersList.assignAll(blocked);
+    } catch (e) {
+      logger.e('❌ Error al cargar bloqueados', error: e);
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> blockUser(String blockId) async {
+    try {
+      isLoading(true);
+      await _userServices.blockUser(blockId);
+
+      // Eliminar de amigos localmente
+      friendsList.removeWhere((u) => u.id == blockId);
+      // Eliminar de la lista de usuarios si está ahí
+      userList.removeWhere((u) => u.id == blockId);
+
+      // Actualizar el usuario actual localmente (añadir a blockedUsers si lo tenemos)
+      final currentUser = authController.currentUser.value;
+      if (currentUser != null) {
+        List<String> newBlocked = List.from(currentUser.blockedUsers ?? []);
+        if (!newBlocked.contains(blockId)) {
+          newBlocked.add(blockId);
+          authController.currentUser.value = User(
+            id: currentUser.id,
+            username: currentUser.username,
+            gmail: currentUser.gmail,
+            birthday: currentUser.birthday,
+            profilePhoto: currentUser.profilePhoto,
+            token: currentUser.token,
+            refreshToken: currentUser.refreshToken,
+            online: currentUser.online,
+            blockedUsers: newBlocked,
+          );
+        }
+      }
+    } catch (e) {
+      Get.snackbar(
+        translate('common.error'),
+        translate('common.error_occurred'),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> unblockUser(String blockId) async {
+    try {
+      isLoading(true);
+      await _userServices.unblockUser(blockId);
+
+      blockedUsersList.removeWhere((u) => u.id == blockId);
+
+      // Actualizar el usuario actual localmente
+      final currentUser = authController.currentUser.value;
+      if (currentUser != null && currentUser.blockedUsers != null) {
+        List<String> newBlocked = List.from(currentUser.blockedUsers!);
+        newBlocked.remove(blockId);
+        authController.currentUser.value = User(
+          id: currentUser.id,
+          username: currentUser.username,
+          gmail: currentUser.gmail,
+          birthday: currentUser.birthday,
+          profilePhoto: currentUser.profilePhoto,
+          token: currentUser.token,
+          refreshToken: currentUser.refreshToken,
+          online: currentUser.online,
+          blockedUsers: newBlocked,
+        );
+      }
+    } catch (e) {
+      Get.snackbar(
+        translate('common.error'),
+        translate('common.error_occurred'),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading(false);
+    }
+  }
+}

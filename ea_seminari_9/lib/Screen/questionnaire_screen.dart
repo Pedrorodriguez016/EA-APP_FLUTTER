@@ -1,0 +1,567 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:flutter_translate/flutter_translate.dart';
+import '../Services/user_services.dart';
+import '../Controllers/eventos_controller.dart';
+import '../Controllers/auth_controller.dart';
+
+class QuestionnaireScreen extends StatefulWidget {
+  const QuestionnaireScreen({super.key});
+
+  @override
+  State<QuestionnaireScreen> createState() => _QuestionnaireScreenState();
+}
+
+class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
+  final UserServices _userServices = UserServices();
+
+  final Map<String, List<String>> _categoryMap = {
+    'SPORTS': [
+      'Fútbol',
+      'Baloncesto',
+      'Tenis',
+      'Pádel',
+      'Running',
+      'Ciclismo',
+      'Natación',
+      'Yoga',
+      'Gimnasio',
+      'Senderismo',
+      'Escalada',
+      'Artes Marciales',
+    ],
+    'MUSIC': [
+      'Concierto Rock',
+      'Concierto Pop',
+      'Concierto Clásica',
+      'Jazz',
+      'Electrónica',
+      'Hip Hop',
+      'Karaoke',
+      'Discoteca',
+      'Festival Musical',
+    ],
+    'CULTURE': [
+      'Exposición Arte',
+      'Teatro',
+      'Cine',
+      'Museo',
+      'Literatura',
+      'Fotografía',
+      'Pintura',
+      'Escultura',
+      'Danza',
+      'Ópera',
+    ],
+    'FOOD': [
+      'Restaurante',
+      'Tapas',
+      'Cocina Internacional',
+      'Vinos',
+      'Cerveza Artesanal',
+      'Repostería',
+      'Brunch',
+      'Food Truck',
+    ],
+    'SOCIAL': [
+      'Fiesta Privada',
+      'Fiesta Temática',
+      'Cumpleaños',
+      'Boda',
+      'Despedida',
+      'After Work',
+      'Networking',
+      'Speed Dating',
+    ],
+    'LEARNING': [
+      'Taller',
+      'Curso',
+      'Conferencia',
+      'Seminario',
+      'Workshop',
+      'Idiomas',
+      'Masterclass',
+    ],
+    'TECH': [
+      'Hackathon',
+      'Meetup Tech',
+      'Gaming',
+      'eSports',
+      'Programación',
+      'Inteligencia Artificial',
+      'Blockchain',
+      'Startups',
+    ],
+    'WELLNESS': [
+      'Meditación',
+      'Spa',
+      'Wellness',
+      'Mindfulness',
+      'Salud Mental',
+    ],
+    'VOLUNTEER': [
+      'Voluntariado Ambiental',
+      'Voluntariado Social',
+      'Donación de Sangre',
+      'Rescate Animal',
+      'Limpieza Playas',
+      'Banco de Alimentos',
+    ],
+    'NATURE': [
+      'Camping',
+      'Montañismo',
+      'Playa',
+      'Barbacoa',
+      'Picnic',
+      'Observación Aves',
+      'Safari',
+    ],
+    'GAMES': [
+      'Juegos de Mesa',
+      'Ajedrez',
+      'Poker',
+      'Escape Room',
+      'Paintball',
+      'Laser Tag',
+      'Bolos',
+    ],
+    'FAMILY': [
+      'Evento Familiar',
+      'Parque Infantil',
+      'Teatro Infantil',
+      'Animación Infantil',
+      'Taller Niños',
+    ],
+    'OTHER': [
+      'Mercadillo',
+      'Feria',
+      'Turismo',
+      'Excursión',
+      'Compras',
+      'Otros',
+    ],
+  };
+
+  IconData _getCategoryIcon(String category) {
+    switch (category) {
+      case 'SPORTS':
+        return Icons.sports_soccer_rounded;
+      case 'MUSIC':
+        return Icons.music_note_rounded;
+      case 'CULTURE':
+        return Icons.theater_comedy_rounded;
+      case 'FOOD':
+        return Icons.restaurant_rounded;
+      case 'SOCIAL':
+        return Icons.people_rounded;
+      case 'LEARNING':
+        return Icons.school_rounded;
+      case 'TECH':
+        return Icons.terminal_rounded;
+      case 'WELLNESS':
+        return Icons.spa_rounded;
+      case 'VOLUNTEER':
+        return Icons.volunteer_activism_rounded;
+      case 'NATURE':
+        return Icons.terrain_rounded;
+      case 'GAMES':
+        return Icons.videogame_asset_rounded;
+      case 'FAMILY':
+        return Icons.family_restroom_rounded;
+      default:
+        return Icons.more_horiz_rounded;
+    }
+  }
+
+  final List<String> _selectedInterests = [];
+  String? _expandedCategory;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadExistingInterests();
+  }
+
+  void _loadExistingInterests() {
+    if (Get.isRegistered<AuthController>()) {
+      final user = Get.find<AuthController>().currentUser.value;
+      if (user?.interests != null) {
+        setState(() {
+          _selectedInterests.addAll(user!.interests!);
+        });
+      }
+    }
+  }
+
+  bool _isCategorySelected(String category) {
+    final subInterests = _categoryMap[category] ?? [];
+    if (subInterests.isEmpty) return _selectedInterests.contains(category);
+    return subInterests.every((i) => _selectedInterests.contains(i));
+  }
+
+  void _toggleInterest(String interest) {
+    setState(() {
+      if (_categoryMap.containsKey(interest)) {
+        // Toggling a whole category
+        final subInterests = _categoryMap[interest]!;
+        final allSelected = _isCategorySelected(interest);
+
+        if (allSelected) {
+          _selectedInterests.removeWhere((i) => subInterests.contains(i));
+        } else {
+          for (final i in subInterests) {
+            if (!_selectedInterests.contains(i)) {
+              _selectedInterests.add(i);
+            }
+          }
+        }
+      } else {
+        // Toggling a single sub-interest
+        if (_selectedInterests.contains(interest)) {
+          _selectedInterests.remove(interest);
+        } else {
+          _selectedInterests.add(interest);
+        }
+      }
+    });
+  }
+
+  void _toggleCategory(String category) {
+    setState(() {
+      if (_expandedCategory == category) {
+        _expandedCategory = null;
+      } else {
+        _expandedCategory = category;
+      }
+    });
+  }
+
+  Future<void> _saveInterests() async {
+    if (_selectedInterests.isEmpty) {
+      Get.snackbar(
+        translate('common.error'),
+        translate('questionnaire.errors.select_least_one'),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    final success = await _userServices.updateInterests(_selectedInterests);
+
+    if (success) {
+      // Refrescar datos del usuario en el AuthController
+      if (Get.isRegistered<AuthController>()) {
+        await Get.find<AuthController>().fetchCurrentUser();
+      }
+
+      if (Get.isRegistered<EventoController>()) {
+        Get.find<EventoController>().fetchRecommended();
+      }
+
+      setState(() => _isLoading = false);
+      Get.offAllNamed('/home');
+    } else {
+      setState(() => _isLoading = false);
+      Get.snackbar(
+        translate('common.error'),
+        translate('questionnaire.errors.save_failed'),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              context.theme.colorScheme.primary.withValues(alpha: 0.8),
+              context.theme.colorScheme.secondary.withValues(alpha: 0.9),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildHeader(context),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: context.theme.scaffoldBackgroundColor,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(32),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 24),
+                      _buildSelectedCount(context),
+                      Expanded(
+                        child: ListView(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          children: _categoryMap.keys
+                              .map((cat) => _buildCategorySection(context, cat))
+                              .toList(),
+                        ),
+                      ),
+                      _buildBottomActions(context),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.auto_awesome, color: Colors.white, size: 28),
+              const SizedBox(width: 12),
+              Text(
+                translate('questionnaire.title'),
+                style: context.textTheme.headlineSmall?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            translate('questionnaire.subtitle'),
+            style: context.textTheme.bodyMedium?.copyWith(
+              color: Colors.white.withValues(alpha: 0.9),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSelectedCount(BuildContext context) {
+    if (_selectedInterests.isEmpty) return const SizedBox();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: context.theme.colorScheme.primary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Text(
+          translate(
+            'questionnaire.selected_count',
+            args: {'count': _selectedInterests.length},
+          ),
+          style: TextStyle(
+            color: context.theme.colorScheme.primary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategorySection(BuildContext context, String category) {
+    final isExpanded = _expandedCategory == category;
+    final subInterests = _categoryMap[category]!;
+    final selectedInCat = subInterests
+        .where((i) => _selectedInterests.contains(i))
+        .length;
+
+    return Column(
+      children: [
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 4),
+          decoration: BoxDecoration(
+            color: isExpanded
+                ? context.theme.colorScheme.primary.withValues(alpha: 0.05)
+                : context.theme.cardColor,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isExpanded
+                  ? context.theme.colorScheme.primary
+                  : context.theme.dividerColor.withValues(alpha: 0.5),
+            ),
+          ),
+          child: Row(
+            children: [
+              // Botón de selección para la categoría general
+              IconButton(
+                onPressed: () => _toggleInterest(category),
+                icon: Icon(
+                  _isCategorySelected(category)
+                      ? Icons.check_circle_rounded
+                      : Icons.radio_button_unchecked_rounded,
+                  color: _isCategorySelected(category)
+                      ? context.theme.colorScheme.primary
+                      : context.theme.hintColor.withValues(alpha: 0.5),
+                ),
+                tooltip: translate(
+                  'questionnaire.select_all',
+                  args: {'category': translate('categories.$category')},
+                ),
+              ),
+              Expanded(
+                child: InkWell(
+                  onTap: () => _toggleCategory(category),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              _getCategoryIcon(category),
+                              size: 18,
+                              color: _isCategorySelected(category)
+                                  ? context.theme.colorScheme.primary
+                                  : context.theme.hintColor,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              translate('categories.$category'),
+                              style: context.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: _isCategorySelected(category)
+                                    ? context.theme.colorScheme.primary
+                                    : null,
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (selectedInCat > 0)
+                          Text(
+                            _isCategorySelected(category)
+                                ? translate(
+                                    'questionnaire.category_all_selected',
+                                  )
+                                : translate(
+                                    'questionnaire.sub_interests_selected',
+                                    args: {'count': selectedInCat},
+                                  ),
+                            style: context.textTheme.bodySmall?.copyWith(
+                              color: context.theme.colorScheme.primary,
+                              fontSize: 10,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: () => _toggleCategory(category),
+                icon: Icon(
+                  isExpanded ? Icons.expand_less : Icons.expand_more,
+                  color: context.theme.hintColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (isExpanded)
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: subInterests.map((interest) {
+                final isSelected = _selectedInterests.contains(interest);
+                return FilterChip(
+                  label: Text(translate('categories.$interest')),
+                  selected: isSelected,
+                  onSelected: (_) => _toggleInterest(interest),
+                  selectedColor: context.theme.colorScheme.primary.withValues(
+                    alpha: 0.2,
+                  ),
+                  checkmarkColor: context.theme.colorScheme.primary,
+                  backgroundColor: context.theme.cardColor,
+                  labelStyle: TextStyle(
+                    color: isSelected
+                        ? context.theme.colorScheme.primary
+                        : context.theme.colorScheme.onSurface,
+                    fontWeight: isSelected
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: BorderSide(
+                      color: isSelected
+                          ? context.theme.colorScheme.primary
+                          : context.theme.dividerColor,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildBottomActions(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton(
+              onPressed: _isLoading ? null : _saveInterests,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: context.theme.colorScheme.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 4,
+              ),
+              child: _isLoading
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : Text(
+                      translate('questionnaire.save_btn'),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextButton(
+            onPressed: () => Get.offAllNamed('/home'),
+            child: Text(
+              translate('questionnaire.skip_btn'),
+              style: TextStyle(color: context.theme.hintColor),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

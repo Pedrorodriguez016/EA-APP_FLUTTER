@@ -1,0 +1,66 @@
+class User {
+  final String id;
+  final String username;
+  final String gmail;
+  final String birthday;
+  final String? profilePhoto;
+  final String? password;
+  final String? token;
+  final String? refreshToken;
+  final bool? online;
+  final List<String>? blockedUsers;
+  final List<String>? sentRequests;
+  final List<String>? interests;
+
+  User({
+    required this.id,
+    required this.username,
+    required this.gmail,
+    required this.birthday,
+    this.profilePhoto,
+    this.online,
+    this.password,
+    this.token,
+    this.refreshToken,
+    this.blockedUsers,
+    this.sentRequests,
+    this.interests,
+  });
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      id: (json['_id'] ?? json['id'] ?? '').toString().trim(),
+      username: json['username'] ?? '',
+      gmail: json['gmail'] ?? '',
+      birthday: json['birthday'] ?? '',
+      profilePhoto: json['profilePhoto'],
+      token: json['token'],
+      refreshToken: json['refreshToken'],
+      online: json['online'],
+      blockedUsers: json['blockedUsers'] != null
+          ? List<String>.from(json['blockedUsers'])
+          : null,
+      sentRequests: json['sentRequests'] != null
+          ? List<String>.from(json['sentRequests'])
+          : null,
+      interests: json['interests'] != null
+          ? List<String>.from(json['interests'])
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'username': username,
+      'gmail': gmail,
+      'password': password,
+      'birthday': birthday,
+      'profilePhoto': profilePhoto,
+      'online': online,
+      'blockedUsers': blockedUsers,
+      'sentRequests': sentRequests,
+      'interests': interests,
+    };
+  }
+}

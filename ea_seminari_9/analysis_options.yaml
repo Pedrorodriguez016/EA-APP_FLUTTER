@@ -1,0 +1,15 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # Prohibido utilizar print
+    avoid_print: true
+
+    # Obligatorio utilizar keys en todos los constructores de widgets
+    use_key_in_widget_constructors: true
+
+    # Ordena propiedades de widgets: child/children al final (mejor legibilidad)
+    sort_child_properties_last: true
+
+    # Prefiere comillas simples '' sobre dobles ""
+    prefer_single_quotes: true
